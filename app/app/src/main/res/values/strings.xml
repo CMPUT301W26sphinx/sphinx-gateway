@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Event Lottery System</string>
+    <string name="event_description_title">Event Description:</string>
+    <string name="event_reg_title">Event Registration Period:</string>
+    <string name="event_waitnum_title">Waiting List Count:</string>
+    <string name="backbutton">Back</string>
+    <string name="registerbutton">Register</string>
+    <string name="removebutton">Remove</string>
 </resources>
