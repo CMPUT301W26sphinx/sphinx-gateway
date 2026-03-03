@@ -13,17 +13,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.WaitlistFirebase;
 import com.example.eventlotterysystem.model.WaitlistEntry;
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 /**
  * A simple {@link Fragment} subclass.
  * EventDetailsFragment displays details for a selected event, as well as provides buttons for registering and removing participants.
  * Details such as poster, description, registration period, and waitlist count are displayed (and are collected from firestore database)
- *
- *
  */
 public class EventDetailsFragment extends Fragment {
-
+    // TODO: add count logic US 01.05.04
+    // TODO: Array adapter for other fragment logic US 01.01.03
+    // TODO: Add the popup about event info for US 01.05.05
     private static final String EVENT_ID = "event_id";
 
     // UI elements (buttons, text views, etc.)
@@ -39,8 +41,10 @@ public class EventDetailsFragment extends Fragment {
     //Firestore data for these variables
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
+    // for button switch logic
+    private boolean isOnlist; // True if the entrant is on the waitlist, false otherwise
 
-    private boolean isOnlist = false; // Indicates if the user has already pressed register, placeholder
+    private final WaitlistFirebase waitlistDb = new WaitlistFirebase();
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -114,20 +118,39 @@ public class EventDetailsFragment extends Fragment {
         backButton = view.findViewById(R.id.backbutton);
         registerButton = view.findViewById(R.id.registerbutton);
 
+        // get the id
         Bundle args = getArguments();
         if (args != null) {
             eventId = args.getString(EVENT_ID);
         }
-
+        // based on current main logic in branch feature/01.07.01-user-authentication
+        // anon auth https://firebase.google.com/docs/auth/android/anonymous-auth?_gl=1*5z5vr9*_up*MQ..*_ga*MTk5ODcwOTI2Mi4xNzcyNDg3MDgy*_ga_CW55HF8NVT*czE3NzI0ODcwODIkbzEkZzAkdDE3NzI0ODcwODIkajYwJGwwJGgw#java
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            entrantId = user.getUid();
+        }
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ...
+                if (!isOnlist) {
+                    WaitlistEntry entry = new WaitlistEntry(eventId, entrantId);
+                    waitlistDb.updateWaitlist(eventId, entry).addOnSuccessListener(unused -> {
+                        isOnlist = true;
+                        updateRegisterButton();
+                    });
+                } else {
+                    waitlistDb.removeWaitlistEntry(eventId, entrantId).addOnSuccessListener(unused -> {
+                        isOnlist = false;
+                        updateRegisterButton();
+                    });
+                }
+
             }
         });
 
         backButton.setOnClickListener(new View.OnClickListener() {
+            // back button ui may be able to be removed? https://developer.android.com/guide/navigation/custom-back
             @Override
             public void onClick(View v) {
                 requireActivity().onBackPressed();
@@ -142,7 +165,23 @@ public class EventDetailsFragment extends Fragment {
                 //TODO
             }
         });
+        initializeUI();
     }
+
+        /**
+         * This method is used to initialize the UI elements for the event details fragment
+         * based on if the entrant is on the waitlist or not, as the button text will be changed.
+         */
+        private void initializeUI() {
+            waitlistDb.isEntrantInWaitlist(eventId, entrantId).addOnSuccessListener(result -> {
+                isOnlist = result;
+                updateRegisterButton();
+            })
+            .addOnFailureListener(e -> {
+                isOnlist = false;
+                updateRegisterButton();
+            });
+        }
 
     /**
      * Updates register button label based on registration state.
@@ -150,6 +189,6 @@ public class EventDetailsFragment extends Fragment {
      * No parameters or returns.
     */
     private void updateRegisterButton() {
-
+        registerButton.setText(isOnlist ? "Remove" : "Register");
     }
 }
