@@ -26,6 +26,7 @@ public class EventDetailsFragment extends Fragment {
     // TODO: add count logic US 01.05.04
     // TODO: Array adapter for other fragment logic US 01.01.03
     // TODO: Add the popup about event info for US 01.05.05
+    // TODO: show event specific info on fragment
     private static final String EVENT_ID = "event_id";
 
     // UI elements (buttons, text views, etc.)
