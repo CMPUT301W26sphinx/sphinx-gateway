@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.model.WaitlistEntry;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,7 +24,7 @@ import com.example.eventlotterysystem.R;
  */
 public class EventDetailsFragment extends Fragment {
 
-    private static final EVENT_ID = "event_id";
+    private static final String EVENT_ID = "event_id";
 
     // UI elements (buttons, text views, etc.)
     private TextView eventTitle;
@@ -37,25 +38,68 @@ public class EventDetailsFragment extends Fragment {
 
     //Firestore data for these variables
     private String eventId; // Unique identifier for the event
-    private boolean isOnlist = False; // Indicates if the user has already pressed register, placeholder
+    private String entrantId; // Unique identifier for the entrant
 
+    private boolean isOnlist = false; // Indicates if the user has already pressed register, placeholder
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public EventDetailsFragment() {
+        // Required empty public constructor
     }
 
-    @Override
+    /**
+     *Create Event Details fragment for specific event with eventId
+     * @param eventId
+     *  The unique identifier for the event
+     * @return fragment
+     *  A new instance of EventDetailsFragment
+     */
+    public static EventDetailsFragment newInstance(String eventId) {
+        /*
+         Author: RobinHood https://stackoverflow.com/users/646806/robinhood
+         Title: "How can I transfer data from one fragment to another fragment android"
+         Answer: https://stackoverflow.com/a/19333288
+         Date: Oct 12, 2013
+         */
+        EventDetailsFragment fragment = new EventDetailsFragment();
+        Bundle args = new Bundle();
+        args.putString(EVENT_ID, eventId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     * Default from fragment creation.
+     * @param inflater
+     *  The LayoutInflater object that can be used to inflate
+     *  any views in the fragment,
+     * @param container
+     *  If non-null, this is the parent view that the fragment's
+     *  UI should be attached to.  The fragment should not add the view itself,
+     *  but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState
+     *  If non-null, this fragment is being re-constructed
+     *  from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
+   @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_event_details, container, false);
     }
 
+    /**
+     * Called immediately after {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}
+     * has returned, but before any saved state has been restored in to the view.
+     * This gives subclasses a chance to initialize themselves once
+     * they know their view hierarchy has been completely created.
+     * @param view
+     *  The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+     * @param savedInstanceState
+     *  If non-null, this fragment is being re-constructed
+     *  from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -70,7 +114,11 @@ public class EventDetailsFragment extends Fragment {
         backButton = view.findViewById(R.id.backbutton);
         registerButton = view.findViewById(R.id.registerbutton);
 
-        loadEventData() // get stuff from firestore
+        Bundle args = getArguments();
+        if (args != null) {
+            eventId = args.getString(EVENT_ID);
+        }
+
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,7 +130,7 @@ public class EventDetailsFragment extends Fragment {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().onBackPressed();
+                requireActivity().onBackPressed();
             }
         });
 
@@ -102,14 +150,6 @@ public class EventDetailsFragment extends Fragment {
      * No parameters or returns.
     */
     private void updateRegisterButton() {
-        if (isRegistered) {
-            registerButton.setText(R.string.removebutton);
-        } else {
-            registerButton.setText(R.string.registerbutton);
-        }
-    }
 
-    private void loadEventData(String eventId){
-        // TODO
     }
 }
