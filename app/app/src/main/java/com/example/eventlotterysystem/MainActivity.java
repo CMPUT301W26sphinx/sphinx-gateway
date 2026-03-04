@@ -18,9 +18,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private UserProfile currentProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +36,9 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        // loads database and auth for firebase
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         // sign in the user
         mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
