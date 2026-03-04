@@ -7,22 +7,19 @@ import java.util.Date;
 
 public class Event implements Serializable {
     // - Event Base? -
-    private Integer EventID;
+    private String EventID;
 
     // - Front Info Of The Event -
     private String eventName;
     private String eventDescription;
     private int capacity;
-    private Date registrationStartTime;
+    private Date registrationStartDate;
 
     // TODO: private something like photo event?
 
     // Construct new Event
     Event(String eventName) {
         this.eventName = eventName;
-        this.eventDescription = "";
-        this.capacity = 0; //baseline capacity, can be changed later
-
     }
 
     // Getters
