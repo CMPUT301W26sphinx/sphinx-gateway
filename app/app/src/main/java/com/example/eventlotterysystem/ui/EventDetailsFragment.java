@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.WaitlistFirebase;
@@ -141,7 +142,7 @@ public class EventDetailsFragment extends Fragment {
                         isOnlist = true;
                         updateRegisterButton();
                         refreshWaitlistCount();
-                        // TODO US 01.06.02: Show confirmation Toast ("Joined waiting list")
+                        Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
                         // TODO: Add event to entrant profile event list once profile system exists.
 
                     });
@@ -151,7 +152,7 @@ public class EventDetailsFragment extends Fragment {
                         isOnlist = false;
                         updateRegisterButton();
                         refreshWaitlistCount();
-                        // TODO: Show confirmation Toast ("Removed from waiting list")
+                        Toast.makeText(getContext(), "Removed from waiting list", Toast.LENGTH_SHORT).show();
                         // TODO: Remove event from entrant profile list once profile system exists.
 
                     });
