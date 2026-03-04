@@ -1,20 +1,19 @@
 package com.example.eventlotterysystem;
 
-import android.security.identity.IdentityCredentialStore;
-
 import java.io.Serializable;
+import java.time.DateTimeException;
 import java.util.Date;
+import java.util.UUID;
 
 public class Event implements Serializable {
     // - Event Base? -
-    private Integer EventID;
-
+    private String eventID;
     // - Front Info Of The Event -
     private String eventName;
     private String eventDescription;
     private int capacity;
-    private Date registrationStartTime;
-
+    private Date registrationStartDate;
+    private DateTimeException registrationStartTime;
     // TODO: private something like photo event?
 
     // Construct new Event
@@ -22,7 +21,7 @@ public class Event implements Serializable {
         this.eventName = eventName;
         this.eventDescription = "";
         this.capacity = 0; //baseline capacity, can be changed later
-
+        this.eventID = UUID.randomUUID().toString(); //change it later? random uuid generator according to java doc
     }
 
     // Getters
@@ -37,6 +36,9 @@ public class Event implements Serializable {
     public Integer getCapacity() {
         return capacity;
     }
+    public String getEventID() {
+        return eventID;
+        }
 
     // Setters
     public void setName(String name) {
