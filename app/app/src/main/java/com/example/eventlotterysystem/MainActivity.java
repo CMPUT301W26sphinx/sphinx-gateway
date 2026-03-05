@@ -55,5 +55,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // create new UserProfile
+        assert mAuth.getCurrentUser() != null;
+        String uid = mAuth.getCurrentUser().getUid();
+        UserProfile userProfile = new UserProfile(uid);
+        // update the user in firebase
+        ProfileManager profileManager = new ProfileManager();
+        profileManager.saveUser(userProfile);
+
     }
 }
