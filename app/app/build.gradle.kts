@@ -48,17 +48,16 @@ dependencies {
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
-<<<<<<< HEAD
     implementation("com.google.firebase:firebase-firestore")
-=======
 
     // QR Code dependancies - google based dependancies
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
     // Camera dependencies
-    implementation("androidx.camera:camera-core:1.3.4")
-    implementation("androidx.camera:camera-camera2:1.3.4")
-    implementation("androidx.camera:camera-lifecycle:1.3.4")
-    implementation("androidx.camera:camera-view:1.3.4")
->>>>>>> e74ffb1 (basic dependancies)
-}
+
+    // CameraX Dependencies
+    val camerax_version = "1.5.3"
+    implementation("androidx.camera:camera-camera2:${camerax_version}")
+    implementation("androidx.camera:camera-lifecycle:${camerax_version}")
+    implementation("androidx.camera:camera-view:1.0.0-alpha30")
+    implementation("androidx.camera:camera-mlkit-vision:1.3.4")
