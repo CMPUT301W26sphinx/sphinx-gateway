@@ -18,7 +18,8 @@ public class ProfileManager {
     }
 
     /**
-     * Saves the desired user into firebase if they do no exist already.
+     * Saves the desired user into firebase if they do no exist already. If they
+     * already exist, updates the information.
      * Note: the userID is the key for the document in firebase.
      * @param user the user profile that you want to save
      */

@@ -1,41 +1,107 @@
 package com.example.eventlotterysystem;
 
 import java.io.Serializable;
-import java.util.UUID;
 
+/**
+ * Stores and manages the information for a user profile
+ */
 public class UserProfile implements Serializable {
-    private String profileID;
-    private String userName;
-    private String userEmail;
-    private Long userPhone;
+    private String userID;
+    private String name;
+    private String email;
+    private String phoneNumber;
+    private boolean receiveNotifications; // notification preference
 
     // private role userRole; //need role class, entrant, organizer, or whatever
-    private boolean notification_preference;
 
     // Construct
-    UserProfile (String profileID){
-        this.profileID = profileID;
+    UserProfile(String userID) {
+        this.userID = userID;
     }
 
     // Setters
-    public void setUserName (String userName){
-        this.userName = userName;
+
+    /**
+     * Update the users name
+     *
+     * @param userName
+     */
+    public void setUserName(String userName) {
+        this.name = userName;
     }
-    public void setUserEmail (String userEmail){
-        this.userEmail = userEmail;
+
+    /**
+     * Update the users email
+     *
+     * @param userEmail
+     */
+    public void setUserEmail(String userEmail) {
+        this.email = userEmail;
     }
-    public void setUserPhone (Long userPhone){
-        this.userPhone = userPhone;
+
+    /**
+     * Update the users phone number
+     *
+     * @param userPhone
+     */
+    public void setUserPhoneNumber(String userPhone) {
+        this.phoneNumber = userPhone;
     }
-    public void setNotification_preference(boolean choice){
-        this.notification_preference = choice;
+
+    /**
+     * Update the users notifcation preference
+     *
+     * @param choice
+     */
+    public void setReceiveNotifications(boolean choice) {
+        this.receiveNotifications = choice;
     }
 
     // Getters
-    public String getUserName (){
-        return userName;
+
+    /**
+     * Get the users stored name
+     *
+     * @return
+     */
+    public String getUserName() {
+        return name;
     }
-    public String getProfileID(){
-        return profileID;
+
+    /**
+     * Get the users userID (UID)
+     *
+     * @return
+     */
+    public String getProfileID() {
+        return userID;
     }
+
+    /**
+     * Update the users stored phone number
+     *
+     * @return
+     */
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * Update the users stored email address
+     *
+     * @return
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Returns notification preference
+     * @return
+     */
+    public boolean getNotificationPreference(){
+        return receiveNotifications;
+    }
+
+
 }
