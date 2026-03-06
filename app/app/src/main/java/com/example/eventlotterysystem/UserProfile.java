@@ -15,12 +15,15 @@ public class UserProfile implements Serializable {
     // private role userRole; //need role class, entrant, organizer, or whatever
 
     // Construct
-    UserProfile(String userID) {
+    public UserProfile() {
+
+    }
+
+    public UserProfile(String userID) {
         this.userID = userID;
     }
 
     // Setters
-
     /**
      * Update the users name
      *
@@ -97,9 +100,10 @@ public class UserProfile implements Serializable {
 
     /**
      * Returns notification preference
+     *
      * @return
      */
-    public boolean getNotificationPreference(){
+    public boolean getNotificationPreference() {
         return receiveNotifications;
     }
 
