@@ -38,7 +38,7 @@
         <View
             android:layout_width="240dp"
             android:layout_height="240dp"
-            android:background="@drawable/qr_scan_frame" />
+            android:background="@drawable/qrscanframe" />
 
     </LinearLayout>
 
