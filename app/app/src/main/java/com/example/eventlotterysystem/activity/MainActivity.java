@@ -45,15 +45,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    // Sign in success
                     Log.d(TAG, "signInAnonymously:success");
+
                     FirebaseUser user = mAuth.getCurrentUser();
+                    String uid = user.getUid();
+
+                    // create profile
+                    UserProfile userProfile = new UserProfile(uid);
+
+                    // save to Firestore
+                    ProfileManager profileManager = new ProfileManager();
+                    profileManager.saveUser(userProfile);
+
                 } else {
-                    // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInAnonymously:failure", task.getException());
-                    // Toast.makeText(AnonymousAuthActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+
+
     }
 }
