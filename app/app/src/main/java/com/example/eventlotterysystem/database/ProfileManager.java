@@ -1,5 +1,6 @@
-package com.example.eventlotterysystem;
+package com.example.eventlotterysystem.database;
 
+import com.example.eventlotterysystem.model.profiles.UserProfile;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;

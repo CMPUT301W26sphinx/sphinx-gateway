@@ -1,4 +1,4 @@
-package com.example.eventlotterysystem.activities.admin;
+package com.example.eventlotterysystem.activity.admin;
 
 import android.os.Bundle;
 
