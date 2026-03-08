@@ -1,4 +1,4 @@
-package com.example.eventlotterysystem.activity;
+package com.example.eventlotterysystem.UI.activity;
 
 import static android.content.ContentValues.TAG;
 
