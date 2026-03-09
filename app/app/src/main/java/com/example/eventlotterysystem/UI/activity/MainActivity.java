@@ -1,4 +1,4 @@
-package com.example.eventlotterysystem;
+package com.example.eventlotterysystem.UI.activity;
 
 import static android.content.ContentValues.TAG;
 
@@ -13,6 +13,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.ProfileManager;
+import com.example.eventlotterysystem.model.profiles.UserProfile;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;

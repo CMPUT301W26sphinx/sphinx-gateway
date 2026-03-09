@@ -1,4 +1,4 @@
-package com.example.eventlotterysystem;
+package com.example.eventlotterysystem.model.profiles;
 
 import java.io.Serializable;
 

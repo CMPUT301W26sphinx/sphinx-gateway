@@ -16,7 +16,7 @@
         <activity android:name=".activities.admin.AdminEventDetailActivity" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".UI.activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

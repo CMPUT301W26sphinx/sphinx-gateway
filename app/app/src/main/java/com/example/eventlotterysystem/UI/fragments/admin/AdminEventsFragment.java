@@ -10,7 +10,7 @@ import android.widget.Button;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
-import com.example.eventlotterysystem.activities.admin.AdminEventDetailActivity;
+import com.example.eventlotterysystem.activity.admin.AdminEventDetailActivity;
 
 /**
  * Fragment that displays the admin Events page.
