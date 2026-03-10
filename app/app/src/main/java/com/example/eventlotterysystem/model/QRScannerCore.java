@@ -28,6 +28,12 @@ public class QRScannerCore {
     private final BarcodeScanner barcodeScanner;
     private boolean resultDelivered = false;
 
+    /**
+     * QRScannerCore — handles all QR scanning logic using CameraX and ML Kit
+     * <a href="https://github.com/android/camera-samples/tree/main/CameraX-MLKit">...</a>
+     * @param context
+     * @param listener
+     */
     public QRScannerCore(Context context, OnQRScannedListener listener) {
         this.context = context.getApplicationContext();
         this.listener = listener;
@@ -37,7 +43,6 @@ public class QRScannerCore {
                 .build();
         barcodeScanner = BarcodeScanning.getClient(options);
     }
-
     public void attach(LifecycleCameraController cameraController, LifecycleOwner lifecycleOwner) {
         resultDelivered = false;
 
@@ -63,13 +68,14 @@ public class QRScannerCore {
                 )
         );
     }
-
-
     public void detach(LifecycleCameraController cameraController) {
         cameraController.clearImageAnalysisAnalyzer();
         barcodeScanner.close();
     }
 
+    /**
+     * reset, when called means that QR needs to be scanned again as it's invalid.
+     */
     public void reset() {
         resultDelivered = false;
     }
