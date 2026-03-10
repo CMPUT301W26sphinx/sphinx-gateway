@@ -4,16 +4,21 @@ package com.example.eventlotterysystem.model;
  * This class is used to represent an entry in the waitlist for an event.
  *Stored in Firestore
  */
-public class WaitlistEntry {
+public class EntrantListEntry {
+    public static final int STATUS_WAITLIST = 1;
+    public static final int STATUS_INVITED = 2;
+    public static final int STATUS_REGISTERED = 3;
+    public static final int STATUS_CANCELLED_OR_REJECTED = 4;
+
     private String eventId;
     private String entrantId;
 
-    private String status; // for invited, etc before going to registered status
+    private int status; // for invited, etc before going to registered status
 
     /**
      * empty consructor used by firestore
      */
-    public WaitlistEntry() {
+    public EntrantListEntry() {
     }
     /**
      * constructor used by app to create a new waitlist entry
@@ -22,10 +27,10 @@ public class WaitlistEntry {
      * @param entrantId
      *  The id of the entrant to add to the waitlist.
      */
-    public WaitlistEntry(String eventId, String entrantId) {
+    public EntrantListEntry(String eventId, String entrantId) {
         this.eventId = eventId;
         this.entrantId = entrantId;
-        this.status = "WAITLIST";
+        this.status = STATUS_WAITLIST;
     }
     /**
      * constructor used by app to create a new waitlist entry
@@ -34,9 +39,9 @@ public class WaitlistEntry {
      * @param entrantId
      *  The id of the entrant to add to the waitlist.
      * @param status
-     *  The status of the waitlist entry.(WAITLIST, INVITED, etc.)
+     *  The status of the waitlist entry.(1-WAITLIST, 2-INVITED, etc.)
      */
-    public WaitlistEntry(String eventId, String entrantId, String status) {
+    public EntrantListEntry(String eventId, String entrantId, int status) {
         this.eventId = eventId;
         this.entrantId = entrantId;
         this.status = status;
@@ -66,7 +71,7 @@ public class WaitlistEntry {
      * @return status
      *  The status of the waitlist entry.(WAITLIST, INVITED, etc.)
      */
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -76,7 +81,7 @@ public class WaitlistEntry {
      * @param status
      *  The status of the waitlist entry.(WAITLIST, INVITED, etc.)
      */
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

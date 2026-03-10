@@ -2,7 +2,7 @@ package com.example.eventlotterysystem.database;
 
 import androidx.annotation.NonNull;
 
-import com.example.eventlotterysystem.model.WaitlistEntry;
+import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -12,7 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * This class is used to represent the waitlist for an event.
  *Contains logic for updating waitlist to the firestore db.
  */
-public class WaitlistFirebase {
+public class EntrantListFirebase {
     // See https://firebase.google.com/docs/firestore/quickstart#java
     // and https://firebase.google.com/docs/reference/android/com/google/firebase/ml/common/modeldownload/FirebaseModelManager
     // For documentation referenced for this implementation
@@ -26,7 +26,7 @@ public class WaitlistFirebase {
      */
     // lab 5, and https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
     private CollectionReference waitlistRef(@NonNull String eventId) {
-        return db.collection("events").document(eventId).collection("waitlist");
+        return db.collection("Events").document(eventId).collection("EntrantList");
     }// in events, go to specific event, then to waitlist
 
     /**
@@ -34,7 +34,7 @@ public class WaitlistFirebase {
      * @param eventId The id of the event to update the waitlist for.
      * @param entry The entry to add to the waitlist.
     **/
-    public Task<Void> updateWaitlist(@NonNull String eventId, @NonNull WaitlistEntry entry) {
+    public Task<Void> updateWaitlist(@NonNull String eventId, @NonNull EntrantListEntry entry) {
         return waitlistRef(eventId).document(entry.getEntrantId()).set(entry);
     }
 

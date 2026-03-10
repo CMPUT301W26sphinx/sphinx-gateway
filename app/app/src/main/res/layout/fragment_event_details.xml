@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.EventDetailsFragment">
+    tools:context=".UI.fragments.EventDetailsFragment">
 
     <TextView
         android:id="@+id/eventTitle"
@@ -36,13 +36,13 @@
 
     <ImageView
         android:id="@+id/eventposter"
-        android:layout_width="196dp"
-        android:layout_height="248dp"
-        android:layout_marginTop="68dp"
+        android:layout_width="158dp"
+        android:layout_height="202dp"
+        android:layout_marginTop="20dp"
         android:contentDescription="No Event Poster Uploaded"
         android:src="@drawable/ic_emptyimageplaceholder"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/eventInfoColumn" />
 
@@ -57,6 +57,40 @@
         app:layout_constraintTop_toBottomOf="@+id/eventTitle">
 
         <!-- Description -->
+        <TextView
+            android:id="@+id/labelStartTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/event_starttime_title"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/valueStartTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp"
+            android:text="Placeholder"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/labelLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/event_location_title"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/valueLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp"
+            android:text="Placeholder description from Firestore."
+            android:textSize="14sp" />
+
         <TextView
             android:id="@+id/labelDescription"
             android:layout_width="match_parent"

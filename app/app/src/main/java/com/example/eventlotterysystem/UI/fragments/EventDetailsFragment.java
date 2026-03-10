@@ -1,4 +1,4 @@
-package com.example.eventlotterysystem.ui;
+package com.example.eventlotterysystem.UI.fragments;
 
 import android.os.Bundle;
 
@@ -14,8 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
-import com.example.eventlotterysystem.database.WaitlistFirebase;
-import com.example.eventlotterysystem.model.WaitlistEntry;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 /**
@@ -25,8 +25,8 @@ import com.google.firebase.auth.FirebaseUser;
  */
 public class EventDetailsFragment extends Fragment {
     // TODO: Array adapter for other fragment logic US 01.01.03
+    // TODO: add event details load in once event firebase and class is set up
     // TODO: Add the popup about event info for US 01.05.05
-    // TODO: maybe add satefty mechanisms for if somehow eventid or entrantid is null returned
     private static final String EVENT_ID = "event_id";
 
     // UI elements (buttons, text views, etc.)
@@ -34,6 +34,8 @@ public class EventDetailsFragment extends Fragment {
     private TextView valueDescription;
     private TextView valueRegistration;
     private TextView valueWaitlistCount;
+    private TextView valueStarttime;
+    private TextView valueLocation;
     private ImageView eventPoster;
     private ImageButton infoButton;
     private Button backButton;
@@ -45,7 +47,7 @@ public class EventDetailsFragment extends Fragment {
     // for button switch logic
     private boolean isOnlist; // True if the entrant is on the waitlist, false otherwise
 
-    private final WaitlistFirebase waitlistDb = new WaitlistFirebase();
+    private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -114,6 +116,9 @@ public class EventDetailsFragment extends Fragment {
         valueDescription = view.findViewById(R.id.valueDescription);
         valueRegistration = view.findViewById(R.id.valueRegistration);
         valueWaitlistCount = view.findViewById(R.id.valueWaitlistCount);
+        valueStarttime = view.findViewById(R.id.valueStartTime);
+        valueLocation = view.findViewById(R.id.valueLocation);
+        valueLocation = view.findViewById(R.id.valueLocation);
         eventPoster = view.findViewById(R.id.eventposter);
         infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
@@ -137,23 +142,26 @@ public class EventDetailsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (!isOnlist) {
-                    WaitlistEntry entry = new WaitlistEntry(eventId, entrantId);
+                    EntrantListEntry entry = new EntrantListEntry(eventId, entrantId);
                     waitlistDb.updateWaitlist(eventId, entry).addOnSuccessListener(unused -> {
                         isOnlist = true;
                         updateRegisterButton();
                         refreshWaitlistCount();
                         Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
-                        // TODO: Add event to entrant profile event list once profile system exists.
-
+                        }).addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error joining waiting list", Toast.LENGTH_SHORT).show();
                     });
+                    // TODO: Add event to entrant myevents UI when worked on
                 } else {
                     waitlistDb.removeWaitlistEntry(eventId, entrantId).addOnSuccessListener(unused -> {
-                        // TODO US 01.05.03: Prevent removal if registration deadline has passed (requires event registration logic).
+                        // TODO US 01.05.03
                         isOnlist = false;
                         updateRegisterButton();
                         refreshWaitlistCount();
                         Toast.makeText(getContext(), "Removed from waiting list", Toast.LENGTH_SHORT).show();
-                        // TODO: Remove event from entrant profile list once profile system exists.
+                        }).addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error removing from waiting list", Toast.LENGTH_SHORT).show();
+                        // TODO: Remove? event to entrant myevents UI when worked on
 
                     });
                 }
@@ -165,7 +173,7 @@ public class EventDetailsFragment extends Fragment {
             // back button ui may be able to be removed? https://developer.android.com/guide/navigation/custom-back
             @Override
             public void onClick(View v) {
-                requireActivity().onBackPressed();
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
             }
         });
 
@@ -193,13 +201,9 @@ public class EventDetailsFragment extends Fragment {
                 isOnlist = false;
                 updateRegisterButton();
             });
+            refreshWaitlistCount();
+            };
 
-            // button count
-            waitlistDb.getWaitlistCount(eventId).addOnSuccessListener(result -> {
-                valueWaitlistCount.setText(String.valueOf(result));
-            });
-            // TODO: add event details load in once event firebase and class is set up
-        }
 
     /**
      * Updates register button label based on registration state.
