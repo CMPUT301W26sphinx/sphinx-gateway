@@ -44,9 +44,18 @@ public class ProfileFragment extends Fragment {
         ProfileManager manager = new ProfileManager();
 
         manager.getUserProfile(user -> {
-            nameTextView.setText("Name: " + user.getUserName());
-            emailTextView.setText("Email: " + user.getEmail());
-            phoneTextView.setText("Phone Number: " + user.getPhoneNumber());
+            if (user.getUserName() != null){
+                nameTextView.setText("Name: " + user.getUserName());
+            }
+
+            if (user.getEmail() != null){
+                emailTextView.setText("Email: " + user.getEmail());
+            }
+
+            if (user.getPhoneNumber() != null){
+                phoneTextView.setText("Phone Number: " + user.getPhoneNumber());
+            }
+
         });
     }
 }
