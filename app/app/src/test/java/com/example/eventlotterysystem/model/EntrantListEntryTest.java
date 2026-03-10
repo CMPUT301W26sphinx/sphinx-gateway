@@ -1,9 +1,7 @@
 package com.example.eventlotterysystem.model;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * This class is used to test the WaitlistEntry class.
  */
@@ -12,6 +10,7 @@ public class EntrantListEntryTest {
      * This method is used to test the WaitlistEntry class.
      * No parameters or returns.
      */
+    @Test
     public void testWaitlistEntry() {
         EntrantListEntry entry = new EntrantListEntry("123", "456");
         assertEquals("123", entry.getEventId());
@@ -23,6 +22,7 @@ public class EntrantListEntryTest {
      * This method is used to test the setters for the WaitlistEntry class. With the default status of WAITLIST.
      * No parameters or returns.
      */
+    @Test
     public void testSettersGetters() {
         EntrantListEntry entry = new EntrantListEntry();
         entry.setEventId("789");
@@ -34,6 +34,11 @@ public class EntrantListEntryTest {
         assertEquals(2, entry.getStatus());
     }
 
+    /**
+     * This method is used to test the constructor for the WaitlistEntry class.
+     * No parameters or returns.
+     */
+    @Test
     public void testConstructor() {
         EntrantListEntry entry = new EntrantListEntry("123", "456");
         assertEquals("123", entry.getEventId());
