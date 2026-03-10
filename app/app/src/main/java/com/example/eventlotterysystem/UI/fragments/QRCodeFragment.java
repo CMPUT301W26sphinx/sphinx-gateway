@@ -36,7 +36,9 @@ public class QRCodeFragment extends Fragment {
                 }
             });
 
-
+    /** Lifecycle behaviour of QR Code
+     * Inflates the QR Code layout
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -44,7 +46,8 @@ public class QRCodeFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.qrcode_main, container, false);
     }
-
+    /** checks camera permission, starts scanner
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -57,7 +60,8 @@ public class QRCodeFragment extends Fragment {
             requestPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
     }
-
+    /** detaches scannercore when it is done
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -66,15 +70,18 @@ public class QRCodeFragment extends Fragment {
         }
     }
 
-
+    /** Camera permission is requested
+     * If denied, a toast is shown and the camera feed does not start.
+     */
     private boolean hasCameraPermission() {
         return ContextCompat.checkSelfPermission(
                 requireContext(), Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED;
     }
 
-
-
+    /**
+     * Sets and calls the QRScannerCore with all the permissions, lifecycelcameracontroller and previewview
+     */
     private void startScanner() {
         cameraController = new LifecycleCameraController(requireContext());
         cameraController.bindToLifecycle(getViewLifecycleOwner());
@@ -84,7 +91,13 @@ public class QRCodeFragment extends Fragment {
         scannerCore.attach(cameraController, getViewLifecycleOwner());
     }
 
-
+    /**
+     * Called when a QR code has been successfully scanned.
+     * Receives the raw string result and passes it to EventDetail.
+     *
+     * @param result the raw string encoded in the QR code
+     * // @throw eventdetail the raw string
+     */
     private void onQRScanned(String result) {
         // TODO: hand it to EventList, or if it is wrong QR code, then scannerCore.reset()
         Toast.makeText(requireContext(), "Scanned: " + result, Toast.LENGTH_LONG).show();
