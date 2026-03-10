@@ -11,15 +11,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EventLotterySystem">
+
+        <activity android:name=".UI.activity.admin.AdminHomeActivity" />
+        <activity android:name=".UI.activity.admin.AdminEventDetailActivity" />
+
         <activity
-            android:name=".MainActivity"
+            android:name=".UI.activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
