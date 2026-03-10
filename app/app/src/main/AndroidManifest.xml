@@ -12,8 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EventLotterySystem">
 
-        <activity android:name=".activities.admin.AdminHomeActivity" />
-        <activity android:name=".activities.admin.AdminEventDetailActivity" />
+        <activity android:name=".UI.activity.admin.AdminHomeActivity" />
+        <activity android:name=".UI.activity.admin.AdminEventDetailActivity" />
 
         <activity
             android:name=".UI.activity.MainActivity"
