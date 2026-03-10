@@ -3,6 +3,8 @@ package com.example.eventlotterysystem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.example.eventlotterysystem.model.profiles.UserProfile;
+
 import org.junit.Test;
 
 public class UserProfileTest {

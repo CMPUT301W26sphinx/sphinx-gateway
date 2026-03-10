@@ -31,11 +31,12 @@
             android:id="@+id/profile_information"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Profile Information"
-            app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="25dp"
+            android:text="Profile Information"
             android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profile_title" />
 
         <TextView
