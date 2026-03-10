@@ -45,7 +45,7 @@ public class EventDetailsFragment extends Fragment {
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
     // for button switch logic
-    private boolean isOnlist; // True if the entrant is on the waitlist, false otherwise
+    private int currentStatus = -1; // Affect UI button
 
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
 
@@ -118,7 +118,6 @@ public class EventDetailsFragment extends Fragment {
         valueWaitlistCount = view.findViewById(R.id.valueWaitlistCount);
         valueStarttime = view.findViewById(R.id.valueStartTime);
         valueLocation = view.findViewById(R.id.valueLocation);
-        valueLocation = view.findViewById(R.id.valueLocation);
         eventPoster = view.findViewById(R.id.eventposter);
         infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
@@ -136,36 +135,87 @@ public class EventDetailsFragment extends Fragment {
             entrantId = user.getUid();
         }
 
+        if (eventId == null || entrantId == null) {
+            registerButton.setEnabled(false);
+            valueWaitlistCount.setText("—");
+            return;
+        }
+
         // TODO: consider how to remove or change button when registration period closed
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            // TODO US 01.06.02: Check if event registration is currently open once Event registration logic is implemented.
-            @Override
-            public void onClick(View v) {
-                if (!isOnlist) {
-                    EntrantListEntry entry = new EntrantListEntry(eventId, entrantId);
-                    waitlistDb.updateWaitlist(eventId, entry).addOnSuccessListener(unused -> {
-                        isOnlist = true;
-                        updateRegisterButton();
-                        refreshWaitlistCount();
-                        Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
-                        }).addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error joining waiting list", Toast.LENGTH_SHORT).show();
-                    });
-                    // TODO: Add event to entrant myevents UI when worked on
-                } else {
-                    waitlistDb.removeWaitlistEntry(eventId, entrantId).addOnSuccessListener(unused -> {
-                        // TODO US 01.05.03
-                        isOnlist = false;
-                        updateRegisterButton();
+        registerButton.setOnClickListener(v -> {
+            switch (currentStatus) {
+                case EntrantListEntry.STATUS_WAITLIST: //if on waitlist, remove from waitlist button
+                    waitlistDb.updateStatus(
+                            eventId,
+                            entrantId,
+                            EntrantListEntry.STATUS_CANCELLED_OR_REJECTED
+                    ).addOnSuccessListener(unused -> {
+                        currentStatus = EntrantListEntry.STATUS_CANCELLED_OR_REJECTED;
+                        updateActionButton();
                         refreshWaitlistCount();
                         Toast.makeText(getContext(), "Removed from waiting list", Toast.LENGTH_SHORT).show();
-                        }).addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error removing from waiting list", Toast.LENGTH_SHORT).show();
-                        // TODO: Remove? event to entrant myevents UI when worked on
-
                     });
-                }
+                    break;
 
+                case EntrantListEntry.STATUS_INVITED:
+                    // TODO: Add logic for moving to inivation screen to respond
+                    break;
+
+                case EntrantListEntry.STATUS_REGISTERED: //if registered, cancel registration button
+                    waitlistDb.updateStatus(
+                            eventId,
+                            entrantId,
+                            EntrantListEntry.STATUS_CANCELLED_OR_REJECTED
+                    ).addOnSuccessListener(unused -> {
+                        currentStatus = EntrantListEntry.STATUS_CANCELLED_OR_REJECTED;
+                        updateActionButton();
+                        Toast.makeText(getContext(), "Registration cancelled", Toast.LENGTH_SHORT).show();
+                    });
+                    break;
+
+                case EntrantListEntry.STATUS_CANCELLED_OR_REJECTED: //if cancelled or rejected, register button
+                default: // if not on list or cancelled, option to register
+                    // TODO: add to entrant list of registered events for myevent screen
+                    waitlistDb.getEntry(eventId, entrantId)
+                            .addOnSuccessListener(entry -> {
+                                if(entry == null){
+                                    EntrantListEntry newEntry = new EntrantListEntry(
+                                            eventId,
+                                            entrantId,
+                                            EntrantListEntry.STATUS_WAITLIST
+                                    );
+                                    waitlistDb.upsertEntry(eventId, newEntry)
+                                            .addOnSuccessListener(unused -> {
+                                                currentStatus = EntrantListEntry.STATUS_WAITLIST;
+                                                updateActionButton();
+                                                refreshWaitlistCount();
+
+                                                Toast.makeText(
+                                                        getContext(),
+                                                        "Joined waiting list",
+                                                        Toast.LENGTH_SHORT
+                                                ).show();
+                                            });
+
+                                } else{
+                                    waitlistDb.updateStatus(
+                                            eventId,
+                                            entrantId,
+                                            EntrantListEntry.STATUS_WAITLIST
+                                    ).addOnSuccessListener(unused -> {
+                                        currentStatus = EntrantListEntry.STATUS_WAITLIST;
+                                        updateActionButton();
+                                        refreshWaitlistCount();
+
+                                        Toast.makeText(
+                                                getContext(),
+                                                "Joined waiting list",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    });
+                                }
+                            });
+                    break;
             }
         });
 
@@ -185,7 +235,7 @@ public class EventDetailsFragment extends Fragment {
                 //TODO
             }
         });
-        initializeUI();
+        initializeUI(); // button update and get event details
     }
 
         /**
@@ -193,25 +243,52 @@ public class EventDetailsFragment extends Fragment {
          * based on if the entrant is on the waitlist or not, as the button text will be changed.
          */
         private void initializeUI() {
-            waitlistDb.isEntrantInWaitlist(eventId, entrantId).addOnSuccessListener(result -> {
-                isOnlist = result;
-                updateRegisterButton();
-            })
-            .addOnFailureListener(e -> {
-                isOnlist = false;
-                updateRegisterButton();
-            });
-            refreshWaitlistCount();
-            };
+            waitlistDb.getEntrantStatus(eventId, entrantId)
+                    .addOnSuccessListener(status -> {
+                        currentStatus = status;
+                        updateActionButton();
+                    })
+                    .addOnFailureListener(e -> {
+                        currentStatus = -1;
+                        updateActionButton();
+                    });
 
+            refreshWaitlistCount();
+            loadEventDetails();
+        }
+
+    /**
+     * This method is used to load the event details from the database.
+     * No parameters or returns.
+     */
+    private void loadEventDetails() {
+        //TODO - need Firebase methods added to get event details from firestore!
+    }
 
     /**
      * Updates register button label based on registration state.
      * Update text when pressed (Register/Remove)
      * No parameters or returns.
     */
-    private void updateRegisterButton() {
-        registerButton.setText(isOnlist ? "Remove" : "Register");
+    private void updateActionButton() {
+        switch (currentStatus) {
+            case EntrantListEntry.STATUS_WAITLIST:
+                registerButton.setText("Remove from Waitlist");
+                break;
+
+            case EntrantListEntry.STATUS_INVITED:
+                registerButton.setText("Respond to Invitation");
+                break;
+
+            case EntrantListEntry.STATUS_REGISTERED:
+                registerButton.setText("Cancel Registration");
+                break;
+
+            case EntrantListEntry.STATUS_CANCELLED_OR_REJECTED:
+            default:
+                registerButton.setText("Register");
+                break;
+        }
     }
 
     /**

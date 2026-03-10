@@ -19,55 +19,101 @@ public class EntrantListFirebase {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
-     * This method is used to get the reference to the waitlist for an event in the firestore db.
+     * This method is used to get the reference to the entrantlistRef for an event in the firestore db.
      * @param eventId
-     *  The id of the event to get the waitlist for.
-     * @return A reference to the waitlist for the event.
+     *  The id of the event to get the entrantlistRef for.
+     * @return A reference to the entrantlistRef for the event.
      */
     // lab 5, and https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
-    private CollectionReference waitlistRef(@NonNull String eventId) {
+    private CollectionReference entrantlistRef(@NonNull String eventId) {
         return db.collection("Events").document(eventId).collection("EntrantList");
-    }// in events, go to specific event, then to waitlist
+    }// in events, go to specific event, then to entrantlistRef
 
     /**
-     * This method is used to update/add to the waitlist for an event in the firestore db.
-     * @param eventId The id of the event to update the waitlist for.
-     * @param entry The entry to add to the waitlist.
+     * This method is used to update/add to the entrant list for an event in the firestore db.
+     * if exist update, if new insert
+     * @param eventId The id of the event to update the list for.
+     * @param entry The entry to add to the list.
     **/
-    public Task<Void> updateWaitlist(@NonNull String eventId, @NonNull EntrantListEntry entry) {
-        return waitlistRef(eventId).document(entry.getEntrantId()).set(entry);
+    public Task<Void> upsertEntry(@NonNull String eventId, @NonNull EntrantListEntry entry) {
+        return entrantlistRef(eventId)
+                .document(entry.getEntrantId())
+                .set(entry);
     }
 
     /**
-     * This method is used to remove an entry from the waitlist for an event in the firestore db.
+     * This method is used to remove an entry from the list for an event in the firestore db.
      * @param eventId The id of the event to remove the entry from.
-     * @param entrantId The entry to remove from the waitlist.
+     * @param entrantId The entry to remove from the list.
      **/
-    public Task<Void> removeWaitlistEntry(@NonNull String eventId, @NonNull String entrantId) {
+    public Task<Void> removeEntrantListEntry(@NonNull String eventId, @NonNull String entrantId) {
         // see lab 5 logic for reference
-        return waitlistRef(eventId).document(entrantId).delete();
+        return entrantlistRef(eventId).document(entrantId).delete();
     }
+
     /**
-     * This method is to verify whether an entrant is in the waitlist already/
-     * @param eventId The id of the event to check the waitlist for.
-     * @param entrantId The id of the entrant to check the waitlist for.
-     * @return A boolean indicating whether the entrant is in the waitlist.
-     **/
-    public Task<Boolean> isEntrantInWaitlist(@NonNull String eventId, @NonNull String entrantId) {
-        return waitlistRef(eventId).document(entrantId).get().continueWith(task -> {
-            if (!task.isSuccessful()) return false;
-            DocumentSnapshot document = task.getResult();
-            return document.exists();
-        });
+     * This method is used to check if an entrant is in the entrantlistRef for an event in the firestore db.
+     * @param eventId
+     * @param entrantId
+     * @return
+     */
+    public Task<EntrantListEntry> getEntry(@NonNull String eventId, @NonNull String entrantId) {
+        return entrantlistRef(eventId)
+                .document(entrantId)
+                .get()
+                .continueWith(task -> {
+                    if (!task.isSuccessful() || task.getResult() == null || !task.getResult().exists()) {
+                        return null;
+                    }
+                    return task.getResult().toObject(EntrantListEntry.class);
+                });
     }
+
     /**
-     * This method is used to get the number of entries in the waitlist for an event in the firestore db.
-     * @param eventId The id of the event to get the waitlist count for.
-     * @return An integer representing the number of entries in the waitlist for the event.
+     * This method is used to check an entrants stored status in the db.
+     * @param eventId
+     * @param entrantId
+     * @return An integer representing the status of the entrant.
+     */
+    public Task<Integer> getEntrantStatus(@NonNull String eventId, @NonNull String entrantId) {
+        return entrantlistRef(eventId)
+                .document(entrantId)
+                .get()
+                .continueWith(task -> {
+                    if (!task.isSuccessful() || task.getResult() == null || !task.getResult().exists()) {
+                        return -1; // no entry exists
+                    }
+
+                    EntrantListEntry entry = task.getResult().toObject(EntrantListEntry.class);
+                    if (entry == null) return -1;
+
+                    return entry.getStatus();
+                });
+    }
+
+    /**
+     * This method is used to change the set status of the entrant in the list for an event in the firestore db.
+     * @param eventId
+     * @param entrantId
+     * @param status
+     * @return void
+     */
+    public Task<Void> updateStatus(@NonNull String eventId,
+                                   @NonNull String entrantId,
+                                   int status) {
+        return entrantlistRef(eventId)
+                .document(entrantId)
+                .update("status", status);
+    }
+
+    /**
+     * This method is used to get the number of entries in the entrantlistRef for an event in the firestore db.
+     * @param eventId The id of the event to get the entrantlistRef count for.
+     * @return An integer representing the number of entries in the entrantlistRef for the event.
      **/
     public Task<Integer> getWaitlistCount(@NonNull String eventId) {
-        return waitlistRef(eventId).get().continueWith(task -> {
-            if (!task.isSuccessful())return 0;
+        return entrantlistRef(eventId).whereEqualTo("Status", EntrantListEntry.STATUS_WAITLIST).get().continueWith(task -> {
+            if (!task.isSuccessful()|| task.getResult() == null )  return 0;
             return task.getResult().size();
         });
     }
