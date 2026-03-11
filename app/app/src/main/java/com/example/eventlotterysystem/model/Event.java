@@ -18,7 +18,7 @@ public class Event implements Serializable {
     // TODO: private something like photo event?
 
     // Construct new Event
-    Event(String eventName) {
+    public Event(String eventName) {
         this.eventName = eventName;
     }
 
