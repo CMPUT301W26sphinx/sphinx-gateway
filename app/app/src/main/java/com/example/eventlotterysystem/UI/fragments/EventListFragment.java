@@ -18,6 +18,7 @@ import java.util.List;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 
 public class EventListFragment extends Fragment {
 
@@ -97,5 +98,9 @@ public class EventListFragment extends Fragment {
         adapter = new EventAdapter(eventList);
 
         recyclerView.setAdapter(adapter);
+
+        MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.toggleGroup);
+        toggleGroup.check(R.id.buttonAll);
+
     }
 }
