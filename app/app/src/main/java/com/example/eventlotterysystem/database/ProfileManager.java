@@ -33,6 +33,10 @@ public class ProfileManager {
      * @param user the user profile that you want to save
      */
     public void saveUser(UserProfile user) {
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        String uid = firebaseUser.getUid();
+
+        user.setUserID(uid);
 
         DocumentReference docRef = usersRef.document(user.getProfileID());
         docRef.set(user);

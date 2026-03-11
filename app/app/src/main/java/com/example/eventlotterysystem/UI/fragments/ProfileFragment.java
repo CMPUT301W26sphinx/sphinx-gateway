@@ -48,8 +48,8 @@ public class ProfileFragment extends Fragment {
         ProfileManager manager = new ProfileManager();
 
         manager.getUserProfile(user -> {
-            if (user.getUserName() != null) {
-                nameTextView.setText("Name: " + user.getUserName());
+            if (user.getFirstName() != null && user.getLastName() != null) {
+                nameTextView.setText("Name: " + user.getFirstName() + user.getLastName());
             }
 
             if (user.getEmail() != null) {

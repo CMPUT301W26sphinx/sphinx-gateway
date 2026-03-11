@@ -29,10 +29,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-    private UserProfile currentProfile;
-
     /**
      * Creates a new instance that goes to the Events, without login.
      * @param savedInstanceState If the activity is being re-initialized after
@@ -65,9 +61,9 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+
         // loads database and auth for firebase
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         // sign in the user
         mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -81,11 +77,8 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "signInAnonymously:success");
 
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    String uid = user.getUid();
-
                     // create profile
-                    UserProfile userProfile = new UserProfile(uid);
+                    UserProfile userProfile = new UserProfile();
 
                     // save to Firestore
                     ProfileManager profileManager = new ProfileManager();

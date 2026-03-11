@@ -18,9 +18,9 @@ public class UserProfileTest {
     public void testGetUserName(){
         UserProfile userProfile = new UserProfile("qwerty");
         // set username
-        userProfile.setUserName("Lorem Ipsum");
+        userProfile.setFirstName("Lorem Ipsum");
         // test retrieval
-        assertEquals("Lorem Ipsum", userProfile.getUserName());
+        assertEquals("Lorem Ipsum", userProfile.getFirstName());
     }
     @Test
     public void testGetEmail(){

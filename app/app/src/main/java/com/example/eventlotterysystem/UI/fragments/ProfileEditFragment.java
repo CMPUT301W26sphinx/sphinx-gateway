@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.ProfileManager;
+import com.example.eventlotterysystem.model.profiles.UserProfile;
 
 public class ProfileEditFragment extends Fragment {
     @Nullable
@@ -27,33 +28,41 @@ public class ProfileEditFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // display the current user information
-        // update views
-        TextView nameTextView = view.findViewById(R.id.edit_first_name);
-        TextView emailTextView = view.findViewById(R.id.edit_email);
-        TextView phoneTextView = view.findViewById(R.id.edit_phone_number);
+        // define views
+        EditText userFirstNameInput = view.findViewById(R.id.edit_first_name);
+        EditText userLastNameInput = view.findViewById(R.id.edit_last_name);
+        EditText userEmailInput = view.findViewById(R.id.edit_email);
+        EditText userPhoneInput = view.findViewById(R.id.edit_phone_number);
 
+        // create profile manager
         ProfileManager manager = new ProfileManager();
 
+        // update views with the users current information if the fields are non-null
         manager.getUserProfile(user -> {
-            if (user.getUserName() != null) {
-                nameTextView.setText(user.getUserName());
+            if (user.getFirstName() != null) {
+                userFirstNameInput.setText(user.getFirstName());
             }
 
             if (user.getEmail() != null) {
-                emailTextView.setText(user.getEmail());
+                userEmailInput.setText(user.getEmail());
             }
 
             if (user.getPhoneNumber() != null) {
-                phoneTextView.setText(user.getPhoneNumber());
+                userPhoneInput.setText(user.getPhoneNumber());
             }
 
         });
 
-        // update the user profile based on typed info
+        // update the user profile based on typed info when 'save' is pressed
         view.findViewById(R.id.save_button).setOnClickListener(v -> {
-            // update first name
-            EditText userFirstNameInput = view.findViewById(R.id.edit_first_name);
+            // get typed first name
             String firstName = userFirstNameInput.getText().toString();
+            // new user profile
+            UserProfile userProfile = new UserProfile();
+            // update fields
+            userProfile.setFirstName(firstName);
+            // update user information in firebase
+            manager.saveUser(userProfile);
 
             // display information saved message
             Toast myToast = Toast.makeText(getActivity(), "Information Saved!",
