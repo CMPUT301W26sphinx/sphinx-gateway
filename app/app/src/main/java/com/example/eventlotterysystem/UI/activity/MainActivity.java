@@ -26,6 +26,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
         // loads database and auth for firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String uid = mAuth.getCurrentUser().getUid();
 
         // sign in the user
         mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -77,12 +80,23 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "signInAnonymously:success");
 
-                    // create profile
-                    UserProfile userProfile = new UserProfile();
+                    // check the user database, if there is already a profile with
+                    // the given uid, then do not override the data
+                    DocumentReference docRef = db.collection("users").document(uid);
 
-                    // save to Firestore
-                    ProfileManager profileManager = new ProfileManager();
-                    profileManager.saveUser(userProfile);
+                    docRef.get().addOnSuccessListener(document -> {
+                        if (!document.exists()){
+
+                            ProfileManager profileManager = new ProfileManager();
+
+                            // create profile
+                            UserProfile userProfile = new UserProfile();
+
+                            // save to Firestore
+                            profileManager.saveUser(userProfile);
+                        }
+                    });
+
 
                 } else {
                     Log.w(TAG, "signInAnonymously:failure", task.getException());

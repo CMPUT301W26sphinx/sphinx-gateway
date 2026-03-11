@@ -49,7 +49,7 @@ public class ProfileFragment extends Fragment {
 
         manager.getUserProfile(user -> {
             if (user.getFirstName() != null && user.getLastName() != null) {
-                nameTextView.setText("Name: " + user.getFirstName() + user.getLastName());
+                nameTextView.setText("Name: " + user.getFirstName() + " " + user.getLastName());
             }
 
             if (user.getEmail() != null) {

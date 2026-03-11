@@ -39,14 +39,19 @@ public class ProfileEditFragment extends Fragment {
 
         // update views with the users current information if the fields are non-null
         manager.getUserProfile(user -> {
+            // update first name
             if (user.getFirstName() != null) {
                 userFirstNameInput.setText(user.getFirstName());
             }
-
+            // update last name
+            if (user.getLastName() != null){
+                userLastNameInput.setText(user.getLastName());
+            }
+            // update email
             if (user.getEmail() != null) {
                 userEmailInput.setText(user.getEmail());
             }
-
+            // update phone number
             if (user.getPhoneNumber() != null) {
                 userPhoneInput.setText(user.getPhoneNumber());
             }
@@ -55,12 +60,18 @@ public class ProfileEditFragment extends Fragment {
 
         // update the user profile based on typed info when 'save' is pressed
         view.findViewById(R.id.save_button).setOnClickListener(v -> {
-            // get typed first name
+            // get typed information
             String firstName = userFirstNameInput.getText().toString();
+            String lastName = userLastNameInput.getText().toString();
+            String email = userEmailInput.getText().toString();
+            String phoneNumber = userPhoneInput.getText().toString();
             // new user profile
             UserProfile userProfile = new UserProfile();
             // update fields
             userProfile.setFirstName(firstName);
+            userProfile.setLastName(lastName);
+            userProfile.setUserEmail(email);
+            userProfile.setUserPhoneNumber(phoneNumber);
             // update user information in firebase
             manager.saveUser(userProfile);
 
