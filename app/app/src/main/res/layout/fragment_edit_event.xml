@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"
-            android:text="Max Entrants: " />
+            android:text="Max Entrants: (Empty for no limit)" />
         <EditText
             android:id="@+id/maxEntrants"
             android:layout_width="match_parent"

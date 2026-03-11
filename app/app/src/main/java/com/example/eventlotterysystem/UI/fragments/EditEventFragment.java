@@ -39,6 +39,7 @@ public class EditEventFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
+        // Post the details from database
         name = view.findViewById(R.id.eventName);
 //        name.setText(db.get(Name));
         descInput = view.findViewById(R.id.eventDescription);
@@ -65,25 +66,40 @@ public class EditEventFragment extends Fragment {
         return view;
     }
     private boolean checkInfo() {
+        // Checking if all the information is good to upload to the database
+
+        // description has to be filled
         String description = descInput.getText().toString();
         if (description.isEmpty()) {
             Toast.makeText(getContext(), "description cannot be Empty", Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        //  place has to be filled
         String place = placeInput.getText().toString();
         if (place.isEmpty()) {
             Toast.makeText(getContext(), "place cannot be Empty", Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        //  time has to be filled and in correct format
+        SimpleDateFormat formatter;
+        formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         String time = timeInput.getText().toString();
         if (time.isEmpty()) {
             Toast.makeText(getContext(), "time cannot be Empty", Toast.LENGTH_SHORT).show();
             return false;
         }
+        try {
+            formatter.parse(time);
+        } catch (ParseException e) {
+            Toast.makeText(getContext(), "Incorrect date format: Time", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Registration Dates should be both filled or all empty
         String start = startRegInput.getText().toString();
         String end = endRegInput.getText().toString();
-        SimpleDateFormat formatter;
-        formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         if (!start.isEmpty()) {
             try {
                 formatter.parse(start);
@@ -108,21 +124,32 @@ public class EditEventFragment extends Fragment {
             Toast.makeText(getContext(), "Registration End is missing", Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        // Max Entrants must an integer greater than 0 or empty
         String maxEntrants = maxInput.getText().toString();
-
-        try {
-            Double.parseDouble(maxEntrants);
-        } catch (NumberFormatException e) {
-            Toast.makeText(getContext(), "Registration End is missing", Toast.LENGTH_SHORT).show();
-            return false;
+        if (!maxEntrants.isEmpty()) {
+            try {
+                double val = Double.parseDouble(maxEntrants);
+                if (val <= 0) {
+                    Toast.makeText(getContext(), "Max Entrants has to be bigger than 0", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(), "Max Entrants has to be integer", Toast.LENGTH_SHORT).show();
+                return false;
+            }
         }
-
         return true;
     }
+
     private void updateEvent(){
+        // Update the database with new info
+
         //to do
         // db.set
-        // Event event = db.get();
+        // Event event = db.get ...
+
+        // new info from user
         Event event = new Event("Test name", "Test desc"); // delete after all coding
         String description = descInput.getText().toString();
         String place = placeInput.getText().toString();
@@ -135,6 +162,8 @@ public class EditEventFragment extends Fragment {
         if (!maxInput.getText().toString().isEmpty()) {
             maxEntrants = Double.parseDouble(maxInput.getText().toString());
         }
+
+        // Setting details
         event.setEventDescription(description);
         event.setEventPlace(place);
         try {
@@ -156,5 +185,8 @@ public class EditEventFragment extends Fragment {
             }
         }
         event.setCapacity(maxEntrants);
+
+        //to do:
+        // db.set ...
     }
 }

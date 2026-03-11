@@ -15,15 +15,16 @@ public class Event implements Serializable {
     private String eventDescription;
     private String eventPlace;
     private Date eventTime;
-    private List<Date> registrationStartDate;
+    private List<Date> registrationDate;
 
     private Double capacity;
 
     // TODO: private something like photo event?
 
     // Construct new Event
-    Event(String eventName) {
+    public Event(String eventName, String eventDescription) {
         this.eventName = eventName;
+        this.eventDescription = eventDescription;
         this.capacity = Double.POSITIVE_INFINITY;
 
     }
@@ -51,7 +52,7 @@ public class Event implements Serializable {
     }
 
     public List<Date> getRegistrationStartDate() {
-        return registrationStartDate;
+        return registrationDate;
     }
 
     public Double getCapacity() {
@@ -72,8 +73,8 @@ public class Event implements Serializable {
         this.eventTime = eventTime;
     }
 
-    public void setRegistrationStartDate(List<Date> registrationStartDate) {
-        this.registrationStartDate = registrationStartDate;
+    public void setRegistrationDate(List<Date> registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public void setCapacity(Double capacity) {
