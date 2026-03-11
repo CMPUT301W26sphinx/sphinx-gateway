@@ -13,16 +13,20 @@ import androidx.fragment.app.Fragment;
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.ProfileManager;
 
+import androidx.navigation.fragment.NavHostFragment;
+
+
 public class ProfileFragment extends Fragment {
     /**
      * TO DO: Create Profile List Fragment!!
-     * @param inflater The LayoutInflater object that can be used to inflate
-     * any views in the fragment,
-     * @param container If non-null, this is the parent view that the fragment's
-     * UI should be attached to.  The fragment should not add the view itself,
-     * but this can be used to generate the LayoutParams of the view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate
+     *                           any views in the fragment,
+     * @param container          If non-null, this is the parent view that the fragment's
+     *                           UI should be attached to.  The fragment should not add the view itself,
+     *                           but this can be used to generate the LayoutParams of the view.
      * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
+     *                           from a previous saved state as given here.
      *
      */
     @Nullable
@@ -44,18 +48,28 @@ public class ProfileFragment extends Fragment {
         ProfileManager manager = new ProfileManager();
 
         manager.getUserProfile(user -> {
-            if (user.getUserName() != null){
+            if (user.getUserName() != null) {
                 nameTextView.setText("Name: " + user.getUserName());
             }
 
-            if (user.getEmail() != null){
+            if (user.getEmail() != null) {
                 emailTextView.setText("Email: " + user.getEmail());
             }
 
-            if (user.getPhoneNumber() != null){
+            if (user.getPhoneNumber() != null) {
                 phoneTextView.setText("Phone Number: " + user.getPhoneNumber());
             }
 
         });
+
+        view.findViewById(R.id.edit_button).setOnClickListener(v -> {
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new ProfileEditFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
+
+
 }
