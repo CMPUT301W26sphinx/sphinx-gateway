@@ -17,6 +17,18 @@ import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
 
 public class ProfileEditFragment extends Fragment {
+    /**
+     * Allows the user to edit stored profile information such as: email, name, phone number.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -27,7 +39,9 @@ public class ProfileEditFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // display the current user information
+        /**
+         * Display the stored user information
+         */
         // define views
         EditText userFirstNameInput = view.findViewById(R.id.edit_first_name);
         EditText userLastNameInput = view.findViewById(R.id.edit_last_name);

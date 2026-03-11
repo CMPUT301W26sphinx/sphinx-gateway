@@ -12,6 +12,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles communication between local user profiles and firebase.
+ * @author Noah Zapisocki
  */
 public class ProfileManager {
 

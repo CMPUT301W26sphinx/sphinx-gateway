@@ -18,7 +18,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 public class ProfileFragment extends Fragment {
     /**
-     * TO DO: Create Profile List Fragment!!
+     * Provides a brief overview of available users functions, such as: edit profile, accept invitation, delete account
      *
      * @param inflater           The LayoutInflater object that can be used to inflate
      *                           any views in the fragment,
@@ -40,13 +40,14 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // update views
+        // define views
         TextView nameTextView = view.findViewById(R.id.name);
         TextView emailTextView = view.findViewById(R.id.email);
         TextView phoneTextView = view.findViewById(R.id.phone_number);
 
         ProfileManager manager = new ProfileManager();
 
+        // update views
         manager.getUserProfile(user -> {
             if (user.getFirstName() != null && user.getLastName() != null) {
                 nameTextView.setText("Name: " + user.getFirstName() + " " + user.getLastName());

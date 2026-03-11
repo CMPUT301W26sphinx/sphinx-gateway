@@ -80,8 +80,10 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "signInAnonymously:success");
 
-                    // check the user database, if there is already a profile with
-                    // the given uid, then do not override the data
+                    /**
+                     * check the user database, if there is already a profile with
+                     * the given uid, then do not override the data
+                     */
                     DocumentReference docRef = db.collection("users").document(uid);
 
                     docRef.get().addOnSuccessListener(document -> {
