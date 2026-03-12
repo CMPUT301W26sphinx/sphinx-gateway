@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         // loads database and auth for firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String uid = mAuth.getCurrentUser().getUid();
 
         // sign in the user
         mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -84,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                      * check the user database, if there is already a profile with
                      * the given uid, then do not override the data
                      */
+                    String uid = mAuth.getCurrentUser().getUid();
                     DocumentReference docRef = db.collection("users").document(uid);
 
                     docRef.get().addOnSuccessListener(document -> {
