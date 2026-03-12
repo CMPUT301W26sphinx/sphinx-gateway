@@ -9,6 +9,6 @@
         android:color="#036BF4"/>
 
     <!-- rounded pill -->
-    <corners android:radius="25dp"/>
+    <corners android:radius="27dp"/>
 
 </shape>

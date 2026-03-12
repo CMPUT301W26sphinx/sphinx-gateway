@@ -52,9 +52,9 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/toggle_background"
 
-        app:layout_constraintTop_toBottomOf="@id/subtitle"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subtitle"
 
         app:selectionRequired="true"
         app:singleSelection="true">
@@ -65,13 +65,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
 
+            android:backgroundTint="@color/toggle_button_color"
             android:text="All"
             android:textColor="@color/black"
             android:textSize="12sp"
-            android:textStyle="bold"
 
-            android:backgroundTint="@android:color/transparent"
-            app:cornerRadius="25dp"/>
+            android:textStyle="bold" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonMyEvents"
@@ -79,13 +78,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
 
+            android:backgroundTint="@color/toggle_button_color"
             android:text="My Events"
             android:textColor="@color/black"
             android:textSize="12sp"
-            android:textStyle="bold"
 
-            android:backgroundTint="@android:color/transparent"
-            app:cornerRadius="25dp"/>
+            android:textStyle="bold" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
