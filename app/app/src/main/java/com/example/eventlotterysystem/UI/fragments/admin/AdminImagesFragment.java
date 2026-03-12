@@ -1,4 +1,4 @@
-package com.example.eventlotterysystem.fragments.admin;
+package com.example.eventlotterysystem.UI.fragments.admin;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

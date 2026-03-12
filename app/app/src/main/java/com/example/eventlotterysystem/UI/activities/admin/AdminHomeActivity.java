@@ -1,4 +1,4 @@
-package com.example.eventlotterysystem.activities.admin;
+package com.example.eventlotterysystem.UI.activities.admin;
 
 import android.os.Bundle;
 
@@ -7,10 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
-import com.example.eventlotterysystem.fragments.admin.AdminEventsFragment;
-import com.example.eventlotterysystem.fragments.admin.AdminImagesFragment;
-import com.example.eventlotterysystem.fragments.admin.AdminLogsFragment;
-import com.example.eventlotterysystem.fragments.admin.AdminProfilesFragment;
+import com.example.eventlotterysystem.UI.fragments.admin.AdminEventsFragment;
+import com.example.eventlotterysystem.UI.fragments.admin.AdminImagesFragment;
+import com.example.eventlotterysystem.UI.fragments.admin.AdminLogsFragment;
+import com.example.eventlotterysystem.UI.fragments.admin.AdminProfilesFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
@@ -57,6 +57,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                 loadFragment(new AdminLogsFragment());
                 return true;
             }
+            // Inside onCreateView, after finding buttons:
 
             return false;
         });
