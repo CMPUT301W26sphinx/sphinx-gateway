@@ -20,27 +20,19 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  */
 public class AdminHomeActivity extends AppCompatActivity {
 
-    // Bottom navigation used to switch between admin pages.
     private BottomNavigationView bottomNavigationView;
 
-    /**
-     * Sets up the admin home screen and loads the default page.
-     * The Events fragment is shown first when the admin opens this screen.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_admin_home);
 
-        // Connect the bottom navigation view from the layout.
         bottomNavigationView = findViewById(R.id.admin_bottom_nav);
 
-        // Show the Events page by default when the admin enters this screen.
         loadFragment(new AdminEventsFragment());
         bottomNavigationView.setSelectedItemId(R.id.nav_events);
 
-        // Change the visible fragment when a navigation item is selected.
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
@@ -57,17 +49,11 @@ public class AdminHomeActivity extends AppCompatActivity {
                 loadFragment(new AdminLogsFragment());
                 return true;
             }
-            // Inside onCreateView, after finding buttons:
 
             return false;
         });
     }
 
-    /**
-     * Replaces the current fragment shown in the admin content area.
-     *
-     * @param fragment the fragment that should be displayed
-     */
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()

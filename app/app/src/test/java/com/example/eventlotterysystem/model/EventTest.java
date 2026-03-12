@@ -2,6 +2,8 @@ package com.example.eventlotterysystem.model;
 
 import static org.junit.Assert.assertEquals;
 
+import com.example.eventlotterysystem.model.Event;
+
 public class EventTest {
     /**
     @Test
