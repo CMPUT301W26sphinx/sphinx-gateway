@@ -3,6 +3,8 @@ package com.example.eventlotterysystem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.example.eventlotterysystem.model.profiles.UserProfile;
+
 import org.junit.Test;
 
 public class UserProfileTest {
@@ -16,9 +18,9 @@ public class UserProfileTest {
     public void testGetUserName(){
         UserProfile userProfile = new UserProfile("qwerty");
         // set username
-        userProfile.setUserName("Lorem Ipsum");
+        userProfile.setFirstName("Lorem Ipsum");
         // test retrieval
-        assertEquals("Lorem Ipsum", userProfile.getUserName());
+        assertEquals("Lorem Ipsum", userProfile.getFirstName());
     }
     @Test
     public void testGetEmail(){

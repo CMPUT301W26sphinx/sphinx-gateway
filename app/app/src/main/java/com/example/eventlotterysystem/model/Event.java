@@ -1,48 +1,83 @@
 package com.example.eventlotterysystem.model;
-
-import android.security.identity.IdentityCredentialStore;
-
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Event implements Serializable {
     // - Event Base? -
-    private String EventID;
+    private static final AtomicInteger count = new AtomicInteger(1);
+    private int eventID;
+
 
     // - Front Info Of The Event -
     private String eventName;
     private String eventDescription;
-    private int capacity;
-    private Date registrationStartDate;
+    private String eventPlace;
+    private Date eventTime;
+    private List<Date> registrationDate;
+
+    private Double capacity;
 
     // TODO: private something like photo event?
 
     // Construct new Event
-    public Event(String eventName) {
+    public Event(String eventName, String eventDescription) {
         this.eventName = eventName;
+        this.eventDescription = eventDescription;
+        this.capacity = Double.POSITIVE_INFINITY;
+
     }
 
     // Getters
+
+    public int getEventID() {
+        return eventID;
+    }
+
     public String getEventName() {
         return eventName;
     }
 
-    public String getDescription() {
+    public String getEventDescription() {
         return eventDescription;
     }
 
-    public Integer getCapacity() {
+    public String getEventPlace() {
+        return eventPlace;
+    }
+
+    public Date getEventTime() {
+        return eventTime;
+    }
+
+    public List<Date> getRegistrationStartDate() {
+        return registrationDate;
+    }
+
+    public Double getCapacity() {
         return capacity;
     }
 
-    // Setters
-    public void setName(String name) {
-        this.eventName = name;
+    // Setter
+
+    public void setEventDescription(String eventDescription) {
+        this.eventDescription = eventDescription;
     }
-    public void setEventDescription(String description){
-        this.eventDescription = description;
+
+    public void setEventPlace(String eventPlace) {
+        this.eventPlace = eventPlace;
     }
-    public void setCapacity(int capacity){
+
+    public void setEventTime(Date eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public void setRegistrationDate(List<Date> registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    public void setCapacity(Double capacity) {
         this.capacity = capacity;
     }
 }

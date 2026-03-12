@@ -4,10 +4,12 @@ import java.io.Serializable;
 
 /**
  * Stores and manages the information for a user profile
+ * @author Noah Zapisocki
  */
 public class UserProfile implements Serializable {
     private String userID;
-    private String name;
+    private String firstName;
+    private String lastName;
     private String email;
     private String phoneNumber;
     private boolean receiveNotifications; // notification preference
@@ -19,18 +21,19 @@ public class UserProfile implements Serializable {
 
     }
 
-    public UserProfile(String userID) {
-        this.userID = userID;
-    }
+//    public UserProfile(String userID) {
+//        this.userID = userID;
+//    }
 
     // Setters
+
     /**
-     * Update the users name
+     * Update the users first name
      *
-     * @param userName
+     * @param firstName
      */
-    public void setUserName(String userName) {
-        this.name = userName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     /**
@@ -60,15 +63,29 @@ public class UserProfile implements Serializable {
         this.receiveNotifications = choice;
     }
 
-    // Getters
+    /**
+     * Set the users last name
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
+    /**
+     * Set user ID
+     * @param userID
+     */
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    // Getters
     /**
      * Get the users stored name
      *
      * @return
      */
-    public String getUserName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
     /**
@@ -106,6 +123,10 @@ public class UserProfile implements Serializable {
     public boolean getNotificationPreference() {
         return receiveNotifications;
     }
-
-
+    /**
+     * Get the users last name.
+     */
+    public String getLastName() {
+        return lastName;
+    }
 }

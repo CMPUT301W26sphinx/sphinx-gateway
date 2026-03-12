@@ -26,13 +26,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-    private UserProfile currentProfile;
-
     /**
      * Creates a new instance that goes to the Events, without login.
      * @param savedInstanceState If the activity is being re-initialized after
@@ -65,9 +62,11 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+
         // loads database and auth for firebase
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String uid = mAuth.getCurrentUser().getUid();
 
         // sign in the user
         mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -81,15 +80,25 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "signInAnonymously:success");
 
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    String uid = user.getUid();
+                    /**
+                     * check the user database, if there is already a profile with
+                     * the given uid, then do not override the data
+                     */
+                    DocumentReference docRef = db.collection("users").document(uid);
 
-                    // create profile
-                    UserProfile userProfile = new UserProfile(uid);
+                    docRef.get().addOnSuccessListener(document -> {
+                        if (!document.exists()){
 
-                    // save to Firestore
-                    ProfileManager profileManager = new ProfileManager();
-                    profileManager.saveUser(userProfile);
+                            ProfileManager profileManager = new ProfileManager();
+
+                            // create profile
+                            UserProfile userProfile = new UserProfile();
+
+                            // save to Firestore
+                            profileManager.saveUser(userProfile);
+                        }
+                    });
+
 
                 } else {
                     Log.w(TAG, "signInAnonymously:failure", task.getException());

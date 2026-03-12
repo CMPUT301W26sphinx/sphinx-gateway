@@ -1,5 +1,14 @@
 <resources>
     <string name="app_name">Event Lottery System</string>
-    <string name ="selection">Select an event to view details and register</string>
-    <string name="eventname">  Event Name\n Event description</string>
+    <string name="default_name">Name: First Last</string>
+    <string name="default_email">Email: email@domain.com</string>
+    <string name="default_phone">Phone Number: xxx-xxx-xxxx</string>
+    <string name="event_starttime_title">Event Date:</string>
+    <string name="event_location_title">Location:</string>
+    <string name="event_description_title">Event Description:</string>
+    <string name="event_reg_title">Event Registration Period:</string>
+    <string name="event_waitnum_title">Number of People Waiting:</string>
+    <string name="backbutton">Back</string>
+    <string name="registerbutton">Register</string>
+    <string name="removebutton">Remove</string>
 </resources>
