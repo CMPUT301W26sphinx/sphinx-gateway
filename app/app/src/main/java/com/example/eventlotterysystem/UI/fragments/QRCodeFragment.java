@@ -1,11 +1,17 @@
 package com.example.eventlotterysystem.UI.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,6 +25,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.model.QRScannerCore;
+
+import java.nio.channels.AlreadyBoundException;
 
 public class QRCodeFragment extends Fragment {
     private PreviewView previewView;
@@ -36,7 +44,8 @@ public class QRCodeFragment extends Fragment {
                 }
             });
 
-    /** Lifecycle behaviour of QR Code
+    /**
+     * Lifecycle behaviour of QR Code
      * Inflates the QR Code layout
      */
     @Nullable
@@ -46,7 +55,9 @@ public class QRCodeFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.qrcode_main, container, false);
     }
-    /** checks camera permission, starts scanner
+
+    /**
+     * checks camera permission, starts scanner
      */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -60,7 +71,9 @@ public class QRCodeFragment extends Fragment {
             requestPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
     }
-    /** detaches scannercore when it is done
+
+    /**
+     * detaches scannercore when it is done
      */
     @Override
     public void onDestroyView() {
@@ -70,7 +83,8 @@ public class QRCodeFragment extends Fragment {
         }
     }
 
-    /** Camera permission is requested
+    /**
+     * Camera permission is requested
      * If denied, a toast is shown and the camera feed does not start.
      */
     private boolean hasCameraPermission() {
@@ -96,10 +110,21 @@ public class QRCodeFragment extends Fragment {
      * Receives the raw string result and passes it to EventDetail.
      *
      * @param result the raw string encoded in the QR code
-     * // @throw eventdetail the raw string
+     *               // @throw eventdetail the raw string
      */
     private void onQRScanned(String result) {
-        // TODO: hand it to EventList, or if it is wrong QR code, then scannerCore.reset()
-        Toast.makeText(requireContext(), "Scanned: " + result, Toast.LENGTH_LONG).show();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("QR Code Scanned")
+                .setMessage(result)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.dismiss();
+                    scannerCore.reset();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
     }
 }
