@@ -40,6 +40,7 @@ public class EntrantListEntry {
      *  The id of the entrant to add to the waitlist.
      * @param status
      *  The status of the waitlist entry.(1-WAITLIST, 2-INVITED, etc.)
+     * @author Jaylin
      */
     public EntrantListEntry(String eventId, String entrantId, int status) {
         this.eventId = eventId;
