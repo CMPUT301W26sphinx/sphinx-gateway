@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.eventlotterysystem.UI.activities.admin.AdminHomeActivity;
+import com.example.eventlotterysystem.database.ProfileManager;
+import com.example.eventlotterysystem.model.profiles.UserProfile;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -38,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "signInAnonymously:success");
                     FirebaseUser user = mAuth.getCurrentUser();
 
-                    // Launch admin home immediately
-                    Intent intent = new Intent(MainActivity.this, AdminHomeActivity.class);
-                    startActivity(intent);
-                    finish(); // Close MainActivity so user can't go back
+                    UserProfile userProfile = new UserProfile(); // no-arg constructor
+                    ProfileManager profileManager = new ProfileManager();
+                    profileManager.saveUser(userProfile);
+
                 } else {
                     Log.w(TAG, "signInAnonymously:failure", task.getException());
                     // Optionally show a Toast and stay on MainActivity
