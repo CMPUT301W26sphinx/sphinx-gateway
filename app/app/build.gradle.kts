@@ -51,7 +51,7 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-
+    
     // QR Code dependancies - google based dependancies
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
@@ -68,4 +68,5 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.4")
     implementation("androidx.camera:camera-lifecycle:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
+    implementation("com.google.android.material:material:1.11.0")
 }

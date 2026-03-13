@@ -1,0 +1,14 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- inner light background -->
+    <solid android:color="#A7C7FF"/>
+
+    <!-- dark border -->
+    <stroke
+        android:width="2dp"
+        android:color="#036BF4"/>
+
+    <!-- rounded pill -->
+    <corners android:radius="27dp"/>
+
+</shape>
