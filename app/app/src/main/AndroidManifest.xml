@@ -12,11 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EventLotterySystem">
 
-        <activity android:name=".UI.activity.admin.AdminHomeActivity" />
-        <activity android:name=".UI.activity.admin.AdminEventDetailActivity" />
+        <activity android:name=".UI.activities.admin.AdminHomeActivity" />
+        <activity android:name=".UI.activities.admin.AdminEventDetailActivity" />
+        <activity android:name=".UI.activities.admin.AdminProfileDetailActivity" />
 
         <activity
-            android:name=".UI.activity.MainActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

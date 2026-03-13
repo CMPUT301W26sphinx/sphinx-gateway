@@ -1,87 +1,45 @@
 package com.example.eventlotterysystem.model;
+
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Event implements Serializable {
-    // - Event Base? -
-    private static final AtomicInteger count = new AtomicInteger(1);
-    private String eventID;
+    private String eventId;
+    private String title;           // was eventName
+    private String description;     // was eventDescription
+    private int capacity;
+    private long registrationStartDate;   // timestamp (milliseconds)
+    private long registrationEndDate;     // timestamp
+    private int waitingListCount;         // number of users on waiting list
+    // TODO: poster image URL
 
+    // Required no-arg constructor for Firestore
+    public Event() {}
 
-    // - Front Info Of The Event -
-    private String eventName;
-    private String eventDescription;
-    private String eventPlace;
-    private Date eventTime;
-    private List<Date> registrationDate;
-
-    private Double capacity;
-
-    // TODO: private something like photo event?
-
-    // Construct new Event
-    public Event(String eventName, String eventDescription) {
-        this.eventName = eventName;
-        this.eventDescription = eventDescription;
-        this.capacity = Double.POSITIVE_INFINITY;
-
+    public Event(String eventId, String title, String description) {
+        this.eventId = eventId;
+        this.title = title;
+        this.description = description;
     }
 
-    // Getters
+    // Getters and setters
+    public String getEventId() { return eventId; }
+    public void setEventId(String eventId) { this.eventId = eventId; }
 
-    public String getEventID() {
-        return eventID;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getEventName() {
-        return eventName;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public String getEventDescription() {
-        return eventDescription;
-    }
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
 
-    public String getEventPlace() {
-        return eventPlace;
-    }
+    public long getRegistrationStartDate() { return registrationStartDate; }
+    public void setRegistrationStartDate(long registrationStartDate) { this.registrationStartDate = registrationStartDate; }
 
-    public Date getEventTime() {
-        return eventTime;
-    }
+    public long getRegistrationEndDate() { return registrationEndDate; }
+    public void setRegistrationEndDate(long registrationEndDate) { this.registrationEndDate = registrationEndDate; }
 
-    public List<Date> getRegistrationStartDate() {
-        return registrationDate;
-    }
-
-    public Double getCapacity() {
-        return capacity;
-    }
-
-    // Setter
-
-    public void setEventId(String eventId) {
-        this.eventID = eventId;
-    }
-
-    public void setEventDescription(String eventDescription) {
-        this.eventDescription = eventDescription;
-    }
-
-    public void setEventPlace(String eventPlace) {
-        this.eventPlace = eventPlace;
-    }
-
-    public void setEventTime(Date eventTime) {
-        this.eventTime = eventTime;
-    }
-
-    public void setRegistrationDate(List<Date> registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
-    public void setCapacity(Double capacity) {
-        this.capacity = capacity;
-    }
+    public int getWaitingListCount() { return waitingListCount; }
+    public void setWaitingListCount(int waitingListCount) { this.waitingListCount = waitingListCount; }
 }

@@ -108,11 +108,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         Event event = eventList.get(position);
 
         // Set event information to UI elements
-        holder.eventName.setText(event.getEventName());
-        holder.eventDescription.setText(event.getEventDescription());
+        holder.eventName.setText(event.getTitle());
+        holder.eventDescription.setText(event.getDescription());
 
         // Alternative debug example (commented out)
-        // Log.d("EventAdapter", "Binding event: " + event.getEventName());
+        // Log.d("EventAdapter", "Binding event: " + event.getTitle());
 
         // Handle click event for the item
         holder.itemView.setOnClickListener(v -> {

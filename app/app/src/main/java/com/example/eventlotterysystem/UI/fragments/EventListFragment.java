@@ -91,7 +91,7 @@ public class EventListFragment extends Fragment {
 
             // Pass selected event ID to details fragment
             Bundle bundle = new Bundle();
-            bundle.putString("event_id", event.getEventID());
+            bundle.putString("event_id", event.getEventId());
 
             EventDetailsFragment detailsFragment = new EventDetailsFragment();
             detailsFragment.setArguments(bundle);
@@ -125,11 +125,12 @@ public class EventListFragment extends Fragment {
                         String name = document.getString("title");
                         String description = document.getString("description");
 
-                        // Create Event object
-                        Event event = new Event(name, description);
-
-                        // Set Firestore document ID as event ID
-                        event.setEventId(document.getId());
+                        // Create Event object using constructor compatible with Event.java
+                        Event event = new Event(
+                                document.getId(),
+                                name,
+                                description
+                        );
 
                         // Add event to list
                         eventList.add(event);

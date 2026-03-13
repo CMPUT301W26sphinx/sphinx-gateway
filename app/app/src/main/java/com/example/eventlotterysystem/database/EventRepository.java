@@ -1,28 +1,77 @@
 package com.example.eventlotterysystem.database;
 
+import com.example.eventlotterysystem.model.Event;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-/**
- * Repository class responsible for providing event data.
- * For now, this uses temporary hardcoded data.
- * Later, this class can be updated to load events from Firestore
- * without requiring major changes to the UI code.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class EventRepository {
 
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Callback for list of events
+    public interface EventCallback {
+        void onEventsLoaded(List<Event> events);
+        void onError(Exception e);
+    }
+
+    // Callback for a single event
+    public interface SingleEventCallback {
+        void onEventLoaded(Event event);
+        void onError(Exception e);
+    }
+
+    // Callback for delete operation
+    public interface OnDeleteListener {
+        void onSuccess();
+        void onError(Exception e);
+    }
+
     /**
-     * Returns a list of sample events for the admin Events page.
-     *
-     * @return a list of Event objects
-     * For now it is disabled fully, until proper implementation
+     * Fetch all events from Firestore.
      */
-//    public List<Event> getEvents() {
-//        List<Event> events = new ArrayList<>();
-//
-//        // Temporary sample data used until Firestore is connected.
-//        events.add(new Event("Swimming Lessons", "Beginner swimming lessons for children."));
-//        events.add(new Event("Piano Lessons", "Introductory piano lessons for beginners."));
-//        events.add(new Event("Dance Class", "Basic interpretive dance and movement safety."));
-//
-//        return events;
-//    }
+    public void getEvents(EventCallback callback) {
+        db.collection("events")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Event> events = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Event event = document.toObject(Event.class);
+                        event.setEventId(document.getId());
+                        events.add(event);
+                    }
+                    callback.onEventsLoaded(events);
+                })
+                .addOnFailureListener(callback::onError);
+    }
+
+    /**
+     * Fetch a single event by its document ID.
+     */
+    public void getEvent(String eventId, SingleEventCallback callback) {
+        db.collection("events").document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Event event = documentSnapshot.toObject(Event.class);
+                        event.setEventId(documentSnapshot.getId());
+                        callback.onEventLoaded(event);
+                    } else {
+                        callback.onError(new Exception("Event not found"));
+                    }
+                })
+                .addOnFailureListener(callback::onError);
+    }
+
+    /**
+     * Delete an event by its document ID.
+     */
+    public void removeEvent(String eventId, OnDeleteListener listener) {
+        db.collection("events").document(eventId)
+                .delete()
+                .addOnSuccessListener(aVoid -> listener.onSuccess())
+                .addOnFailureListener(listener::onError);
+    }
 }
