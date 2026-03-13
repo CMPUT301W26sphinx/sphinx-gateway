@@ -126,7 +126,7 @@ public class CreateEventFragment extends Fragment {
         String maxEntrants = maxInput.getText().toString();
         if (!maxEntrants.isEmpty()){
             try {
-                double val = Double.parseDouble(maxEntrants);
+                int val = Integer.parseInt(maxEntrants);
                 if (val <= 0) {
                     Toast.makeText(getContext(), "Max Entrants has to be bigger than 0", Toast.LENGTH_SHORT).show();
                     return false;

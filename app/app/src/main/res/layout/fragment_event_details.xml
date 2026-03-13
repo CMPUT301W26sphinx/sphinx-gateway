@@ -142,6 +142,11 @@
             android:layout_marginTop="4dp"
             android:text="xx placeholder for firestore"
             android:textSize="14sp" />
+        <Button
+            android:id="@+id/viewWaitlistButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Waiting List"/>
 
     </LinearLayout>
 
