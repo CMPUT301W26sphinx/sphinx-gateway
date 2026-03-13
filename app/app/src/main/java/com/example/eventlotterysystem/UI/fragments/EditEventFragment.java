@@ -1,10 +1,7 @@
 package com.example.eventlotterysystem.UI.fragments;
 
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,94 +10,106 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.eventlotterysystem.R;
-import com.example.eventlotterysystem.model.Event;
-import com.google.firebase.firestore.FirebaseFirestore;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-import org.w3c.dom.Text;
+import com.example.eventlotterysystem.R;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Locale;
 
 public class EditEventFragment extends Fragment {
 
     private FirebaseFirestore db;
-    private EditText descInput, timeInput, placeInput, startRegInput, endRegInput, maxInput;
+
+    private EditText descInput;
+    private EditText timeInput;
+    private EditText placeInput;
+    private EditText startRegInput;
+    private EditText endRegInput;
+    private EditText maxInput;
     private TextView name;
     private Button saveButton;
+
+    private String eventId;
+    private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
+
+    public EditEventFragment() {
+    }
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
 
         db = FirebaseFirestore.getInstance();
 
-        // Post the details from database
         name = view.findViewById(R.id.eventName);
-//        name.setText(db.get(Name));
         descInput = view.findViewById(R.id.eventDescription);
-//        descInput.setText(db.get(description));
         timeInput = view.findViewById(R.id.eventTime);
-//        timeInput.setText(db.get(time));
         placeInput = view.findViewById(R.id.eventPlace);
-//        placeInput.setText(db.get(place));
         startRegInput = view.findViewById(R.id.regStart);
-//        startRegInput.setText(db.get(startReg));
         endRegInput = view.findViewById(R.id.regEnd);
-//        endRegInput.setText(db.get(endReg));
         maxInput = view.findViewById(R.id.maxEntrants);
-//        maxInput.setText(db.get(max));
         saveButton = view.findViewById(R.id.saveEventButton);
+
+        loadArguments();
+
         saveButton.setOnClickListener(v -> {
-            if (checkInfo()){
+            if (checkInfo()) {
                 updateEvent();
-                Toast.makeText(getContext(), "Saved", Toast.LENGTH_SHORT).show();
             }
         });
 
-
         return view;
     }
+
+    private void loadArguments() {
+        Bundle args = getArguments();
+        if (args == null) {
+            return;
+        }
+
+        eventId = args.getString("eventId", "");
+
+        String title = args.getString("title", "");
+        String description = args.getString("description", "");
+        long registrationStart = args.getLong("registrationStartDate", 0L);
+        long registrationEnd = args.getLong("registrationEndDate", 0L);
+        int capacity = args.getInt("capacity", 0);
+
+        name.setText(title);
+        descInput.setText(description);
+
+        if (registrationStart > 0) {
+            startRegInput.setText(formatter.format(new Date(registrationStart)));
+        }
+
+        if (registrationEnd > 0) {
+            endRegInput.setText(formatter.format(new Date(registrationEnd)));
+        }
+
+        if (capacity > 0) {
+            maxInput.setText(String.valueOf(capacity));
+        }
+    }
+
     private boolean checkInfo() {
-        // Checking if all the information is good to upload to the database
-
-        // description has to be filled
-        String description = descInput.getText().toString();
+        String description = descInput.getText().toString().trim();
         if (description.isEmpty()) {
-            Toast.makeText(getContext(), "description cannot be Empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Description cannot be empty", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        //  place has to be filled
-        String place = placeInput.getText().toString();
-        if (place.isEmpty()) {
-            Toast.makeText(getContext(), "place cannot be Empty", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+        String start = startRegInput.getText().toString().trim();
+        String end = endRegInput.getText().toString().trim();
 
-        //  time has to be filled and in correct format
-        SimpleDateFormat formatter;
-        formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        String time = timeInput.getText().toString();
-        if (time.isEmpty()) {
-            Toast.makeText(getContext(), "time cannot be Empty", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        try {
-            formatter.parse(time);
-        } catch (ParseException e) {
-            Toast.makeText(getContext(), "Incorrect date format: Time", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        // Registration Dates should be both filled or all empty
-        String start = startRegInput.getText().toString();
-        String end = endRegInput.getText().toString();
-        if (!start.isEmpty()) {
+        if (!TextUtils.isEmpty(start)) {
             try {
                 formatter.parse(start);
             } catch (ParseException e) {
@@ -108,7 +117,8 @@ public class EditEventFragment extends Fragment {
                 return false;
             }
         }
-        if (!end.isEmpty()) {
+
+        if (!TextUtils.isEmpty(end)) {
             try {
                 formatter.parse(end);
             } catch (ParseException e) {
@@ -116,77 +126,85 @@ public class EditEventFragment extends Fragment {
                 return false;
             }
         }
-        if (start.isEmpty() && !end.isEmpty()) {
+
+        if (TextUtils.isEmpty(start) && !TextUtils.isEmpty(end)) {
             Toast.makeText(getContext(), "Registration Start is missing", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (!start.isEmpty() && end.isEmpty()) {
+
+        if (!TextUtils.isEmpty(start) && TextUtils.isEmpty(end)) {
             Toast.makeText(getContext(), "Registration End is missing", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        // Max Entrants must an integer greater than 0 or empty
-        String maxEntrants = maxInput.getText().toString();
+        String maxEntrants = maxInput.getText().toString().trim();
         if (!maxEntrants.isEmpty()) {
             try {
-                double val = Double.parseDouble(maxEntrants);
+                int val = Integer.parseInt(maxEntrants);
                 if (val <= 0) {
-                    Toast.makeText(getContext(), "Max Entrants has to be bigger than 0", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Max Entrants has to be greater than 0", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Max Entrants has to be integer", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Max Entrants must be an integer", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
+
         return true;
     }
 
-    private void updateEvent(){
-        // Update the database with new info
-
-        //to do
-        // db.set
-        // Event event = db.get ...
-
-        // new info from user
-        Event event = new Event("Test name", "Test desc"); // delete after all coding
-        String description = descInput.getText().toString();
-        String place = placeInput.getText().toString();
-        String time = timeInput.getText().toString();
-        SimpleDateFormat formatter;
-        formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        String start = startRegInput.getText().toString();
-        String end = endRegInput.getText().toString();
-        Double maxEntrants = Double.POSITIVE_INFINITY;
-        if (!maxInput.getText().toString().isEmpty()) {
-            maxEntrants = Double.parseDouble(maxInput.getText().toString());
+    private void updateEvent() {
+        if (TextUtils.isEmpty(eventId)) {
+            Toast.makeText(getContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        // Setting details
-        event.setEventDescription(description);
-        event.setEventPlace(place);
+        String description = descInput.getText().toString().trim();
+        String start = startRegInput.getText().toString().trim();
+        String end = endRegInput.getText().toString().trim();
+
+        int capacity = 0;
+        String maxEntrantsText = maxInput.getText().toString().trim();
+        if (!maxEntrantsText.isEmpty()) {
+            capacity = Integer.parseInt(maxEntrantsText);
+        }
+
+        Long registrationStartMillis = null;
+        Long registrationEndMillis = null;
+
         try {
-            event.setEventTime(formatter.parse(time));
-        } catch (ParseException e){
-            e.printStackTrace();
-        }
-        if ((start != null) && (end != null))   {
-            try {
-                Date date_start = formatter.parse(start);
-                Date date_end = formatter.parse(end);
-                List<Date> list_reg_date = new ArrayList<>();
-                list_reg_date.add(date_start);
-                list_reg_date.add(date_end);
-                event.setRegistrationDate(list_reg_date);
-
-            } catch (ParseException e) {
-                e.printStackTrace();
+            if (!start.isEmpty()) {
+                Date startDate = formatter.parse(start);
+                if (startDate != null) {
+                    registrationStartMillis = startDate.getTime();
+                }
             }
-        }
-        event.setCapacity(maxEntrants);
 
-        //to do:
-        // db.set ...
+            if (!end.isEmpty()) {
+                Date endDate = formatter.parse(end);
+                if (endDate != null) {
+                    registrationEndMillis = endDate.getTime();
+                }
+            }
+        } catch (ParseException e) {
+            Toast.makeText(getContext(), "Invalid registration date format", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        db.collection("events")
+                .document(eventId)
+                .update(
+                        "description", description,
+                        "capacity", capacity,
+                        "registrationStartDate", registrationStartMillis == null ? 0L : registrationStartMillis,
+                        "registrationEndDate", registrationEndMillis == null ? 0L : registrationEndMillis
+                )
+                .addOnSuccessListener(unused ->
+                        Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show()
+                )
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show()
+                );
     }
 }
