@@ -1,6 +1,7 @@
 package com.example.eventlotterysystem.model.profiles;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Stores and manages the information for a user profile
@@ -12,7 +13,8 @@ public class UserProfile implements Serializable {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private boolean receiveNotifications; // notification preference
+    private boolean notificationPreference; // was receiveNotifications
+    private List<String> notification;      // was Notifications
 
     // private role userRole; //need role class, entrant, organizer, or whatever
 
@@ -52,15 +54,6 @@ public class UserProfile implements Serializable {
      */
     public void setUserPhoneNumber(String userPhone) {
         this.phoneNumber = userPhone;
-    }
-
-    /**
-     * Update the users notifcation preference
-     *
-     * @param choice
-     */
-    public void setReceiveNotifications(boolean choice) {
-        this.receiveNotifications = choice;
     }
 
     /**
@@ -117,16 +110,25 @@ public class UserProfile implements Serializable {
 
     /**
      * Returns notification preference
-     *
      * @return
      */
-    public boolean getNotificationPreference() {
-        return receiveNotifications;
-    }
+    public boolean getNotificationPreference() {return notificationPreference;}
+
+    /**
+     * Sets notification preference
+     * @param choice yes or no
+     */
+    public void setReceiveNotifications(boolean choice) {this.notificationPreference = choice;}
+    /**
+     * Gets notifications
+     * @return notification
+     */
+    public List<String> getNotification() {return notification;}
     /**
      * Get the users last name.
      */
     public String getLastName() {
         return lastName;
     }
+
 }

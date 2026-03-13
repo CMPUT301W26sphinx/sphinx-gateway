@@ -1,6 +1,5 @@
-package com.example.eventlotterysystem.model;
+package com.example.eventlotterysystem.database;
 
-import com.example.eventlotterysystem.database.ProfileManager;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
