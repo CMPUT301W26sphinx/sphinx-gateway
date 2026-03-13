@@ -1,5 +1,6 @@
 package com.example.eventlotterysystem.UI.fragments;
 
+import com.example.eventlotterysystem.model.Event;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -13,7 +14,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
-import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
@@ -138,39 +138,25 @@ public class CreateEventFragment extends Fragment {
         return true;
     }
     private void createEvent() {
-        // Create a new Event
+        String name = nameInput.getText().toString().trim();
+        String description = descInput.getText().toString().trim();
+        String start = startRegInput.getText().toString().trim();
+        String end = endRegInput.getText().toString().trim();
 
-        // Input from the user
-        String name = nameInput.getText().toString();
-        String description = descInput.getText().toString();
-        String time = timeInput.getText().toString();
-        String place = placeInput.getText().toString();
-        String start = startRegInput.getText().toString();
-        String end = endRegInput.getText().toString();
-        Double maxEntrants = Double.POSITIVE_INFINITY;
-        if (!maxInput.getText().toString().isEmpty()) {
-            maxEntrants = Double.parseDouble(maxInput.getText().toString());
+        int maxEntrants = 0;
+        if (!maxInput.getText().toString().trim().isEmpty()) {
+            maxEntrants = Integer.parseInt(maxInput.getText().toString().trim());
         }
 
-        // Create Event Object
-        Event event = new Event(name, description);
+        Event event = new Event();
+        event.setTitle(name);
+        event.setDescription(description);
+        event.setCapacity(maxEntrants);
 
-        // Format for Date
-        SimpleDateFormat formatter;
-        formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-
-        // Set Time
-        try {
-            event.setEventTime(formatter.parse(time));
-        } catch (ParseException e){
-            e.printStackTrace();
-        }
-
-        // Set Place
-        event.setEventPlace(place);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         // Set Registration Date
-        if ((start != null) && (end != null))   {
+        if ((start != null) && (end != null)) {
             try {
                 Date date_start = formatter.parse(start);
                 Date date_end = formatter.parse(end);
@@ -179,23 +165,23 @@ public class CreateEventFragment extends Fragment {
                 list_reg_date.add(date_end);
                 event.setRegistrationDate(list_reg_date);
 
+
             } catch (ParseException e) {
                 e.printStackTrace();
+                Toast.makeText(getContext(), "Invalid date format", Toast.LENGTH_SHORT).show();
+                return;
             }
         }
 
-        // Set Max Entrants
-        if (maxEntrants != Double.POSITIVE_INFINITY){
-            event.setCapacity(maxEntrants);
-        }
-
-        // To do:
-        // For QR code generator
-
-
-
-        // To do:
-        // 1: Save Event to db
-        // 2. Create Lists for Event in db (Waiting, Entrants, etc.)
+        db.collection("events")
+        .add(event)
+        .addOnSuccessListener(documentReference -> {
+            event.setEventId(documentReference.getId());
+            documentReference.update("eventId", documentReference.getId());
+            Toast.makeText(getContext(), "New Event: " + name + " is created", Toast.LENGTH_SHORT).show();
+        })
+        .addOnFailureListener(e ->
+                Toast.makeText(getContext(), "Failed to create event", Toast.LENGTH_SHORT).show()
+        );
     }
 }

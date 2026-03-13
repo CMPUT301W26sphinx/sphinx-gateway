@@ -6,9 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Event implements Serializable {
     // - Event Base? -
-    private static final AtomicInteger count = new AtomicInteger(1);
-    private int eventID;
-
+    private String eventID;
 
     // - Front Info Of The Event -
     private String eventName;
@@ -17,21 +15,25 @@ public class Event implements Serializable {
     private Date eventTime;
     private List<Date> registrationDate;
 
-    private Double capacity;
+    private int capacity;
 
     // TODO: private something like photo event?
 
+
+    public Event(){
+        this.capacity = 0;
+    }
     // Construct new Event
     public Event(String eventName, String eventDescription) {
         this.eventName = eventName;
         this.eventDescription = eventDescription;
-        this.capacity = Double.POSITIVE_INFINITY;
+        this.capacity = 0;
 
     }
 
     // Getters
 
-    public int getEventID() {
+    public String getEventID() {
         return eventID;
     }
 
@@ -51,17 +53,26 @@ public class Event implements Serializable {
         return eventTime;
     }
 
-    public List<Date> getRegistrationStartDate() {
+    public List<Date> getRegistrationDate() {
         return registrationDate;
     }
 
-    public Double getCapacity() {
+    public int getCapacity() {
         return capacity;
     }
 
     // Setter
 
-    public void setEventDescription(String eventDescription) {
+
+    public void setEventId(String eventID) {
+        this.eventID = eventID;
+    }
+
+    public void setTitle(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public void setDescription(String eventDescription) {
         this.eventDescription = eventDescription;
     }
 
@@ -77,7 +88,7 @@ public class Event implements Serializable {
         this.registrationDate = registrationDate;
     }
 
-    public void setCapacity(Double capacity) {
+    public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
 }
