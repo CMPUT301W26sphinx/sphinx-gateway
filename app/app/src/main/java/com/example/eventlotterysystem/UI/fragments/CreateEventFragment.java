@@ -29,6 +29,7 @@ public class CreateEventFragment extends Fragment {
     private EditText nameInput, descInput, timeInput, placeInput, startRegInput, endRegInput, maxInput;
 
     private Button saveButton;
+    private Button backButton;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +47,12 @@ public class CreateEventFragment extends Fragment {
         endRegInput = view.findViewById(R.id.regEnd);
         maxInput = view.findViewById(R.id.maxEntrants);
         saveButton = view.findViewById(R.id.saveEventButton);
+        backButton = view.findViewById(R.id.backButton);
+
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
         saveButton.setOnClickListener(v -> {
             // check if all the inputs are valid
             if (checkInfo()){
@@ -178,6 +185,13 @@ public class CreateEventFragment extends Fragment {
                     event.setEventId(documentReference.getId());
                     documentReference.update("eventId", documentReference.getId());
                     Toast.makeText(getContext(), "New Event: " + name + " is created", Toast.LENGTH_SHORT).show();
+
+                    // direct to EventDetailsFragment after it is created
+                    EventDetailsFragment fragment = EventDetailsFragment.newInstance(documentReference.getId());
+                    getParentFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, fragment)
+                            .commit();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "Failed to create event", Toast.LENGTH_SHORT).show()

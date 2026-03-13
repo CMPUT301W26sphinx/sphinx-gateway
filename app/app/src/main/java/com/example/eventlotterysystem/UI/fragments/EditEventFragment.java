@@ -34,6 +34,7 @@ public class EditEventFragment extends Fragment {
     private EditText maxInput;
     private TextView name;
     private Button saveButton;
+    private Button backButton;
 
     private String eventId;
     private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
@@ -56,7 +57,7 @@ public class EditEventFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_create_event, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
 
         db = FirebaseFirestore.getInstance();
 
@@ -68,8 +69,13 @@ public class EditEventFragment extends Fragment {
         endRegInput = view.findViewById(R.id.regEnd);
         maxInput = view.findViewById(R.id.maxEntrants);
         saveButton = view.findViewById(R.id.saveEventButton);
+        backButton = view.findViewById(R.id.backButton);
+
 
         loadArguments();
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
 
         saveButton.setOnClickListener(v -> {
             if (checkInfo()) {
@@ -211,8 +217,15 @@ public class EditEventFragment extends Fragment {
                         "registrationStartDate", registrationStartMillis == null ? 0L : registrationStartMillis,
                         "registrationEndDate", registrationEndMillis == null ? 0L : registrationEndMillis
                 )
-                .addOnSuccessListener(unused ->
-                        Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show()
+                .addOnSuccessListener(unused -> {
+                            Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
+                            // direct back to EventDetailsFragment after updating
+                            EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventId);
+                            getParentFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_container, fragment)
+                                    .commit();
+                        }
                 )
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show()

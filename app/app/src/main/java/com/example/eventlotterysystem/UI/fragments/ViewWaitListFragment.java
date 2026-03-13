@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ public class ViewWaitListFragment extends Fragment {
     private String eventId;
     private List<EntrantListEntry> waitlist = new ArrayList<>();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private Button backButton;
 
     public ViewWaitListFragment() {}
     public static ViewWaitListFragment newInstance(String eventId) {
@@ -50,6 +52,11 @@ public class ViewWaitListFragment extends Fragment {
         if (args != null) {
             eventId = args.getString(EVENT_ID);
         }
+        backButton = view.findViewById(R.id.backButton);
+
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
         loadWaitlist();
         showWaitList();
     }
