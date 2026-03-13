@@ -30,6 +30,13 @@ public class CreateEventFragment extends Fragment {
 
     private Button saveButton;
     private Button backButton;
+
+    public static CreateEventFragment newInstance() {
+        CreateEventFragment fragment = new CreateEventFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
     @Nullable
     @Override
     /**
