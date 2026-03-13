@@ -10,6 +10,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Handles communication between local user profiles and firebase.
  * @author Noah Zapisocki
@@ -66,5 +69,36 @@ public class ProfileManager {
 
     }
 
+    public interface AllUsersCallback {
+        void onUsersLoaded(List<UserProfile> users);
+        void onError(Exception e);
+    }
+
+    public void getAllUsers(AllUsersCallback callback) {
+        usersRef.get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<UserProfile> users = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        UserProfile user = doc.toObject(UserProfile.class);
+                        user.setUserID(doc.getId()); // ensure ID is set
+                        users.add(user);
+                    }
+                    callback.onUsersLoaded(users);
+                })
+                .addOnFailureListener(callback::onError);
+    }
+
+
+    public interface OnDeleteListener {
+        void onSuccess();
+        void onError(Exception e);
+    }
+
+    public void deleteUser(String userId, OnDeleteListener listener) {
+        usersRef.document(userId)
+                .delete()
+                .addOnSuccessListener(aVoid -> listener.onSuccess())
+                .addOnFailureListener(listener::onError);
+    }
 
 }

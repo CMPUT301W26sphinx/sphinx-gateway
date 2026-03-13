@@ -3,12 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="16dp"
+    android:background="#F4F4F4">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Search Bar -->
+    <EditText
+        android:id="@+id/search_profiles"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Admin Profiles Page"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:hint="Search by name or email"
+        android:padding="12dp"
+        android:background="@drawable/search_background"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="30dp"/>
+
+    <!-- RecyclerView for Profiles -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/profiles_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

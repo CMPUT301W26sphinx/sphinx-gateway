@@ -1,5 +1,6 @@
 package com.example.eventlotterysystem.UI.fragments;
 
+import com.example.eventlotterysystem.model.Event;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
