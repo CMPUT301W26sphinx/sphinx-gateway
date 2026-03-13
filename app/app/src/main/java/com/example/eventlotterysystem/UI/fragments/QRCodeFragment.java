@@ -24,6 +24,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.model.Event;
 import com.example.eventlotterysystem.model.QRScannerCore;
 
 import java.nio.channels.AlreadyBoundException;
@@ -32,6 +34,7 @@ public class QRCodeFragment extends Fragment {
     private PreviewView previewView;
     private LifecycleCameraController cameraController;
     private QRScannerCore scannerCore;
+    private final EventRepository EventRepository = new EventRepository();
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
@@ -113,18 +116,52 @@ public class QRCodeFragment extends Fragment {
      *               // @throw eventdetail the raw string
      */
     private void onQRScanned(String result) {
+        scannerCore.reset();
+        EventRepository.getEvent(result, new EventRepository.SingleEventCallback() {
+            @Override
+            public void onEventLoaded(Event event) {
+                if (!isAdded()) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("QR Code Scanned")
-                .setMessage(result)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    dialog.dismiss();
-                    scannerCore.reset();
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                    dialog.dismiss();
-                })
-                .setCancelable(false)
-                .show();
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Event Found")
+                        .setMessage(event.getTitle())
+                        .setPositiveButton("See More", (dialog, which) -> {
+                            dialog.dismiss();
+                            EventDetailsFragment fragment = EventDetailsFragment.newInstance(result);
+                            requireActivity().getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_container, fragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                        .show();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (!isAdded()) return;
+
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Event Not Found")
+                        .setMessage("No event matches this QR code.")
+                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                        .show();
+            }
+        });
+    }
+
+    /**
+     * https://developer.android.com/guide/fragments/fragmentmanager
+     * @param eventID
+     */
+    private void navigateToEventDetails(String eventID) {
+        EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventID);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)  // replace with your actual container ID
+                .addToBackStack(null)
+                .commit();
     }
 }
