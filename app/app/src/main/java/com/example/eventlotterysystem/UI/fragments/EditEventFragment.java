@@ -22,25 +22,66 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Fragment for editing an existing event.
+ * <p>
+ * This fragment receives event data via {@link Fragment#getArguments()}, populates the UI,
+ * and allows the user to update the event's description, capacity, and registration dates.
+ * The updated information is saved to Firestore.
+ * </p>
+ *
+ * @see CreateEventFragment
+ */
 public class EditEventFragment extends Fragment {
 
+    /** FirebaseFirestore instance for database operations. */
     private FirebaseFirestore db;
 
+    /** EditText for event description. */
     private EditText descInput;
+
+    /** EditText for event time (unused in update). */
     private EditText timeInput;
+
+    /** EditText for event place (unused in update). */
     private EditText placeInput;
+
+    /** EditText for registration start date. */
     private EditText startRegInput;
+
+    /** EditText for registration end date. */
     private EditText endRegInput;
+
+    /** EditText for maximum number of entrants. */
     private EditText maxInput;
+
+    /** TextView for event name (read‑only). */
     private TextView name;
+
+    /** Button to save changes. */
     private Button saveButton;
 
+    /** Firestore document ID of the event being edited. */
     private String eventId;
+
+    /** Date formatter used for parsing and displaying registration dates. */
     private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
 
+    /**
+     * Required empty public constructor.
+     */
     public EditEventFragment() {
     }
 
+    /**
+     * Inflates the layout, initializes Firebase Firestore, sets up UI references,
+     * loads any passed arguments, and sets the click listener for the save button.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate views.
+     * @param container          The parent view that this fragment's UI should be attached to.
+     * @param savedInstanceState If non‑null, this fragment is being re‑constructed from a previous saved state.
+     * @return The root view of the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -69,6 +110,14 @@ public class EditEventFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Retrieves event data from the fragment's arguments and populates the input fields.
+     * <p>
+     * The following keys are expected in the arguments bundle:
+     * "eventId", "title", "description", "registrationStartDate", "registrationEndDate", "capacity".
+     * If a key is missing or its value is empty/default, the corresponding field is left blank or with a placeholder.
+     * </p>
+     */
     private void loadArguments() {
         Bundle args = getArguments();
         if (args == null) {
@@ -99,6 +148,21 @@ public class EditEventFragment extends Fragment {
         }
     }
 
+    /**
+     * Validates the user input fields.
+     * <p>
+     * Checks that:
+     * <ul>
+     *   <li>Description is not empty.</li>
+     *   <li>If provided, registration start and end dates are in the correct format ("dd/MM/yyyy HH:mm").</li>
+     *   <li>Both registration dates are either both provided or both empty.</li>
+     *   <li>If provided, maximum entrants is a positive integer.</li>
+     * </ul>
+     * Displays appropriate error messages via {@link Toast} if validation fails.
+     * </p>
+     *
+     * @return {@code true} if all input is valid; {@code false} otherwise.
+     */
     private boolean checkInfo() {
         String description = descInput.getText().toString().trim();
         if (description.isEmpty()) {
@@ -154,6 +218,15 @@ public class EditEventFragment extends Fragment {
         return true;
     }
 
+    /**
+     * Updates the event document in Firestore with the current input values.
+     * <p>
+     * This method updates the fields "description", "capacity", "registrationStartDate",
+     * and "registrationEndDate" for the event document identified by {@link #eventId}.
+     * If a date field is empty, it is set to 0 (epoch) in Firestore.
+     * Shows success or failure messages via {@link Toast}.
+     * </p>
+     */
     private void updateEvent() {
         if (TextUtils.isEmpty(eventId)) {
             Toast.makeText(getContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();
