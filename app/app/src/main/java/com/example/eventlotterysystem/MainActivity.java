@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         // Set default fragment (Events)
         setCurrentFragment(eventListFragment);
 
+        // No Login!!
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.events) {
