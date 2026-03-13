@@ -38,11 +38,8 @@
         <View
             android:layout_width="240dp"
             android:layout_height="240dp"
-<<<<<<< HEAD
             android:background="@drawable/qrscanframe" />
-=======
-            android:background="@drawable/qr_scan_frame" />
->>>>>>> e0947cd (implemented QRCode scanner based off MLkit, and it's required dependencies)
+
 
     </LinearLayout>
 
