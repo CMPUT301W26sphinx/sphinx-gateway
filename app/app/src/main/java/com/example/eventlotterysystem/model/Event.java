@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Event implements Serializable {
     // - Event Base? -
     private static final AtomicInteger count = new AtomicInteger(1);
-    private int eventID;
+    private String eventID;
 
 
     // - Front Info Of The Event -
@@ -31,7 +31,7 @@ public class Event implements Serializable {
 
     // Getters
 
-    public int getEventID() {
+    public String getEventID() {
         return eventID;
     }
 
@@ -60,6 +60,10 @@ public class Event implements Serializable {
     }
 
     // Setter
+
+    public void setEventId(String eventId) {
+        this.eventID = eventId;
+    }
 
     public void setEventDescription(String eventDescription) {
         this.eventDescription = eventDescription;

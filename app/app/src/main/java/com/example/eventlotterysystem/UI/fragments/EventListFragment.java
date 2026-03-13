@@ -22,14 +22,38 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment responsible for displaying a list of events.
+ *
+ * <p>This fragment retrieves event data from Firebase Firestore and displays
+ * the events using a RecyclerView with the EventAdapter.</p>
+ *
+ * <p>When a user selects an event, the fragment navigates to
+ * {@link EventDetailsFragment} to display detailed information about
+ * the selected event.</p>
+ */
 public class EventListFragment extends Fragment {
 
+    /** RecyclerView used to display the list of events */
     RecyclerView recyclerView;
+
+    /** Adapter used to bind event data to RecyclerView items */
     EventAdapter adapter;
+
+    /** List that stores Event objects retrieved from Firestore */
     List<Event> eventList;
 
+    /** Firebase Firestore instance used for retrieving event data */
     FirebaseFirestore db;
 
+    /**
+     * Inflates the fragment layout.
+     *
+     * @param inflater LayoutInflater used to inflate the layout
+     * @param container Parent container
+     * @param savedInstanceState Saved instance state
+     * @return Inflated view for the fragment
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -39,41 +63,86 @@ public class EventListFragment extends Fragment {
         return inflater.inflate(R.layout.eventlist_main, container, false);
     }
 
+    /**
+     * Called after the fragment view has been created.
+     * Initializes RecyclerView, adapter, and retrieves event data from Firestore.
+     *
+     * @param view Fragment view
+     * @param savedInstanceState Saved instance state
+     */
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
 
+        // Initialize RecyclerView and set layout manager
         recyclerView = view.findViewById(R.id.eventsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        // Initialize event list
         eventList = new ArrayList<>();
 
-        adapter = new EventAdapter(eventList);
+        /**
+         * Create adapter with click listener.
+         * When an event is clicked, the app navigates to EventDetailsFragment.
+         */
+        adapter = new EventAdapter(eventList, event -> {
+
+            // Pass selected event ID to details fragment
+            Bundle bundle = new Bundle();
+            bundle.putString("event_id", event.getEventID());
+
+            EventDetailsFragment detailsFragment = new EventDetailsFragment();
+            detailsFragment.setArguments(bundle);
+
+            // Replace current fragment with EventDetailsFragment
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, detailsFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        // Attach adapter to RecyclerView
         recyclerView.setAdapter(adapter);
 
+        // Initialize Firestore database instance
         db = FirebaseFirestore.getInstance();
 
-        // Fetch events from Firestore
+        /**
+         * Retrieve all events from the "events" collection in Firestore.
+         * Each document is converted into an Event object.
+         */
         db.collection("events")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
 
-                        String name = document.getString("name");
+                        // Extract event information from Firestore document
+                        String name = document.getString("title");
                         String description = document.getString("description");
 
-                        Event event = new Event(name);
-                        event.setEventDescription(description);
+                        // Create Event object
+                        Event event = new Event(name, description);
 
+                        // Set Firestore document ID as event ID
+                        event.setEventId(document.getId());
+
+                        // Add event to list
                         eventList.add(event);
                     }
 
+                    // Notify adapter that data has changed
                     adapter.notifyDataSetChanged();
                 });
 
+        /**
+         * Initialize toggle button group and set default selection.
+         * Currently defaults to displaying all events.
+         */
         MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.toggleGroup);
         toggleGroup.check(R.id.buttonAll);
     }
