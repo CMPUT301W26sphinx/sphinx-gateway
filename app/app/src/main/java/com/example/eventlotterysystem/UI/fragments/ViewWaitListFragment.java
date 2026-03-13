@@ -51,7 +51,9 @@ public class ViewWaitListFragment extends Fragment {
             eventId = args.getString(EVENT_ID);
         }
         loadWaitlist();
+        showWaitList();
     }
+    // Load the waiting list from data base
     private void loadWaitlist() {
 
         if (eventId == null) return;
@@ -69,9 +71,10 @@ public class ViewWaitListFragment extends Fragment {
                     EntrantListEntry entry = doc.toObject(EntrantListEntry.class);
                     waitlist.add(entry);
                 }
-                showWaitList();
         });
     }
+
+    // To show all the entrant in the waiting list
     private void showWaitList() {
         LinearLayout waitlistContainer = getView().findViewById(R.id.waitlistContainer);
 
@@ -86,6 +89,8 @@ public class ViewWaitListFragment extends Fragment {
             waitlistContainer.addView(tv);
             return;
         }
+
+        // Generate TextView for each entrant in the waiting list
         for (EntrantListEntry entry : waitlist) {
             TextView tv = new TextView(getContext());
             tv.setText(entry.getEntrantId()); // replace by name later
