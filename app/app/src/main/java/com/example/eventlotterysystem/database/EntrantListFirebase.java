@@ -26,7 +26,7 @@ public class EntrantListFirebase {
      */
     // lab 5, and https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
     private CollectionReference entrantlistRef(@NonNull String eventId) {
-        return db.collection("Events").document(eventId).collection("EntrantList");
+        return db.collection("events").document(eventId).collection("EntrantList");
     }// in events, go to specific event, then to entrantlistRef
 
     /**
@@ -112,7 +112,7 @@ public class EntrantListFirebase {
      * @return An integer representing the number of entries in the entrantlistRef for the event.
      **/
     public Task<Integer> getWaitlistCount(@NonNull String eventId) {
-        return entrantlistRef(eventId).whereEqualTo("Status", EntrantListEntry.STATUS_WAITLIST).get().continueWith(task -> {
+        return entrantlistRef(eventId).whereEqualTo("status", EntrantListEntry.STATUS_WAITLIST).get().continueWith(task -> {
             if (!task.isSuccessful()|| task.getResult() == null )  return 0;
             return task.getResult().size();
         });
