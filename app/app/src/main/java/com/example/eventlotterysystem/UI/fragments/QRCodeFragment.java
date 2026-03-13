@@ -30,6 +30,12 @@ import com.example.eventlotterysystem.model.QRScannerCore;
 
 import java.nio.channels.AlreadyBoundException;
 
+/**
+ * QRCodeFragment
+ * Takes QRCode, and passes it as a fragment.
+ * When scanned, alert dialog and passes it to EventDetailsFragment
+ * @author Bryan Jonathan
+ */
 public class QRCodeFragment extends Fragment {
     private PreviewView previewView;
     private LifecycleCameraController cameraController;
@@ -46,11 +52,6 @@ public class QRCodeFragment extends Fragment {
                             Toast.LENGTH_LONG).show();
                 }
             });
-
-    /**
-     * Lifecycle behaviour of QR Code
-     * Inflates the QR Code layout
-     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -58,10 +59,6 @@ public class QRCodeFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.qrcode_main, container, false);
     }
-
-    /**
-     * checks camera permission, starts scanner
-     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -74,10 +71,6 @@ public class QRCodeFragment extends Fragment {
             requestPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
     }
-
-    /**
-     * detaches scannercore when it is done
-     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -89,16 +82,13 @@ public class QRCodeFragment extends Fragment {
     /**
      * Camera permission is requested
      * If denied, a toast is shown and the camera feed does not start.
+     * @author Bryan Jonathan
      */
     private boolean hasCameraPermission() {
         return ContextCompat.checkSelfPermission(
                 requireContext(), Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED;
     }
-
-    /**
-     * Sets and calls the QRScannerCore with all the permissions, lifecycelcameracontroller and previewview
-     */
     private void startScanner() {
         cameraController = new LifecycleCameraController(requireContext());
         cameraController.bindToLifecycle(getViewLifecycleOwner());
@@ -113,7 +103,7 @@ public class QRCodeFragment extends Fragment {
      * Receives the raw string result and passes it to EventDetail.
      *
      * @param result the raw string encoded in the QR code
-     *               // @throw eventdetail the raw string
+     * @author Bryan Jonathan
      */
     private void onQRScanned(String result) {
         EventRepository.getEvent(result, new EventRepository.SingleEventCallback() {
@@ -122,8 +112,8 @@ public class QRCodeFragment extends Fragment {
                 if (!isAdded()) return;
 
                 new AlertDialog.Builder(requireContext())
-                        .setTitle("Event Found")
-                        .setMessage(event.getTitle())
+                        .setTitle(event.getTitle())
+                        .setMessage(event.getDescription())
                         .setPositiveButton("See More", (dialog, which) -> {
                             dialog.dismiss();
                             EventDetailsFragment fragment = EventDetailsFragment.newInstance(result);
@@ -150,19 +140,5 @@ public class QRCodeFragment extends Fragment {
                         .show();
             }
         });
-    }
-
-    /**
-     * https://developer.android.com/guide/fragments/fragmentmanager
-     * @param eventID
-     */
-    private void navigateToEventDetails(String eventID) {
-        EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventID);
-
-        requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, fragment)  // replace with your actual container ID
-                .addToBackStack(null)
-                .commit();
     }
 }

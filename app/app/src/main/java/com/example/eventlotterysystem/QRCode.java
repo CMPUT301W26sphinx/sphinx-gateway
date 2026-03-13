@@ -25,22 +25,12 @@ import java.util.Collections;
 
 /** Based off official CameraX-MLkit dev<p>
  * https://github.com/android/camera-samples/tree/main/CameraX-MLKit <p>
- * HOW TO CALL FROM ANY ACTIVITY: <p>
- * scanQrButton.setOnClickListener(v -> {
- *   Intent intent = new Intent(getActivity(), QRScannerActivity.class);
- *   startActivityForResult(intent, QRScannerActivity.REQUEST_CODE);
- * });
- *
- * protected void onActivityResult(int requestCode, int resultCode, Intent data) {
- *   super.onActivityResult(requestCode, resultCode, data);
- *   if (requestCode == QRScannerActivity.REQUEST_CODE && resultCode == RESULT_OK) {
- *   String uuid = data.getStringExtra(QRScannerActivity.EXTRA_RESULT);
- }
+ *     Supposed to be one which creates QR, but now is seperated to fragments
+ * @author Bryan Jonathan
  */
 
 public class QRCode extends AppCompatActivity {
     private static final String TAG = "CameraX-MLKit";
-    public static final int REQUEST_CODE = 1001;
     private static final int CAMERA_PERMISSION_REQUEST = 100;
     public static final String QR_RESULT = "qr_result";
 
@@ -134,12 +124,6 @@ public class QRCode extends AppCompatActivity {
         );
         previewView.setController(cameraController);
     }
-    // Cancel button (wired via android:onClick in XML)
-    public void onCancelClicked(android.view.View v) {
-        finish();
-    }
-
-    // Return result to caller
     private void deliverResult(String result) {
         Intent data = new Intent();
         data.putExtra(QR_RESULT, result);
