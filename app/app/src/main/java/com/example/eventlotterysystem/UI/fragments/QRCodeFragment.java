@@ -116,7 +116,6 @@ public class QRCodeFragment extends Fragment {
      *               // @throw eventdetail the raw string
      */
     private void onQRScanned(String result) {
-        scannerCore.reset();
         EventRepository.getEvent(result, new EventRepository.SingleEventCallback() {
             @Override
             public void onEventLoaded(Event event) {
@@ -134,7 +133,8 @@ public class QRCodeFragment extends Fragment {
                                     .addToBackStack(null)
                                     .commit();
                         })
-                        .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                        .setNegativeButton("Cancel", (dialog, which) -> scannerCore.reset())
+                        .setOnCancelListener(dialog -> scannerCore.reset())
                         .show();
             }
 
@@ -145,7 +145,8 @@ public class QRCodeFragment extends Fragment {
                 new AlertDialog.Builder(requireContext())
                         .setTitle("Event Not Found")
                         .setMessage("No event matches this QR code.")
-                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                        .setPositiveButton("OK", (dialog, which) -> scannerCore.reset())
+                        .setOnCancelListener(dialog -> scannerCore.reset())
                         .show();
             }
         });
