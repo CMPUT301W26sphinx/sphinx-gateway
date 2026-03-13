@@ -51,10 +51,7 @@ public class MainActivity extends AppCompatActivity {
         // Set default fragment (Events)
         setCurrentFragment(eventListFragment);
 
-<<<<<<< HEAD
         // No Login!!
-=======
->>>>>>> b4251b3aba401bc3c8d23b9017084b807b42a8fb
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.events) {
@@ -98,8 +95,4 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.fragment_container, fragment)
                 .commit();
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> b4251b3aba401bc3c8d23b9017084b807b42a8fb
