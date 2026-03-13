@@ -81,18 +81,56 @@ public class ProfileEditFragment extends Fragment {
             String phoneNumber = userPhoneInput.getText().toString();
             // new user profile
             UserProfile userProfile = new UserProfile();
-            // update fields
-            userProfile.setFirstName(firstName);
-            userProfile.setLastName(lastName);
-            userProfile.setUserEmail(email);
-            userProfile.setUserPhoneNumber(phoneNumber);
-            // update user information in firebase
-            manager.saveUser(userProfile);
+            boolean isValid = true;
 
-            // display information saved message
-            Toast myToast = Toast.makeText(getActivity(), "Information Saved!",
-                    Toast.LENGTH_SHORT);
-            myToast.show();
+            // update fields
+            if (email.contains("@") && email.endsWith(".com")){
+                userProfile.setUserEmail(email);
+            } else {
+                Toast myToast = Toast.makeText(getActivity(), "Invalid email format",
+                        Toast.LENGTH_SHORT);
+                myToast.show();
+                isValid = false;
+            }
+
+            if (phoneNumber.matches("\\d{3}-\\d{3}\\-\\d{4}") || phoneNumber.isEmpty()){
+                userProfile.setUserPhoneNumber(phoneNumber);
+            } else {
+                Toast myToast = Toast.makeText(getActivity(), "Invalid phone number format",
+                        Toast.LENGTH_SHORT);
+                myToast.show();
+                isValid = false;
+            }
+
+            if (firstName.isEmpty()){
+                Toast myToast = Toast.makeText(getActivity(), "Name is a required field",
+                        Toast.LENGTH_SHORT);
+                myToast.show();
+                isValid = false;
+            } else {
+                userProfile.setFirstName(firstName);
+            }
+
+            if (lastName.isEmpty()){
+                Toast myToast = Toast.makeText(getActivity(), "Name is a required field",
+                        Toast.LENGTH_SHORT);
+                myToast.show();
+                isValid = false;
+            } else {
+                userProfile.setLastName(lastName);
+
+            }
+
+            // update user information in firebase
+            if (isValid){
+                manager.saveUser(userProfile);
+                // display information saved message
+                Toast myToast = Toast.makeText(getActivity(), "Information Saved!",
+                        Toast.LENGTH_SHORT);
+                myToast.show();
+            }
+
+
         });
     }
 }
