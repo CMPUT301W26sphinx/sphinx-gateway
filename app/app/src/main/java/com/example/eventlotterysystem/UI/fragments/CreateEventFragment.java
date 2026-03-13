@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class CreateEventFragment extends Fragment {
 
@@ -30,6 +31,13 @@ public class CreateEventFragment extends Fragment {
 
     private Button saveButton;
     private Button backButton;
+
+    public static CreateEventFragment newInstance() {
+        CreateEventFragment fragment = new CreateEventFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
     @Nullable
     @Override
     /**
@@ -181,6 +189,8 @@ public class CreateEventFragment extends Fragment {
         }
 
         Event event = new Event();
+        final String uuid = UUID.randomUUID().toString().replace("-", "");
+        event.setEventId(uuid);
         event.setTitle(name);
         event.setDescription(description);
         event.setCapacity(maxEntrants);
