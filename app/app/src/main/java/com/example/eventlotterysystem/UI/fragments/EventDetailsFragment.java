@@ -18,6 +18,14 @@ import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.model.Event;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * A simple {@link Fragment} subclass.
  * EventDetailsFragment displays details for a selected event, as well as provides buttons for registering and removing participants.
@@ -48,6 +56,7 @@ public class EventDetailsFragment extends Fragment {
     private int currentStatus = -1; // Affect UI button
 
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
+    private final EventRepository eventRepository = new EventRepository();
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -262,9 +271,69 @@ public class EventDetailsFragment extends Fragment {
      * No parameters or returns.
      */
     private void loadEventDetails() {
-        //TODO - need Firebase methods added to get event details from firestore!
+
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+
+            @Override
+            public void onEventLoaded(Event event) {
+                if (!isAdded()) return;
+
+                // Title
+                eventTitle.setText(event.getTitle());
+
+                // Description
+                valueDescription.setText(event.getDescription());
+
+                // Registration period
+                String regPeriod = formatRegistrationPeriod(
+                        event.getRegistrationStartDate(),
+                        event.getRegistrationEndDate()
+                );
+                valueRegistration.setText(regPeriod);
+
+                // These fields are not yet in the Event model
+                valueStarttime.setText("Not available");
+                valueLocation.setText("Not available");
+
+                // Waitlist count is handled by refreshWaitlistCount()
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (!isAdded()) return;
+
+                Toast.makeText(
+                        getContext(),
+                        "Failed to load event: " + e.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                eventTitle.setText("Unknown Event");
+                valueDescription.setText("N/A");
+                valueRegistration.setText("Not set");
+                valueStarttime.setText("Not available");
+                valueLocation.setText("Not available");
+            }
+        });
     }
 
+    /**
+     * This method is used to format the registration period for the event.
+     * @param start
+     * @param end
+     * @return
+     */
+    private String formatRegistrationPeriod(long start, long end) {
+        if (start == 0 || end == 0) {
+            return "Not set";
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String startStr = sdf.format(new Date(start));
+        String endStr = sdf.format(new Date(end));
+
+        return startStr + " - " + endStr;
+    }
     /**
      * Updates register button label based on registration state.
      * Update text when pressed (Register/Remove)
