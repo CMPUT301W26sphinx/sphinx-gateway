@@ -61,6 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Edit Event"
+            android:backgroundTint="@color/nav_blue"
             android:layout_marginTop="8dp"/>
         <!-- Description -->
         <TextView
@@ -152,6 +153,7 @@
             android:id="@+id/viewWaitlistButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/nav_blue"
             android:text="View Waiting List"/>
 
     </LinearLayout>

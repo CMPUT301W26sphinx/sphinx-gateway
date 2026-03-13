@@ -55,6 +55,19 @@ public class EditEventFragment extends Fragment {
 
     @Nullable
     @Override
+    /**
+     * Allows the user to edit an existed event
+     * New info will replace the old info in database if all the new info are valid
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return The view of editing Event
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
@@ -86,6 +99,10 @@ public class EditEventFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Loading the event details from the database
+     * (The old info)
+     */
     private void loadArguments() {
         Bundle args = getArguments();
         if (args == null) {
@@ -116,6 +133,12 @@ public class EditEventFragment extends Fragment {
         }
     }
 
+    /**
+     * Checking all the info if they are good to upload to the database
+     * (new info)
+     * @return  true if the formats are all correct and non-optional info are all filled
+     *          false if any info is missing or in incorrect format
+     */
     private boolean checkInfo() {
         String description = descInput.getText().toString().trim();
         if (description.isEmpty()) {
@@ -171,6 +194,9 @@ public class EditEventFragment extends Fragment {
         return true;
     }
 
+    /**
+     * update the database with new info
+     */
     private void updateEvent() {
         if (TextUtils.isEmpty(eventId)) {
             Toast.makeText(getContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();

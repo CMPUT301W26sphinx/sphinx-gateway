@@ -32,6 +32,18 @@ public class CreateEventFragment extends Fragment {
     private Button backButton;
     @Nullable
     @Override
+    /**
+     * Allows the user to create a new event by providing details of the event
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return The view of creating Event
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
@@ -69,6 +81,12 @@ public class CreateEventFragment extends Fragment {
         return view;
     }
 
+
+    /**
+     * Checking all the information if they are good to upload to the database
+     * @return  true if the formats are all correct and non-optional infomation are all filled
+     *          false if any infomation is missing or in incorrect format
+     */
     private boolean checkInfo() {
         // Checking if all the information is good to upload to the database
 
@@ -145,6 +163,12 @@ public class CreateEventFragment extends Fragment {
         }
         return true;
     }
+
+    /**
+     * Base on the users' text
+     * make an event and set all the details
+     * upload it to the database
+     */
     private void createEvent() {
         String name = nameInput.getText().toString().trim();
         String description = descInput.getText().toString().trim();

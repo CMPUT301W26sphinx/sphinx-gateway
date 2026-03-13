@@ -23,7 +23,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class ViewWaitListFragment extends Fragment {
     private static final String EVENT_ID = "event_id";
     private String eventId;
@@ -41,6 +40,18 @@ public class ViewWaitListFragment extends Fragment {
     }
 
     @Override
+    /**
+     * Allows the user to view the current waiting list
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return The view of waiting list
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_view_wait_list, container, false);
@@ -60,7 +71,11 @@ public class ViewWaitListFragment extends Fragment {
         loadWaitlist();
         showWaitList();
     }
-    // Load the waiting list from data base
+
+    /**
+     * Load the waiting list from database
+     * Store the data in --waitlist
+     */
     private void loadWaitlist() {
 
         if (eventId == null) return;
@@ -81,7 +96,10 @@ public class ViewWaitListFragment extends Fragment {
         });
     }
 
-    // To show all the entrant in the waiting list
+    /**
+     * To show all the entrant in --waitlist
+     */
+
     private void showWaitList() {
         LinearLayout waitlistContainer = getView().findViewById(R.id.waitlistContainer);
 
