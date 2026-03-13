@@ -29,8 +29,21 @@ public class CreateEventFragment extends Fragment {
     private EditText nameInput, descInput, timeInput, placeInput, startRegInput, endRegInput, maxInput;
 
     private Button saveButton;
+    private Button backButton;
     @Nullable
     @Override
+    /**
+     * Allows the user to create a new event by providing details of the event
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return The view of creating Event
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
@@ -46,6 +59,12 @@ public class CreateEventFragment extends Fragment {
         endRegInput = view.findViewById(R.id.regEnd);
         maxInput = view.findViewById(R.id.maxEntrants);
         saveButton = view.findViewById(R.id.saveEventButton);
+        backButton = view.findViewById(R.id.backButton);
+
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
         saveButton.setOnClickListener(v -> {
             // check if all the inputs are valid
             if (checkInfo()){
@@ -62,6 +81,12 @@ public class CreateEventFragment extends Fragment {
         return view;
     }
 
+
+    /**
+     * Checking all the information if they are good to upload to the database
+     * @return  true if the formats are all correct and non-optional infomation are all filled
+     *          false if any infomation is missing or in incorrect format
+     */
     private boolean checkInfo() {
         // Checking if all the information is good to upload to the database
 
@@ -126,7 +151,7 @@ public class CreateEventFragment extends Fragment {
         String maxEntrants = maxInput.getText().toString();
         if (!maxEntrants.isEmpty()){
             try {
-                double val = Double.parseDouble(maxEntrants);
+                int val = Integer.parseInt(maxEntrants);
                 if (val <= 0) {
                     Toast.makeText(getContext(), "Max Entrants has to be bigger than 0", Toast.LENGTH_SHORT).show();
                     return false;
@@ -138,6 +163,12 @@ public class CreateEventFragment extends Fragment {
         }
         return true;
     }
+
+    /**
+     * Base on the users' text
+     * make an event and set all the details
+     * upload it to the database
+     */
     private void createEvent() {
         String name = nameInput.getText().toString().trim();
         String description = descInput.getText().toString().trim();
@@ -178,6 +209,13 @@ public class CreateEventFragment extends Fragment {
                     event.setEventId(documentReference.getId());
                     documentReference.update("eventId", documentReference.getId());
                     Toast.makeText(getContext(), "New Event: " + name + " is created", Toast.LENGTH_SHORT).show();
+
+                    // direct to EventDetailsFragment after it is created
+                    EventDetailsFragment fragment = EventDetailsFragment.newInstance(documentReference.getId());
+                    getParentFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, fragment)
+                            .commit();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "Failed to create event", Toast.LENGTH_SHORT).show()

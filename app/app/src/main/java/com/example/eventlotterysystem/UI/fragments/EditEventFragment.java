@@ -34,18 +34,43 @@ public class EditEventFragment extends Fragment {
     private EditText maxInput;
     private TextView name;
     private Button saveButton;
+    private Button backButton;
 
     private String eventId;
     private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
 
-    public EditEventFragment() {
+    private static final String EVENT_ID = "event_id";
+
+
+    public EditEventFragment() {}
+
+    public static EditEventFragment newInstance(String eventId) {
+        EditEventFragment fragment = new EditEventFragment();
+        Bundle args = new Bundle();
+        args.putString(EVENT_ID, eventId);
+        fragment.setArguments(args);
+        return fragment;
     }
+
 
     @Nullable
     @Override
+    /**
+     * Allows the user to edit an existed event
+     * New info will replace the old info in database if all the new info are valid
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return The view of editing Event
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_create_event, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
 
         db = FirebaseFirestore.getInstance();
 
@@ -57,8 +82,13 @@ public class EditEventFragment extends Fragment {
         endRegInput = view.findViewById(R.id.regEnd);
         maxInput = view.findViewById(R.id.maxEntrants);
         saveButton = view.findViewById(R.id.saveEventButton);
+        backButton = view.findViewById(R.id.backButton);
+
 
         loadArguments();
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
 
         saveButton.setOnClickListener(v -> {
             if (checkInfo()) {
@@ -69,6 +99,10 @@ public class EditEventFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Loading the event details from the database
+     * (The old info)
+     */
     private void loadArguments() {
         Bundle args = getArguments();
         if (args == null) {
@@ -99,6 +133,12 @@ public class EditEventFragment extends Fragment {
         }
     }
 
+    /**
+     * Checking all the info if they are good to upload to the database
+     * (new info)
+     * @return  true if the formats are all correct and non-optional info are all filled
+     *          false if any info is missing or in incorrect format
+     */
     private boolean checkInfo() {
         String description = descInput.getText().toString().trim();
         if (description.isEmpty()) {
@@ -154,6 +194,9 @@ public class EditEventFragment extends Fragment {
         return true;
     }
 
+    /**
+     * update the database with new info
+     */
     private void updateEvent() {
         if (TextUtils.isEmpty(eventId)) {
             Toast.makeText(getContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();
@@ -200,8 +243,15 @@ public class EditEventFragment extends Fragment {
                         "registrationStartDate", registrationStartMillis == null ? 0L : registrationStartMillis,
                         "registrationEndDate", registrationEndMillis == null ? 0L : registrationEndMillis
                 )
-                .addOnSuccessListener(unused ->
-                        Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show()
+                .addOnSuccessListener(unused -> {
+                            Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
+                            // direct back to EventDetailsFragment after updating
+                            EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventId);
+                            getParentFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_container, fragment)
+                                    .commit();
+                        }
                 )
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show()
