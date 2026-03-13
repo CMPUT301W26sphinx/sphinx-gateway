@@ -24,13 +24,17 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-    private UserProfile currentProfile;
-
+    /**
+     * Creates a new instance that goes to the Events, without login.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,9 +68,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        // Initialize Firebase
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        // loads database and auth for firebase
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Sign in anonymously
         mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -75,11 +79,21 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "signInAnonymously:success");
 
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    // No need to pass UID to constructor – ProfileManager will set it
-                    UserProfile userProfile = new UserProfile(); // no-arg constructor
-                    ProfileManager profileManager = new ProfileManager();
-                    profileManager.saveUser(userProfile);
+                    String uid = mAuth.getCurrentUser().getUid();
+                    DocumentReference docRef = db.collection("users").document(uid);
+
+                    docRef.get().addOnSuccessListener(document -> {
+                        if (!document.exists()){
+
+                            ProfileManager profileManager = new ProfileManager();
+
+                            // create profile
+                            UserProfile userProfile = new UserProfile();
+
+                            // save to Firestore
+                            profileManager.saveUser(userProfile);
+                        }
+                    });
 
                     // Stay on entrant UI (no redirect)
                 } else {
@@ -89,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Replaces current fragment with the specified fragment
+     * @param fragment the fragment to display next
+     */
     private void setCurrentFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
