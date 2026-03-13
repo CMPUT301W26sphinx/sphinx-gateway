@@ -38,8 +38,19 @@ public class EditEventFragment extends Fragment {
     private String eventId;
     private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
 
-    public EditEventFragment() {
+    private static final String EVENT_ID = "event_id";
+
+
+    public EditEventFragment() {}
+
+    public static EditEventFragment newInstance(String eventId) {
+        EditEventFragment fragment = new EditEventFragment();
+        Bundle args = new Bundle();
+        args.putString(EVENT_ID, eventId);
+        fragment.setArguments(args);
+        return fragment;
     }
+
 
     @Nullable
     @Override
