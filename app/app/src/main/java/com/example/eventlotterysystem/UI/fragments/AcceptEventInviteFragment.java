@@ -47,17 +47,31 @@ public class AcceptEventInviteFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         RecyclerView recyclerView = view.findViewById(R.id.event_invite_recycler_view);
+        List<Event> filteredEvents = new ArrayList<>();
+        EventInviteAdapter adapter = new EventInviteAdapter(filteredEvents);
 
-        List<Event> eventList = new ArrayList<>(); // event list
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
 
         EventRepository repo = new EventRepository();
+        EntrantListFirebase entrantDB = new EntrantListFirebase();
+        ProfileManager profileManager = new ProfileManager();
+        String currentUserId = profileManager.getUserID();
 
-        // get all the events
+        // Load all events
         repo.getEvents(new EventRepository.EventCallback() {
             @Override
             public void onEventsLoaded(List<Event> events) {
-                eventList.clear();
-                eventList.addAll(events);
+                // Check which events the user is invited to
+                for (Event event : events) {
+                    entrantDB.getEntrantStatus(event.getEventId(), currentUserId)
+                            .addOnSuccessListener(status -> {
+                                if (status == EntrantListEntry.STATUS_INVITED) {
+                                    filteredEvents.add(event);
+                                    adapter.notifyItemInserted(filteredEvents.size() - 1);
+                                }
+                            });
+                }
             }
 
             @Override
@@ -65,32 +79,6 @@ public class AcceptEventInviteFragment extends Fragment {
                 e.printStackTrace();
             }
         });
-
-        // filter events if our ID is in it
-        List<Event> filteredEvents = new ArrayList<>(); // filtered list
-
-        EntrantListFirebase entrantDB = new EntrantListFirebase();
-        ProfileManager profileManager = new ProfileManager();
-        String currentUserId = profileManager.getUserID();
-
-        // Adapter
-        EventInviteAdapter adapter = new EventInviteAdapter(filteredEvents);
-
-        // recycler view
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(adapter);
-
-        for (Event event : eventList) {
-
-            entrantDB.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {
-
-                if (status == EntrantListEntry.STATUS_INVITED) {
-                    filteredEvents.add(event);
-                    adapter.notifyDataSetChanged();
-                }
-
-            });
-        }
 
 
     }

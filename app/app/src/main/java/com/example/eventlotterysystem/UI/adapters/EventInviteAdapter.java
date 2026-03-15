@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.model.Event;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
@@ -67,7 +68,7 @@ public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.
         // contents of the view with that element
         Event event = events.get(position);
         EntrantListFirebase db = new EntrantListFirebase();
-        UserProfile userProfile = new UserProfile();
+        ProfileManager profileManager = new ProfileManager();
 
         // Bind data
         holder.eventName.setText(event.getTitle());
@@ -76,13 +77,17 @@ public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.
         // Button click listeners
         holder.acceptButton.setOnClickListener(v -> {
             // update user status to registered
-            db.updateStatus(event.getEventId(), userProfile.getProfileID(), EntrantListEntry.STATUS_REGISTERED);
+            db.updateStatus(event.getEventId(), profileManager.getUserID(), EntrantListEntry.STATUS_REGISTERED);
+            events.remove(position);
+            notifyItemRemoved(position);
 
         });
 
         holder.declineButton.setOnClickListener(v -> {
             // update user status to declined
-            db.updateStatus(event.getEventId(), userProfile.getProfileID(), EntrantListEntry.STATUS_CANCELLED_OR_REJECTED);
+            db.updateStatus(event.getEventId(), profileManager.getUserID(), EntrantListEntry.STATUS_CANCELLED_OR_REJECTED);
+            events.remove(position);
+            notifyItemRemoved(position);
         });
     }
 
