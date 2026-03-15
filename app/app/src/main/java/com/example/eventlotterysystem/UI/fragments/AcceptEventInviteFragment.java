@@ -13,8 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.EventInviteAdapter;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.database.ProfileManager;
+import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.model.Event;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +37,7 @@ public class AcceptEventInviteFragment extends Fragment {
      */
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout that contains the RecyclerView
         return inflater.inflate(R.layout.accept_event_invite, container, false);
     }
@@ -46,23 +48,16 @@ public class AcceptEventInviteFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.event_invite_recycler_view);
 
-
         List<Event> eventList = new ArrayList<>(); // event list
-
-        // Adapter
-        EventInviteAdapter adapter = new EventInviteAdapter(eventList);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(adapter);
 
         EventRepository repo = new EventRepository();
 
+        // get all the events
         repo.getEvents(new EventRepository.EventCallback() {
             @Override
             public void onEventsLoaded(List<Event> events) {
                 eventList.clear();
                 eventList.addAll(events);
-                adapter.notifyDataSetChanged(); // refresh RecyclerView
             }
 
             @Override
@@ -71,7 +66,31 @@ public class AcceptEventInviteFragment extends Fragment {
             }
         });
 
+        // filter events if our ID is in it
+        List<Event> filteredEvents = new ArrayList<>(); // filtered list
 
+        EntrantListFirebase entrantDB = new EntrantListFirebase();
+        ProfileManager profileManager = new ProfileManager();
+        String currentUserId = profileManager.getUserID();
+
+        // Adapter
+        EventInviteAdapter adapter = new EventInviteAdapter(filteredEvents);
+
+        // recycler view
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+
+        for (Event event : eventList) {
+
+            entrantDB.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {
+
+                if (status == EntrantListEntry.STATUS_INVITED) {
+                    filteredEvents.add(event);
+                    adapter.notifyDataSetChanged();
+                }
+
+            });
+        }
 
 
     }

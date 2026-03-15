@@ -116,4 +116,13 @@ public class ProfileManager {
             }
         });
     }
+
+    /**
+     * get the user id of the signed in user
+     * @return
+     */
+    public String getUserID(){
+        return mAuth.getCurrentUser().getUid();
+    }
+
 }

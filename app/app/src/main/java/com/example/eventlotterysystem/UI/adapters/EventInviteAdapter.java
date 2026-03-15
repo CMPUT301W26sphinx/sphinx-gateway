@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.model.Event;
 
 import java.util.List;
@@ -63,6 +64,7 @@ public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         Event event = events.get(position);
+        // EntrantListFirebase db = new EntrantListFirebase();
 
         // Bind data
         holder.eventName.setText(event.getTitle());
