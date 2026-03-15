@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.model.profiles.UserProfile;
 
 import java.util.List;
 
@@ -64,7 +66,8 @@ public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         Event event = events.get(position);
-        // EntrantListFirebase db = new EntrantListFirebase();
+        EntrantListFirebase db = new EntrantListFirebase();
+        UserProfile userProfile = new UserProfile();
 
         // Bind data
         holder.eventName.setText(event.getTitle());
@@ -72,12 +75,14 @@ public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.
 
         // Button click listeners
         holder.acceptButton.setOnClickListener(v -> {
-            // TODO: handle accept
+            // update user status to registered
+            db.updateStatus(event.getEventId(), userProfile.getProfileID(), EntrantListEntry.STATUS_REGISTERED);
 
         });
 
         holder.declineButton.setOnClickListener(v -> {
-            // TODO: handle decline
+            // update user status to declined
+            db.updateStatus(event.getEventId(), userProfile.getProfileID(), EntrantListEntry.STATUS_CANCELLED_OR_REJECTED);
         });
     }
 
