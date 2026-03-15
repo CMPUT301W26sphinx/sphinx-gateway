@@ -42,4 +42,6 @@ public class Event implements Serializable {
 
     public int getWaitingListCount() { return waitingListCount; }
     public void setWaitingListCount(int waitingListCount) { this.waitingListCount = waitingListCount; }
+
+
 }
