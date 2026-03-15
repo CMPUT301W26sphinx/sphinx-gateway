@@ -16,7 +16,7 @@ import java.util.List;
 
 public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.ViewHolder> {
 
-    private List<Event> events; // dummy data
+    private final List<Event> events;
 
     public EventInviteAdapter(List<Event> events) {
         this.events = events;
@@ -71,6 +71,7 @@ public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.
         // Button click listeners
         holder.acceptButton.setOnClickListener(v -> {
             // TODO: handle accept
+
         });
 
         holder.declineButton.setOnClickListener(v -> {

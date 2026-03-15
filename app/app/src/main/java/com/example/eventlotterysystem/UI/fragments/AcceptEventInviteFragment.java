@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.EventInviteAdapter;
+import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
 
 import java.util.ArrayList;
@@ -21,9 +22,14 @@ import java.util.List;
 public class AcceptEventInviteFragment extends Fragment {
     /**
      *
-     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+     * @param inflater           The LayoutInflater object that can be used to inflate
+     *                           any views in the fragment,
+     * @param container          If non-null, this is the parent view that the fragment's
+     *                           UI should be attached to.  The fragment should not add the view itself,
+     *                           but this can be used to generate the LayoutParams of the view.
      * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
+     *                           from a previous saved state as given here.
+     * @return
      */
 
     @Override
@@ -40,10 +46,8 @@ public class AcceptEventInviteFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.event_invite_recycler_view);
 
-        // Example dummy data
-        List<Event> eventList = new ArrayList<>();
-        eventList.add(new Event("Hackathon", "24 hour coding event", "test"));
-        eventList.add(new Event("Club Meeting", "Weekly discussion", "test"));
+
+        List<Event> eventList = new ArrayList<>(); // event list
 
         // Adapter
         EventInviteAdapter adapter = new EventInviteAdapter(eventList);
@@ -51,6 +55,26 @@ public class AcceptEventInviteFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
+        EventRepository repo = new EventRepository();
+
+        repo.getEvents(new EventRepository.EventCallback() {
+            @Override
+            public void onEventsLoaded(List<Event> events) {
+                eventList.clear();
+                eventList.addAll(events);
+                adapter.notifyDataSetChanged(); // refresh RecyclerView
+            }
+
+            @Override
+            public void onError(Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+
+
 
     }
+
+
 }
