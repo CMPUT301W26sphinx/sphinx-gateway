@@ -7,6 +7,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is used to represent the waitlist for an event.
@@ -116,5 +120,37 @@ public class EntrantListFirebase {
             if (!task.isSuccessful()|| task.getResult() == null )  return 0;
             return task.getResult().size();
         });
+    }
+
+    /**
+     * This method is used to getAllEntrantsref from private to public
+     * @param eventId The id of the event to get the entrantlistRef count for.
+     * @return entrantlistRef
+     * @Author: Bryan Jonathan
+     */
+    public Task<QuerySnapshot> getAllEntrants(@NonNull String eventId) {
+        return entrantlistRef(eventId).get();
+    }
+
+    /**
+     * Returns a Task containing all waitlisted (status 0) entrants for the given event.
+     * @param eventId The id of the event to get waitlisted entrants for.
+     * @return all the entrants that are waitlisted
+     * @Author: Bryan Jonathan
+     */
+    public Task<List<EntrantListEntry>> getWaitlistedEntrants(@NonNull String eventId) {
+        return entrantlistRef(eventId)
+                .whereEqualTo("status", EntrantListEntry.STATUS_WAITLIST)
+                .get()
+                .continueWith(task -> {
+                    List<EntrantListEntry> waitlistEntrants = new ArrayList<>();
+                    if (!task.isSuccessful() || task.getResult() == null) return waitlistEntrants;
+
+                    for (DocumentSnapshot doc : task.getResult().getDocuments()) {
+                        EntrantListEntry entry = doc.toObject(EntrantListEntry.class);
+                        if (entry != null) waitlistEntrants.add(entry);
+                    }
+                    return waitlistEntrants;
+                });
     }
 }
