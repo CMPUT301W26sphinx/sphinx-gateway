@@ -7,14 +7,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  * This class is used to represent the waitlist for an event.
  *Contains logic for updating waitlist to the firestore db.
+ * @author Jaylin
  */
 public class EntrantListFirebase {
     // See https://firebase.google.com/docs/firestore/quickstart#java
@@ -123,34 +121,55 @@ public class EntrantListFirebase {
     }
 
     /**
-     * This method is used to getAllEntrantsref from private to public
-     * @param eventId The id of the event to get the entrantlistRef count for.
-     * @return entrantlistRef
-     * @Author: Bryan Jonathan
+     * This method is used to get the list of entrants in the entrantlistRef for an event in the firestore db.
+     * @param eventId
+     *  The id of the event to get the entrants for.
+     * @return
+     *  A list of EntrantListEntry objects representing the entrants in the entrantlistRef for the event.
      */
-    public Task<QuerySnapshot> getAllEntrants(@NonNull String eventId) {
-        return entrantlistRef(eventId).get();
+    public Task<List<EntrantListEntry>> getEntrantList(@NonNull String eventId) {
+        return entrantlistRef(eventId)
+                .get()
+                .continueWith(task -> {
+                    List<EntrantListEntry> entrants = new ArrayList<>(); // make list
+                    if(!task.isSuccessful() || task.getResult() == null) {
+                        return entrants;
+                    }
+                    for (DocumentSnapshot doc:task.getResult().getDocuments()){
+                        EntrantListEntry entry = doc.toObject(EntrantListEntry.class);
+                        if (entry != null) {
+                            entrants.add(entry); // append entrant to list
+                        }
+                    }
+                    return entrants;
+                });
     }
 
     /**
-     * Returns a Task containing all waitlisted (status 0) entrants for the given event.
-     * @param eventId The id of the event to get waitlisted entrants for.
-     * @return all the entrants that are waitlisted
-     * @Author: Bryan Jonathan
+     * This method is used to get the list of entrants in the entrantlistRef for an event in the firestore db.
+     * @param eventId
+     *  The id of the event to get the entrants for.
+     * @param status
+     *  The status of the entrants to get.
+     * @return
+     *  A list of EntrantListEntry objects representing the entrants in the entrantlistRef for the event.
      */
-    public Task<List<EntrantListEntry>> getWaitlistedEntrants(@NonNull String eventId) {
+    public Task<List<EntrantListEntry>> getEntrantsByStatus(@NonNull String eventId, int status) {
         return entrantlistRef(eventId)
-                .whereEqualTo("status", EntrantListEntry.STATUS_WAITLIST)
+                .whereEqualTo("status", status) //only for the type of list wanted
                 .get()
                 .continueWith(task -> {
-                    List<EntrantListEntry> waitlistEntrants = new ArrayList<>();
-                    if (!task.isSuccessful() || task.getResult() == null) return waitlistEntrants;
-
-                    for (DocumentSnapshot doc : task.getResult().getDocuments()) {
-                        EntrantListEntry entry = doc.toObject(EntrantListEntry.class);
-                        if (entry != null) waitlistEntrants.add(entry);
+                    List<EntrantListEntry> entrants = new ArrayList<>();
+                    if (!task.isSuccessful() || task.getResult() == null) {
+                        return entrants;
                     }
-                    return waitlistEntrants;
+                    for (DocumentSnapshot doc:task.getResult().getDocuments()) {
+                        EntrantListEntry entry = doc.toObject(EntrantListEntry.class);
+                        if (entry != null) {
+                            entrants.add(entry);
+                        }
+                    }
+                    return entrants;
                 });
     }
 }

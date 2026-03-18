@@ -22,3 +22,13 @@ An event organizer posts an event in the app, specifying how much people the eve
 - Entrant: a person who signs up for an event
 - Organizer: the entity that runs the event
 - Administrator: The entity that administers and runs the infrastructure
+
+# Members:
+| Student Name | CCID      |
+| ------------ | --------- |
+|`Bryan Jonathan`    | `bjonatha` |
+| `Noah Zapisocki`    | `nzapisoc` |
+| `Jaylin Auger-LaFleur` | `augerlaf`  |
+| `Ivan Yip` | `iyip`  |
+| `Syed Hammad` | `smhammad`  |
+| `Hassaan Ahmed Fazli` | `hafazli`  |

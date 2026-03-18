@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,6 +46,9 @@ public class EventListFragment extends Fragment {
 
     /** Firebase Firestore instance used for retrieving event data */
     FirebaseFirestore db;
+
+    /** Button to access create Event */
+    private Button createEventButton;
 
     /**
      * Inflates the fragment layout.
@@ -146,5 +150,33 @@ public class EventListFragment extends Fragment {
          */
         MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.toggleGroup);
         toggleGroup.check(R.id.buttonAll);
+
+        /**
+         * For creating new event
+         */
+        createEventButton = view.findViewById(R.id.createEventButton);
+        createEventButton.setOnClickListener(v -> {
+            Fragment fragment = CreateEventFragment.newInstance();
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        // transition to the invited events fragment
+        Button myEventsButton = view.findViewById(R.id.buttonMyEvents);
+        myEventsButton.setOnClickListener(v -> {
+            // Replace the current fragment with AcceptEventInviteFragment
+            AcceptEventInviteFragment fragment = new AcceptEventInviteFragment();
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment) // your container ID
+                    .addToBackStack(null) // optional: allows back button to go back
+                    .commit();
+        });
     }
 }
