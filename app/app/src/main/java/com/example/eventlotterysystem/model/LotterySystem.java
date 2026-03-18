@@ -6,8 +6,9 @@ import com.example.eventlotterysystem.database.NotificationSystem;
 
 import java.util.Random;
 /** Basic Lottery System
- * TODO: polish the code up, change the message.
- * TL;DR, When lottery is triggered, it passes capacity. When someone cancels, it triggers this again, but only 1 person.
+ * TL;DR, When lottery is triggered, it passes capacity.
+ * When someone cancels, it should triggers this again, but only 1 person.
+ * Auto notifies the user who wins with predetermined notification.
  * @author Bryan Jonathan
  */
 public class LotterySystem {
@@ -21,35 +22,42 @@ public class LotterySystem {
      */
     public void start(String eventId, int capacity) {
         entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_INVITED)
-        .addOnSuccessListener(invitedEntrants -> {
+                .addOnSuccessListener(invitedEntrants -> {
+            entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_REGISTERED)
+                    .addOnSuccessListener(registeredEntrants -> {
 
-            //check if invited is over capacity
-            int remainingSpots = capacity - invitedEntrants.size();
-            if (remainingSpots <= 0) return;
+                //check if invited + registered is over capacity
+                int remainingSpots = capacity - invitedEntrants.size() - registeredEntrants.size();
+                if (remainingSpots <= 0) return;
 
-            entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_WAITLIST)
-                    .addOnSuccessListener(waitlistEntrants -> {
-                        if (waitlistEntrants.isEmpty()) return;
+                entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_WAITLIST)
+                        .addOnSuccessListener(waitlistEntrants -> {
 
-                        Random rand = new Random ();
-                        int inviteCount = Math.min(remainingSpots, waitlistEntrants.size());
+                    //LOTTERY LOGIC
+                    Random rand = new Random();
+                    int inviteCount = Math.min(remainingSpots, waitlistEntrants.size());
 
-                        for (int i = 0; i < inviteCount; i++) {
-                            int randomIndex = rand.nextInt(waitlistEntrants.size());
-                            EntrantListEntry chosen = waitlistEntrants.remove(randomIndex);
+                    for (int i = 0; i < inviteCount; i++) {
+                        int randomIndex = rand.nextInt(waitlistEntrants.size());
+                        EntrantListEntry chosen = waitlistEntrants.remove(randomIndex);
 
-                            entrantListFirebase.updateStatus(
-                                    eventId,
-                                    chosen.getEntrantId(),
-                                    EntrantListEntry.STATUS_INVITED
-                            );
-                            notifyEntrant(chosen.getEntrantId(), eventId);
-                        }
-                    });
+                        entrantListFirebase.updateStatus(
+                                eventId,
+                                chosen.getEntrantId(),
+                                EntrantListEntry.STATUS_INVITED
+                        );
+                        notifyEntrantLottery(chosen.getEntrantId(), eventId);
+                    }
+                });
+            });
         });
     }
 
-    private void notifyEntrant(String entrantId, String eventId) {
+    /** Lottery System specific notification system.
+     * @param entrantId used to see which user to notify
+     * @param eventId eventid is passed by from triggering lottery
+     */
+    private void notifyEntrantLottery(String entrantId, String eventId) {
         eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
             @Override
             public void onEventLoaded(Event event) {
@@ -60,12 +68,10 @@ public class LotterySystem {
             }
             @Override
             public void onError(Exception e) {
-                // Fallback if event fetch fails
                 notificationSystem.sendNotification(
                         entrantId,
                         "You have been selected for an event! Please confirm your registration."
                 );
-                e.printStackTrace();
             }
         });
     }
