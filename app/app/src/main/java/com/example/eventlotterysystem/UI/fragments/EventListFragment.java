@@ -164,5 +164,19 @@ public class EventListFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+
+        // transition to the invited events fragment
+        Button myEventsButton = view.findViewById(R.id.buttonMyEvents);
+        myEventsButton.setOnClickListener(v -> {
+            // Replace the current fragment with AcceptEventInviteFragment
+            AcceptEventInviteFragment fragment = new AcceptEventInviteFragment();
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment) // your container ID
+                    .addToBackStack(null) // optional: allows back button to go back
+                    .commit();
+        });
     }
 }
