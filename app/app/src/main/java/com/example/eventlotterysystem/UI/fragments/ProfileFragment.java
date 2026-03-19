@@ -60,7 +60,6 @@ public class ProfileFragment extends Fragment {
             if (user.getPhoneNumber() != null) {
                 phoneTextView.setText("Phone Number: " + user.getPhoneNumber());
             }
-
         });
 
         view.findViewById(R.id.edit_button).setOnClickListener(v -> {
@@ -70,7 +69,19 @@ public class ProfileFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+
+        view.findViewById(R.id.NotificationMore).setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("userId", manager.getUserID());
+
+            NotificationFragment notificationFragment = new NotificationFragment();
+            notificationFragment.setArguments(args);
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, notificationFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
-
-
 }
