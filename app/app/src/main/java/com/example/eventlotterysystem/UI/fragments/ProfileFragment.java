@@ -1,9 +1,11 @@
 package com.example.eventlotterysystem.UI.fragments;
 
+import android.app.Notification;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,9 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.ProfileManager;
-
-import androidx.navigation.fragment.NavHostFragment;
-
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
     /**
@@ -70,6 +70,7 @@ public class ProfileFragment extends Fragment {
                     .commit();
         });
 
+        //Notification Fragment Button
         view.findViewById(R.id.NotificationMore).setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString("userId", manager.getUserID());
@@ -82,6 +83,21 @@ public class ProfileFragment extends Fragment {
                     .replace(R.id.fragment_container, notificationFragment)
                     .addToBackStack(null)
                     .commit();
+        });
+
+        // TODO: separate this firebase thingy.
+        // Checkbox for notification settings.
+        CheckBox checkBox = view.findViewById(R.id.checkBoxforNotification);
+        manager.getUserProfile(user -> {
+            checkBox.setChecked(user.getNotificationPreference());
+
+            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                // save back to Firestore
+                FirebaseFirestore.getInstance()
+                        .collection("users")
+                        .document(manager.getUserID())
+                        .update("notificationPreference", isChecked);
+            });
         });
     }
 }

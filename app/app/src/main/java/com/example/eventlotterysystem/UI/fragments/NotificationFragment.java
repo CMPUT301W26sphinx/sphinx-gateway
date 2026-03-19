@@ -5,21 +5,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.app.AlertDialog;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.UI.adapters.NotificationAdapter;
 import com.example.eventlotterysystem.database.NotificationSystem;
 
 import java.util.ArrayList;
-import java.util.List;
-
-/**
- * TODO: Seperate NotificationAdapter
+/** Notification Fragment.
+ * Pops up notification. Basically.
+ * Calls NotificationSystem and NotificationAdapter.
+ * @author Bryan Jonathan
  */
 public class NotificationFragment extends Fragment {
     private RecyclerView recyclerView;
@@ -27,10 +30,6 @@ public class NotificationFragment extends Fragment {
     private TextView subtitle;
     private NotificationSystem notificationSystem;
     private String userId;
-
-    // -----------------------------------------------------------------------
-    // Lifecycle
-    // -----------------------------------------------------------------------
 
     @Nullable
     @Override
@@ -55,9 +54,29 @@ public class NotificationFragment extends Fragment {
         subtitle     = view.findViewById(R.id.Notificationsubtitle);
 
         // Set up RecyclerView
-        adapter = new NotificationAdapter(new ArrayList<>());
+        adapter = new NotificationAdapter(new ArrayList<>(), this::showNotificationDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        ItemTouchHelper.SimpleCallback swipeToDeleteCallback =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView,
+                                          @NonNull RecyclerView.ViewHolder viewHolder,
+                                          @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        int position = viewHolder.getAdapterPosition();
+                        if (position == RecyclerView.NO_POSITION) return;
+
+                        String removed = adapter.removeItem(position);
+                        notificationSystem.deleteNotification(userId, removed);
+                    }
+                };
+
+        new ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(recyclerView);
 
         loadNotifications();
     }
@@ -73,49 +92,35 @@ public class NotificationFragment extends Fragment {
                 subtitle.setText("You have no notifications.");
                 recyclerView.setVisibility(View.GONE);
             } else {
-                subtitle.setVisibility(View.GONE);
+                subtitle.setText("Swipe to delete, press to see more.");
                 recyclerView.setVisibility(View.VISIBLE);
                 adapter.setItems(notifications);
             }
         });
     }
 
-    private static class NotificationAdapter
-            extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
+    /** Parser of the notifications so that is readable for Notification.
+     * @param raw raw as f text that comes from NotificationSystem. Parser goes here.
+     */
+    private void showNotificationDialog(String raw) {
+        String[] parts = raw.split("\\|", -1);
+        String message  = parts.length > 0 ? parts[0] : raw;
+        String eventId  = parts.length > 1 ? parts[1] : null;
+        String sender   = parts.length > 2 ? parts[2] : "Notification";
 
-        private final List<String> items;
-
-        NotificationAdapter(List<String> items) {
-            this.items = items;
-        }
-
-        void setItems(List<String> newItems) {
-            items.clear();
-            items.addAll(newItems);
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.notification_item, parent, false);
-            return new ViewHolder(v);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.message.setText(items.get(position));
-        }
-
-        @Override
-        public int getItemCount() { return items.size(); }
-
-        static class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView message;
-            ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                message = itemView.findViewById(R.id.text_notification_message);
-            }
-        }
+        new AlertDialog.Builder(requireContext())
+                .setTitle(sender)
+                .setMessage(message)
+                .setPositiveButton("See More", (dialog, which) -> {
+                    dialog.dismiss();
+                    EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventId);
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, fragment)
+                            .addToBackStack(null)
+                            .commit();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }

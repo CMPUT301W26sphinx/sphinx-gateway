@@ -178,7 +178,7 @@
             android:layout_width="362dp"
             android:layout_height="36dp"
             android:layout_marginStart="24dp"
-            android:text="Notifications include selection to register, calcellations, and more. "
+            android:text="Notifications include selection to register, calcellations, and more. The settings will only be affected with future notifications."
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/checkBoxforNotification" />

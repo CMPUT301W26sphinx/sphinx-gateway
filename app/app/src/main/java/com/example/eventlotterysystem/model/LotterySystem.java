@@ -62,15 +62,12 @@ public class LotterySystem {
             @Override
             public void onEventLoaded(Event event) {
                 notificationSystem.sendNotification(
-                        entrantId,
-                        "You have been selected for '" + event.getTitle() + "'! Please confirm your registration."
-                );
+                        entrantId, "You have been selected for this event! Please confirm your registration.", eventId, "Organizer");
             }
             @Override
             public void onError(Exception e) {
                 notificationSystem.sendNotification(
-                        entrantId,
-                        "You have been selected for an event! Please confirm your registration."
+                        entrantId,"You have been selected for an event! Please confirm your registration in the Events tab.", "", ""
                 );
             }
         });
