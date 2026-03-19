@@ -10,10 +10,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EventLotterySystem">
 
-        <!-- Launcher activity -->
         <activity
             android:name=".UI.activities.AccountTypeActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,22 +19,15 @@
             </intent-filter>
         </activity>
 
-        <!-- Admin activities -->
         <activity android:name=".UI.activities.admin.AdminHomeActivity" />
         <activity android:name=".UI.activities.admin.AdminEventDetailActivity" />
-        <activity
-            android:name=".UI.activities.admin.AdminLoginActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".UI.activities.admin.AdminLoginActivity" />
         <activity android:name=".UI.activities.admin.AdminProfileDetailActivity" />
         <activity android:name=".UI.activities.admin.AdminImageDetailActivity" />
 
-        <!-- Entrant main activity -->
         <activity android:name=".MainActivity" />
 
-        <!-- Terms activity -->
-        <activity
-            android:name=".UI.activities.TermsActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".UI.activities.TermsActivity" />
 
     </application>
 </manifest>
