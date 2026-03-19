@@ -69,7 +69,6 @@ public class ViewWaitListFragment extends Fragment {
             getParentFragmentManager().popBackStack();
         });
         loadWaitlist();
-        showWaitList();
     }
 
     /**
@@ -93,6 +92,7 @@ public class ViewWaitListFragment extends Fragment {
                     EntrantListEntry entry = doc.toObject(EntrantListEntry.class);
                     waitlist.add(entry);
                 }
+                showWaitList();
         });
     }
 

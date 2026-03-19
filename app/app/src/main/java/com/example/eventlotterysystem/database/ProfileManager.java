@@ -66,7 +66,6 @@ public class ProfileManager {
                 callback.onComplete(userProfile);
             }
         });
-
     }
 
     public interface AllUsersCallback {
@@ -99,6 +98,31 @@ public class ProfileManager {
                 .delete()
                 .addOnSuccessListener(aVoid -> listener.onSuccess())
                 .addOnFailureListener(listener::onError);
+    }
+
+    /**
+     * Get the user profile of any user by their ID.
+     * Used by systems like NotificationSystem that need to look up other users.
+     * @param userId   The ID of the user to fetch.
+     * @param callback Returns the UserProfile, or null if not found.
+     */
+    public void getUserProfileById(String userId, UserProfileCallBack callback) {
+        usersRef.document(userId).get().addOnSuccessListener(document -> {
+            if (document.exists()) {
+                UserProfile userProfile = document.toObject(UserProfile.class);
+                callback.onComplete(userProfile);
+            } else {
+                callback.onComplete(null);
+            }
+        });
+    }
+
+    /**
+     * get the user id of the signed in user
+     * @return
+     */
+    public String getUserID(){
+        return mAuth.getCurrentUser().getUid();
     }
 
 }
