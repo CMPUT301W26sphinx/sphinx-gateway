@@ -9,6 +9,10 @@
         android:title="QR Scan"
         android:icon="@drawable/baseline_qr_code_scanner_24"/>
     <item
+        android:id="@+id/organizer"
+        android:title="Organizer"
+        android:icon="@drawable/organizer_folder"/>
+    <item
         android:id="@+id/profile"
         android:title="Profile"
         android:icon="@drawable/ic_profiles"/>
