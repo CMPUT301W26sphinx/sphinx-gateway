@@ -2,6 +2,8 @@ package com.example.eventlotterysystem.UI.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -16,9 +18,26 @@ public class AccountTypeActivity extends AppCompatActivity {
     private AutoCompleteTextView dropdownAccountType;
     private Button btnNext;
 
+    // Admin Android ID
+    private static final String AUTHORIZED_DEVICE_ID = "85e1384542b9313d";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+
+        // Get the current device's Android ID
+        String currentDeviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        // If not your device, skip directly to entrant flow
+        if (!AUTHORIZED_DEVICE_ID.equals(currentDeviceId)) {
+            startActivity(new Intent(this, TermsActivity.class));
+            finish();
+            return;
+        }
+
+
         setContentView(R.layout.activity_account_type);
 
         dropdownAccountType = findViewById(R.id.dropdown_account_type);
