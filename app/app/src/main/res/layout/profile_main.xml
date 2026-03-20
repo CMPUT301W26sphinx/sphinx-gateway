@@ -6,12 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".UI.fragments.ProfileFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <!-- PROFILE INFORMATION -->
 
         <TextView
             android:id="@+id/profile_title"
@@ -113,6 +112,88 @@
             app:layout_constraintBottom_toTopOf="@+id/buffer_line2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/buffer_line1" />
+
+        <!-- NOTIFICATIONS -->
+        <TextView
+            android:id="@+id/Notifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="15dp"
+            android:text="Notifications"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buffer_line2" />
+
+        <Button
+            android:id="@+id/NotificationMore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="25dp"
+            android:backgroundTint="@color/admin_nav_blue"
+            android:text="See More"
+            app:cornerRadius="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Notifications" />
+
+        <View
+            android:id="@+id/buffer_line3"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:background="@color/textbox_line"
+            android:backgroundTint="@color/admin_bottom_nav_colors"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/NotificationMore" />
+
+        <!-- NOTIFICATIONS SETTINGS-->
+        <TextView
+            android:id="@+id/NotificationsSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="15dp"
+            android:text="Notifications Settings"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buffer_line3" />
+
+        <CheckBox
+            android:id="@+id/checkBoxforNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:text="Receive Notifications from Organizers and Admin"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/NotificationsSettings" />
+
+        <TextView
+            android:id="@+id/Notificationsettingtext"
+            android:layout_width="362dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="24dp"
+            android:text="Notifications include selection to register, calcellations, and more. The settings will only be affected with future notifications."
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBoxforNotification" />
+
+        <!--Delete Profile-->
+        <View
+            android:id="@+id/buffer_line4"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/textbox_line"
+            android:backgroundTint="@color/admin_bottom_nav_colors"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Notificationsettingtext" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
