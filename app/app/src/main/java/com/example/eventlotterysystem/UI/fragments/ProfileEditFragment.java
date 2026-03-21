@@ -49,7 +49,7 @@ public class ProfileEditFragment extends Fragment {
         EditText userPhoneInput = view.findViewById(R.id.edit_phone_number);
 
         // create profile manager
-        ProfileManager manager = new ProfileManager();
+        ProfileManager manager = ProfileManager.getInstance();
 
         // update views with the users current information if the fields are non-null
         manager.getUserProfile(user -> {

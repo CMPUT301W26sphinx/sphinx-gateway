@@ -68,7 +68,7 @@ public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.
         // contents of the view with that element
         Event event = events.get(position);
         EntrantListFirebase db = new EntrantListFirebase();
-        ProfileManager profileManager = new ProfileManager();
+        ProfileManager profileManager = ProfileManager.getInstance();
 
         // Bind data
         holder.eventName.setText(event.getTitle());
