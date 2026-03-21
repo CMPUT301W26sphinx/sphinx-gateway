@@ -46,7 +46,7 @@ public class AdminProfilesFragment extends Fragment {
         adapter = new ProfileAdapter(filteredProfiles, this::openProfileDetail);
         recyclerView.setAdapter(adapter);
 
-        profileManager = new ProfileManager();
+        profileManager = ProfileManager.getInstance();
 
         // Search filter
         searchInput.addTextChangedListener(new TextWatcher() {

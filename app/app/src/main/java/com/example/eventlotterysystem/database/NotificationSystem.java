@@ -10,7 +10,7 @@ import java.util.List;
 public class NotificationSystem {
     private final ProfileManager profileManager;
     public NotificationSystem() {
-        this.profileManager = new ProfileManager();
+        this.profileManager = ProfileManager.getInstance();
     }
 
     /**

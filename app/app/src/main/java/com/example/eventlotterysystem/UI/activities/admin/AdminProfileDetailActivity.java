@@ -30,7 +30,7 @@ public class AdminProfileDetailActivity extends AppCompatActivity {
             return;
         }
 
-        profileManager = new ProfileManager();
+        profileManager = ProfileManager.getInstance();
 
         // Initialize views using your layout's IDs
         firstNameView = findViewById(R.id.profile_first_name);

@@ -55,7 +55,7 @@ public class AcceptEventInviteFragment extends Fragment {
 
         EventRepository repo = new EventRepository();
         EntrantListFirebase entrantDB = new EntrantListFirebase();
-        ProfileManager profileManager = new ProfileManager();
+        ProfileManager profileManager = ProfileManager.getInstance();
         String currentUserId = profileManager.getUserID();
 
         // Load all events

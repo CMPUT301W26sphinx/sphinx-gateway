@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     docRef.get().addOnSuccessListener(document -> {
                         if (!document.exists()){
 
-                            ProfileManager profileManager = new ProfileManager();
+                            ProfileManager profileManager = ProfileManager.getInstance();
 
                             // create profile
                             UserProfile userProfile = new UserProfile();
