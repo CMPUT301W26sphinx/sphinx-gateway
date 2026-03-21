@@ -23,10 +23,30 @@ public class ProfileManager {
     private CollectionReference usersRef;
     private FirebaseAuth mAuth;
 
-    public ProfileManager() {
+    private ProfileManager() {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("users");
         mAuth = FirebaseAuth.getInstance();
+    }
+
+    private static class Holder {
+        private static final ProfileManager instance = new ProfileManager();
+    }
+
+    public static ProfileManager getInstance(){
+        return Holder.instance;
+    }
+
+    /**
+     * Get the user id of the signed in user
+     * @return
+     */
+    public String getUserID(){
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            throw new IllegalStateException("User not authenticated");
+        }
+        return user.getUid();
     }
 
     /**
@@ -37,13 +57,12 @@ public class ProfileManager {
      * @param user the user profile that you want to save
      */
     public void saveUser(UserProfile user) {
-        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-        String uid = firebaseUser.getUid();
-
+        // get the UID
+        String uid = getUserID();
+        // set the ID for the profile
         user.setUserID(uid);
-
-        DocumentReference docRef = usersRef.document(user.getProfileID());
-        docRef.set(user);
+        // update in firebase
+        usersRef.document(uid).set(user);
     }
 
     public interface UserProfileCallBack {
@@ -52,14 +71,12 @@ public class ProfileManager {
 
     /**
      * Get the user profile of the current signed in user
+     * @param callback
      */
     public void getUserProfile(UserProfileCallBack callback) {
         // get current user
-        FirebaseUser user = mAuth.getCurrentUser();
-        String uid = user.getUid();
+        String uid = getUserID();
         // retrieve the user in firebase
-        DocumentReference docRef = usersRef.document(uid);
-
         usersRef.document(uid).get().addOnSuccessListener(document -> {
             if (document.exists()){
                 UserProfile userProfile = document.toObject(UserProfile.class);
@@ -117,12 +134,6 @@ public class ProfileManager {
         });
     }
 
-    /**
-     * get the user id of the signed in user
-     * @return
-     */
-    public String getUserID(){
-        return mAuth.getCurrentUser().getUid();
-    }
+
 
 }

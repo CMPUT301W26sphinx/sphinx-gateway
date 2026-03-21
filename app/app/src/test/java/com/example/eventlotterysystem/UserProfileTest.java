@@ -10,13 +10,15 @@ import org.junit.Test;
 public class UserProfileTest {
     @Test
     public void testGetProfileID(){
-        UserProfile userProfile = new UserProfile("qwerty");
+        UserProfile userProfile = new UserProfile();
+        // set id
+        userProfile.setUserID("qwerty");
         // test ID retrieval
         assertEquals("qwerty", userProfile.getProfileID());
     }
     @Test
     public void testGetUserName(){
-        UserProfile userProfile = new UserProfile("qwerty");
+        UserProfile userProfile = new UserProfile();
         // set username
         userProfile.setFirstName("Lorem Ipsum");
         // test retrieval
@@ -24,7 +26,7 @@ public class UserProfileTest {
     }
     @Test
     public void testGetEmail(){
-        UserProfile userProfile = new UserProfile("qwerty");
+        UserProfile userProfile = new UserProfile();
         // set email
         userProfile.setUserEmail("test@gmail.com");
         // test retrieval
@@ -32,7 +34,7 @@ public class UserProfileTest {
     }
     @Test
     public void testGetPhoneNumber(){
-        UserProfile userProfile = new UserProfile("qwerty");
+        UserProfile userProfile = new UserProfile();
         // set phone number
         userProfile.setUserPhoneNumber("780-777-3576");
         // test retrieval
@@ -40,7 +42,7 @@ public class UserProfileTest {
     }
     @Test
     public void testSetNotificationPreference(){
-        UserProfile userProfile = new UserProfile("qwerty");
+        UserProfile userProfile = new UserProfile();
         // set preference
         userProfile.setReceiveNotifications(true);
         // test retrieval

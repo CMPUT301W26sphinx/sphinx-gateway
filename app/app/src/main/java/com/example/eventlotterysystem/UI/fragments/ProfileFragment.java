@@ -45,7 +45,7 @@ public class ProfileFragment extends Fragment {
         TextView emailTextView = view.findViewById(R.id.email);
         TextView phoneTextView = view.findViewById(R.id.phone_number);
 
-        ProfileManager manager = new ProfileManager();
+        ProfileManager manager = ProfileManager.getInstance();
 
         // update views
         manager.getUserProfile(user -> {
