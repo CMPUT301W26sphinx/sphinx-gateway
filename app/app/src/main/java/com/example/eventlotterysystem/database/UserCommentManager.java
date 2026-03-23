@@ -12,6 +12,7 @@ public class UserCommentManager {
     private FirebaseFirestore db;
     private CollectionReference eventRef;
 
+    // TODO: make this singleton
     public UserCommentManager() {
         db = FirebaseFirestore.getInstance();
         eventRef = db.collection("events");
