@@ -10,8 +10,8 @@
 
     <ImageButton
         android:id="@+id/infoButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:contentDescription="Lottery System Information"
         android:background="@color/material_on_background_disabled"
         android:src="@drawable/ic_infoicon"
@@ -42,7 +42,7 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventTitle">
+        app:layout_constraintTop_toTopOf="parent">
 
         <!-- Description -->
         <TextView
@@ -132,16 +132,42 @@
             android:textSize="14sp" />
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/editEventButton"
-        android:layout_width="220dp"
-        android:layout_height="49dp"
-        android:backgroundTint="@color/nav_blue"
-        android:text="Edit Event"
+    <LinearLayout
+        android:id="@+id/buttonRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventposter" />
+        app:layout_constraintTop_toBottomOf="@+id/eventposter">
+
+        <Button
+            android:id="@+id/backbutton"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/nav_blue"
+            android:text="@string/backbutton" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:id="@+id/editEventButton"
+            android:backgroundTint="@color/nav_blue"
+            android:text="Edit Event"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/eventposter"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

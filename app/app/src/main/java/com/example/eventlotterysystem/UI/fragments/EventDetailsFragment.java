@@ -130,7 +130,6 @@ public class EventDetailsFragment extends Fragment {
         infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         registerButton = view.findViewById(R.id.registerbutton);
-        viewWLButton = view.findViewById(R.id.viewWaitlistButton);
         editEventButton = view.findViewById(R.id.editEventButton);
 
 
@@ -153,16 +152,6 @@ public class EventDetailsFragment extends Fragment {
         }
         viewWLButton.setOnClickListener(v -> {
             Fragment fragment = ViewWaitListFragment.newInstance(eventId);
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        editEventButton.setOnClickListener(v -> {
-            Fragment fragment = EditEventFragment.newInstance(eventId);
             requireActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
