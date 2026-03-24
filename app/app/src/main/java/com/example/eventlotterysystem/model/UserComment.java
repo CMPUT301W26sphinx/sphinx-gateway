@@ -1,25 +1,60 @@
 package com.example.eventlotterysystem.model;
 
 
+import java.security.Timestamp;
+
 public class UserComment {
     /**
      * This defines the structure of a comment to be stored in an event
      */
-    private String comment;
+    private String text;
+    private Timestamp timestamp;
+    private String userID;
+    private String userName;
 
     // empty constructor for firebase
     public UserComment() {
 
     }
 
+    public UserComment(String text) {
+        this.text = text;
+        this.timestamp = null;
+        this.userID = null;
+        this.userName = null;
+    }
+
     // getters
-    public String getComment() {
-        return comment;
+    public String getText() {
+        return text;
+    }
+
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     // setters
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setText(String text) {
+        this.text = this.text;
     }
 
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setUserID(String userID) {
+        this.userID= this.userID;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 }

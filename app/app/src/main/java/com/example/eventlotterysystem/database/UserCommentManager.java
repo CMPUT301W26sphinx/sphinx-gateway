@@ -2,7 +2,11 @@ package com.example.eventlotterysystem.database;
 
 import com.example.eventlotterysystem.model.UserComment;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserCommentManager {
     /**
@@ -20,8 +24,21 @@ public class UserCommentManager {
 
     // TODO: add comment to an event
     public void addCommentToEvent(String eventID, UserComment comment){
-        // get user ID
-        String uid = ProfileManager.getInstance().getUserID();
-        eventRef.document(eventID).collection("comments").document(uid).set(comment);
+        ProfileManager manager = ProfileManager.getInstance();
+        // get userID
+        String uid = manager.getUserID();
+        // get the user
+        manager.getUserProfile(user -> {
+           String firstName = user.getFirstName();
+            // set fields
+            Map<String, Object> data = new HashMap<>();
+            data.put("text", comment.getText());
+            data.put("userID", uid);
+            data.put("userName", firstName);
+            data.put("timestamp", FieldValue.serverTimestamp());
+            eventRef.document(eventID).collection("comments").add(data);
+        });
+
+
     }
 }

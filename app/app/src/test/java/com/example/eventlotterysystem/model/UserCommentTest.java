@@ -8,11 +8,9 @@ import org.junit.Test;
 public class UserCommentTest {
     // TODO: implement UserComment tests
     @Test
-    public void addUserCommentTest(){
-        UserComment comment = new UserComment();
-        // add the comment
-        comment.setComment("Test");
+    public void NewUserCommentTest(){
+        UserComment comment = new UserComment("Hello World");
         // get comment
-        assertEquals("Test", comment.getComment());
+        assertEquals("Hello World", comment.getText());
     }
 }
