@@ -32,8 +32,6 @@ import java.util.Locale;
  * Details such as poster, description, registration period, and waitlist count are displayed (and are collected from firestore database)
  */
 public class EventDetailsFragment extends Fragment {
-    // TODO: Array adapter for other fragment logic US 01.01.03
-    // TODO: add event details load in once event firebase and class is set up
     // TODO: Add the popup about event info for US 01.05.05
     private static final String EVENT_ID = "event_id";
 
