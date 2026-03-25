@@ -177,7 +177,7 @@
             <EditText
                 android:id="@+id/write_comment_box"
                 android:layout_width="match_parent"
-                android:text="Write your comment here"
+                android:hint="Add a comment..."
                 android:layout_height="wrap_content">
 
             </EditText>

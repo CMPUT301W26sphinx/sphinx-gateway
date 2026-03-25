@@ -226,6 +226,7 @@ public class EventDetailsFragment extends Fragment {
             }
         });
 
+
         // add a comment when the add button is pressed
         addCommentButton.setOnClickListener(v -> {
             String comment = writeCommentBox.getText().toString();
