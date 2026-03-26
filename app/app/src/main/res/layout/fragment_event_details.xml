@@ -159,41 +159,9 @@
 
             </LinearLayout>
             <!-- comments -->
-            <TextView
-                android:id="@+id/comments_title"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Comments"
-                android:textSize="20dp">
-            </TextView>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:id="@+id/comment_recycler_view" >
-            </androidx.recyclerview.widget.RecyclerView>
-
-            <EditText
-                android:id="@+id/write_comment_box"
-                android:layout_width="match_parent"
-                android:hint="Add a comment..."
-                android:layout_height="wrap_content">
-
-            </EditText>
-
-            <Button
-                android:id="@+id/add_comment_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:backgroundTint="@color/admin_nav_blue"
-                android:text="+"
-                android:textColor="@android:color/white"
-                app:cornerRadius="20dp"
-                app:rippleColor="@color/white">
-
-            </Button>
+            <include
+                layout="@layout/comments">
+            </include>
         </LinearLayout>
     </ScrollView>
 
