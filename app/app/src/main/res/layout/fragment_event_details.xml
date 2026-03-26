@@ -67,14 +67,6 @@
                 android:layout_margin="16dp"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/editEventButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Edit Event"
-                    android:backgroundTint="@color/nav_blue"
-                    android:layout_marginTop="8dp"/>
-
                 <TextView
                     android:id="@+id/labelStartTime"
                     android:layout_width="match_parent"
@@ -148,14 +140,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Placeholder"/>
-
-                <Button
-                    android:id="@+id/viewWaitlistButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="View Waiting List"
-                    android:backgroundTint="@color/nav_blue"
-                    android:layout_marginTop="8dp"/>
 
             </LinearLayout>
             <!-- comments -->

@@ -50,8 +50,6 @@ public class EventDetailsFragment extends Fragment {
     private ImageButton infoButton;
     private Button backButton;
     private Button registerButton;
-    private Button viewWLButton;
-    private Button editEventButton;
     private Button addCommentButton;
     private EditText writeCommentBox;
     //Firestore data for these variables
@@ -132,8 +130,6 @@ public class EventDetailsFragment extends Fragment {
         infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         registerButton = view.findViewById(R.id.registerbutton);
-        viewWLButton = view.findViewById(R.id.viewWaitlistButton);
-        editEventButton = view.findViewById(R.id.editEventButton);
         addCommentButton = view.findViewById(R.id.add_comment_button);
         writeCommentBox = view.findViewById(R.id.write_comment_box);
 
@@ -155,16 +151,6 @@ public class EventDetailsFragment extends Fragment {
             valueWaitlistCount.setText("—");
             return;
         }
-        viewWLButton.setOnClickListener(v -> {
-            Fragment fragment = ViewWaitListFragment.newInstance(eventId);
-            requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
-        });
-
-        editEventButton.setOnClickListener(v -> {
-            Fragment fragment = EditEventFragment.newInstance(eventId);
-            requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
-        });
-
 
         // TODO: consider how to remove or change button when registration period closed
         registerButton.setOnClickListener(v -> {

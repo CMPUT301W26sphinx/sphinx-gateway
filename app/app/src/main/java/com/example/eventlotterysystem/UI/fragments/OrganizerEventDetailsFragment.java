@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,6 +38,9 @@ public class OrganizerEventDetailsFragment extends Fragment{
     private ImageView eventPoster;
     private ImageButton infoButton;
     private Button backButton;
+    private Button addCommentButton;
+    private EditText writeCommentBox;
+    //Firestore data for these variables
     private Button editEventButton;
     //Firestore data for these variables
     private String eventId; // Unique identifier for the event
@@ -116,7 +121,8 @@ public class OrganizerEventDetailsFragment extends Fragment{
         infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         editEventButton = view.findViewById(R.id.editEventButton);
-
+        addCommentButton = view.findViewById(R.id.add_comment_button);
+        writeCommentBox = view.findViewById(R.id.write_comment_box);
 
         // get the id
         Bundle args = getArguments();
@@ -147,7 +153,27 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             }
         });
+        // add a comment when the add button is pressed
+        addCommentButton.setOnClickListener(v -> {
+            String comment = writeCommentBox.getText().toString();
+            // input validation
+            boolean isValid = true;
+            if (comment.isEmpty()){
+                isValid = false;
+            }
+            // add the comment to firebase
+            if (isValid){
+                UserCommentManager commentManager = UserCommentManager.getInstance();
+                commentManager.addCommentToEvent(eventId, comment);
+                // clear the text box
+                writeCommentBox.setText("");
+                // send a comment posted message
+                Toast.makeText(getContext(), "Comment posted!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
+            }
 
+        });
         // the lottery system info pop up (future implementation)
         infoButton.setOnClickListener(new View.OnClickListener() {
             // TODO: add the pop up
