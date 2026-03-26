@@ -6,6 +6,7 @@
         android:id="@+id/action_switch_account"
         android:title="Logout"
         android:icon="@drawable/ic_switch_account"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        />
 
 </menu>
