@@ -104,7 +104,7 @@
                 android:layout_height="220dp"
                 android:layout_marginTop="8dp"
                 android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_entrant" />
+                tools:listitem="@layout/item_profile" />
 
             <!-- Selected -->
             <LinearLayout
@@ -137,7 +137,7 @@
                 android:layout_height="220dp"
                 android:layout_marginTop="8dp"
                 android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_entrant" />
+                tools:listitem="@layout/item_profile" />
 
             <!-- Enrolled -->
             <LinearLayout
@@ -170,7 +170,7 @@
                 android:layout_height="220dp"
                 android:layout_marginTop="8dp"
                 android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_entrant" />
+                tools:listitem="@layout/item_profile" />
 
             <!-- Cancelled -->
             <LinearLayout
@@ -204,7 +204,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="24dp"
                 android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_entrant" />
+                tools:listitem="@layout/item_profile" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
