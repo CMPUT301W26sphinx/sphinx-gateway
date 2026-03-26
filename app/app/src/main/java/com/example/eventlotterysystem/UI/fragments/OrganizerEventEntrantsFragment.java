@@ -26,7 +26,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public OrganizerEventMapFragment() {
+    public OrganizerEventEntrantsFragment() {
         // Required empty public constructor
     }
 
