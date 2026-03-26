@@ -12,10 +12,10 @@ import com.example.eventlotterysystem.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link OrganizerEventEntrantsFragment#newInstance} factory method to
+ * Use the {@link OrganizerEventMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OrganizerEventEntrantsFragment extends Fragment {
+public class OrganizerEventMapFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
