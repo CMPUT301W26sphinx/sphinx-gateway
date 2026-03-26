@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventlotterysystem.MainActivity;
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.activities.admin.AdminHomeActivity;
 
@@ -27,12 +28,15 @@ public class AccountTypeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
 
+
         // Get the current device's Android ID
         String currentDeviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         // If not your device, skip directly to entrant flow
         if (!AUTHORIZED_DEVICE_ID.equals(currentDeviceId)) {
-            startActivity(new Intent(this, TermsActivity.class));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("show_terms_popup", true);
+            startActivity(intent);
             finish();
             return;
         }
@@ -60,7 +64,9 @@ public class AccountTypeActivity extends AppCompatActivity {
             if (selectedType.equals("Admin")) {
                 startActivity(new Intent(this, AdminHomeActivity.class));
             } else if (selectedType.equals("Entrant")) {
-                startActivity(new Intent(this, TermsActivity.class));
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("show_terms_popup", true);
+                startActivity(intent);
             }
 
             finish();

@@ -3,13 +3,18 @@ package com.example.eventlotterysystem;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -28,7 +33,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -60,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Set default fragment (Events)
         setCurrentFragment(eventListFragment);
+
+        boolean showTermsPopup = getIntent().getBooleanExtra("show_terms_popup", false);
+        if (showTermsPopup) {
+            showTermsDialog();
+        }
 
         // No Login!!
         bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -109,6 +118,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void showTermsDialog() {
+        View dialogView = getLayoutInflater().inflate(R.layout.activity_terms, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        Button understandBtn = dialogView.findViewById(R.id.btn_understand);
+        understandBtn.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 
     /**

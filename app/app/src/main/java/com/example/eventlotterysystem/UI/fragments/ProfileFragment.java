@@ -99,5 +99,7 @@ public class ProfileFragment extends Fragment {
                         .update("notificationPreference", isChecked);
             });
         });
+
+
     }
 }
