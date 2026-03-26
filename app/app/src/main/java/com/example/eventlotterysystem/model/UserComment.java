@@ -17,12 +17,6 @@ public class UserComment {
 
     }
 
-    public UserComment(String text) {
-        this.text = text;
-        this.timestamp = null;
-        this.userID = null;
-        this.userName = null;
-    }
 
     // getters
     public String getText() {
@@ -51,7 +45,7 @@ public class UserComment {
     }
 
     public void setUserID(String userID) {
-        this.userID= this.userID;
+        this.userID = this.userID;
     }
 
     public void setUserName(String userName) {
