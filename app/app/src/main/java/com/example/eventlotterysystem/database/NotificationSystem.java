@@ -71,4 +71,15 @@ public class NotificationSystem {
                 .document(userId)
                 .update("notification", FieldValue.arrayRemove(message));
     }
+    public void logNotification(String entrantId, String eventId, String message) {
+        java.util.Map<String, Object> logData = new java.util.HashMap<>();
+        logData.put("EntrantID", entrantId);
+        logData.put("EventID", eventId);
+        logData.put("Message", message);
+        logData.put("Time", com.google.firebase.Timestamp.now());
+
+        FirebaseFirestore.getInstance()
+                .collection("logs_notification")
+                .add(logData);
+    }
 }
