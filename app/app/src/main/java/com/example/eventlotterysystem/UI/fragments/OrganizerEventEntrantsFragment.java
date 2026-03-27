@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
+ * This fragment allows an organizer to view the entrants for an event according to their status
  * Use the {@link OrganizerEventEntrantsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */

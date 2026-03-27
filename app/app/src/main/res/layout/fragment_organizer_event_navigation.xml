@@ -104,7 +104,7 @@
                 android:id="@+id/indicatorEntrants"
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:background="#FF4FC3"
+                android:background="#000000"
                 android:visibility="invisible" />
         </LinearLayout>
 
@@ -132,7 +132,7 @@
                 android:id="@+id/indicatorMap"
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:background="#FF4FC3"
+                android:background="#000000"
                 android:visibility="invisible" />
         </LinearLayout>
 

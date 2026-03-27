@@ -14,6 +14,8 @@ import com.example.eventlotterysystem.R;
 
 /**
  * A simple {@link Fragment} subclass.
+ * THis class allows navigation for an organizer to view details about thier event
+ * Uses child fragments: OrganizerEventDetailsFragment, OrganizerEventEntrantsFragment, OrganizerEventMapFragment
  * Use the {@link OrganizerEventNavigationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */

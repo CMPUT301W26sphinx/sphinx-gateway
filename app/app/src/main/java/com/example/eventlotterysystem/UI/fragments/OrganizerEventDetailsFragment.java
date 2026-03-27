@@ -25,6 +25,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * A simple {@link Fragment} subclass.
+ * This fragment shows the event details screen from an organizer view
+ * Does not allow registration of an event
+
+ * @ Author Jaylin
+ */
+
 public class OrganizerEventDetailsFragment extends Fragment{
     // TODO: Add the popup about event info for US 01.05.05
     private static final String EVENT_ID = "event_id";
