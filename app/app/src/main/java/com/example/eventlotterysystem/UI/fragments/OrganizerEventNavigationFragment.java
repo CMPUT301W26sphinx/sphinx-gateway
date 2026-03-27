@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.example.eventlotterysystem.R;
 
@@ -17,14 +19,18 @@ import com.example.eventlotterysystem.R;
  */
 public class OrganizerEventNavigationFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_EVENT_ID = "eventId";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String eventId;
+
+    private TextView eventTitle;
+    private ImageButton infoButton;
+    private TextView tabDetails;
+    private TextView tabEntrants;
+    private TextView tabMap;
+    private View indicatorDetails;
+    private View indicatorEntrants;
+    private View indicatorMap;
 
     public OrganizerEventNavigationFragment() {
         // Required empty public constructor
@@ -34,16 +40,14 @@ public class OrganizerEventNavigationFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param eventId The unique identifier for the event.
      * @return A new instance of fragment OrganizerEventNavigationFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static OrganizerEventNavigationFragment newInstance(String param1, String param2) {
+    public static OrganizerEventNavigationFragment newInstance(String eventId) {
         OrganizerEventNavigationFragment fragment = new OrganizerEventNavigationFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_EVENT_ID, eventId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,8 +56,7 @@ public class OrganizerEventNavigationFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            eventId = getArguments().getString(ARG_EVENT_ID);
         }
     }
 
@@ -62,5 +65,54 @@ public class OrganizerEventNavigationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_organizer_event_navigation, container, false);
+    }
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        eventTitle = view.findViewById(R.id.eventTitle);
+        infoButton = view.findViewById(R.id.infoButton);
+        tabDetails = view.findViewById(R.id.tabDetails);
+        tabEntrants = view.findViewById(R.id.tabEntrants);
+        tabMap = view.findViewById(R.id.tabMap);
+        indicatorDetails = view.findViewById(R.id.indicatorDetails);
+        indicatorEntrants = view.findViewById(R.id.indicatorEntrants);
+        indicatorMap = view.findViewById(R.id.indicatorMap);
+        if (infoButton != null) {
+            infoButton.setOnClickListener(v -> {
+                // placeholder
+            });
+        }
+
+        tabDetails.setOnClickListener(v -> showDetailsTab());
+        tabEntrants.setOnClickListener(v -> showEntrantsTab());
+
+        tabMap.setOnClickListener(v -> {
+            indicatorDetails.setVisibility(View.INVISIBLE);
+            indicatorEntrants.setVisibility(View.INVISIBLE);
+            indicatorMap.setVisibility(View.VISIBLE);
+
+            // Placeholder until map fragment is ready
+        });
+        if (savedInstanceState == null && eventId != null && !eventId.isEmpty()) {
+            showDetailsTab();
+        }
+    }
+
+    private void showEntrantsTab() {
+        indicatorDetails.setVisibility(View.INVISIBLE);
+        indicatorEntrants.setVisibility(View.VISIBLE);
+        indicatorMap.setVisibility(View.INVISIBLE);
+
+        OrganizerEventEntrantsFragment fragment = OrganizerEventEntrantsFragment.newInstance(eventId);
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+    }
+    private void showDetailsTab() {
+        indicatorDetails.setVisibility(View.VISIBLE);
+        indicatorEntrants.setVisibility(View.INVISIBLE);
+        indicatorMap.setVisibility(View.INVISIBLE);
+
+        OrganizerEventDetailsFragment fragment = OrganizerEventDetailsFragment.newInstance(eventId);
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
 }
