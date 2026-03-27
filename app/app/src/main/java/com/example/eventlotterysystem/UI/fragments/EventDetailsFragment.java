@@ -3,6 +3,8 @@ package com.example.eventlotterysystem.UI.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +17,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.UI.adapters.CommentAdapter;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.model.EntrantListEntry;
+import com.example.eventlotterysystem.model.UserComment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -25,7 +29,9 @@ import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -63,6 +69,9 @@ public class EventDetailsFragment extends Fragment {
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
     private final EventRepository eventRepository = new EventRepository();
 
+    private CommentAdapter commentAdapter;
+    private List<UserComment> commentList;
+
     public EventDetailsFragment() {
         // Required empty public constructor
     }
@@ -87,6 +96,7 @@ public class EventDetailsFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -227,17 +237,40 @@ public class EventDetailsFragment extends Fragment {
         });
 
 
+        // get the comment data from firebase
+        commentList = new ArrayList<>();
+        commentAdapter = new CommentAdapter(commentList);
+
+        RecyclerView recyclerView = view.findViewById(R.id.comment_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(commentAdapter);
+
+        UserCommentManager commentManager = UserCommentManager.getInstance();
+
+        commentManager.getCommentsFromEvent(eventId, new UserCommentManager.UserCommentCallback() {
+            @Override
+            public void onCommentLoaded(List<UserComment> comments) {
+                commentList.clear();
+                commentList.addAll(comments);
+                commentAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(getContext(), "Failed to load comments", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // add a comment when the add button is pressed
         addCommentButton.setOnClickListener(v -> {
             String comment = writeCommentBox.getText().toString();
             // input validation
             boolean isValid = true;
-            if (comment.isEmpty()){
+            if (comment.isEmpty()) {
                 isValid = false;
             }
             // add the comment to firebase
-            if (isValid){
-                UserCommentManager commentManager = UserCommentManager.getInstance();
+            if (isValid) {
                 commentManager.addCommentToEvent(eventId, comment);
                 // clear the text box
                 writeCommentBox.setText("");
@@ -246,6 +279,9 @@ public class EventDetailsFragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
             }
+
+            // TODO: update when a new comment is posted
+            
 
         });
 

@@ -70,7 +70,6 @@ public class UserCommentManager {
     public void getCommentsFromEvent(String eventID, UserCommentCallback callback) {
         eventRef.document(eventID).collection("comments").orderBy("timestamp", Query.Direction.DESCENDING).get().addOnSuccessListener(snapshot -> {
             List<UserComment> comments = snapshot.toObjects(UserComment.class);
-            if (comments == null) comments = new ArrayList<>();
             callback.onCommentLoaded(comments);
         }).addOnFailureListener(callback::onError);
 

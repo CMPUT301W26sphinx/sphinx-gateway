@@ -1,8 +1,7 @@
 package com.example.eventlotterysystem.model;
 
 
-import java.security.Timestamp;
-
+import com.google.firebase.Timestamp;
 public class UserComment {
     /**
      * This defines the structure of a comment to be stored in an event
@@ -37,7 +36,7 @@ public class UserComment {
 
     // setters
     public void setText(String text) {
-        this.text = this.text;
+        this.text = text;
     }
 
     public void setTimestamp(Timestamp timestamp) {
@@ -45,7 +44,7 @@ public class UserComment {
     }
 
     public void setUserID(String userID) {
-        this.userID = this.userID;
+        this.userID = userID;
     }
 
     public void setUserName(String userName) {
