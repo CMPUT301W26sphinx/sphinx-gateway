@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -89,6 +90,13 @@ public class EventComments extends Fragment {
         initializeCommentList();
         updateComments();
         addComment();
+
+        Button backButton = view.findViewById(R.id.comment_back_button);
+
+        backButton.setOnClickListener(v -> {
+            requireActivity().getOnBackPressedDispatcher().onBackPressed();
+        });
+
     }
 
     private void initializeCommentList() {

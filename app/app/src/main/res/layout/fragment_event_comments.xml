@@ -3,18 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/comments_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:text="Comments"
         android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/comment_back_button">
 
     </TextView>
+
 
     <EditText
         android:id="@+id/write_comment_box"
@@ -31,12 +33,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:nestedScrollingEnabled="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/write_comment_box">
+        app:layout_constraintTop_toBottomOf="@+id/write_comment_box"
+        tools:layout_editor_absoluteX="0dp">
 
     </androidx.recyclerview.widget.RecyclerView>
-
 
     <Button
         android:id="@+id/add_comment_button"
@@ -48,10 +48,19 @@
         android:textColor="@android:color/white"
         android:textSize="20dp"
         app:cornerRadius="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/comment_recycler_view"
         app:layout_constraintStart_toEndOf="@+id/write_comment_box"
-        app:layout_constraintTop_toBottomOf="@+id/comments_title"
         app:rippleColor="@color/white">
 
     </Button>
+
+    <Button
+        android:id="@+id/comment_back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/admin_nav_blue"
+        android:text="Back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
