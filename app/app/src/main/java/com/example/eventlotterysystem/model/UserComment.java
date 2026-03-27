@@ -16,6 +16,11 @@ public class UserComment {
 
     }
 
+    public UserComment(String text, String userID, String userName) {
+        this.text = text;
+        this.userID = userID;
+        this.userName = userName;
+    }
 
     // getters
     public String getText() {
