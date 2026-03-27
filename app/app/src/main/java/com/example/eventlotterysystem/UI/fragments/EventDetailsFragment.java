@@ -27,6 +27,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.auth.User;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,6 +74,9 @@ public class EventDetailsFragment extends Fragment {
 
     private CommentAdapter commentAdapter;
     private List<UserComment> commentList;
+    private UserCommentManager commentManager = UserCommentManager.getInstance();
+
+    private ListenerRegistration commentListener;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -237,54 +243,6 @@ public class EventDetailsFragment extends Fragment {
         });
 
 
-        // get the comment data from firebase
-        commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(commentList);
-
-        RecyclerView recyclerView = view.findViewById(R.id.comment_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(commentAdapter);
-
-        UserCommentManager commentManager = UserCommentManager.getInstance();
-
-        commentManager.getCommentsFromEvent(eventId, new UserCommentManager.UserCommentCallback() {
-            @Override
-            public void onCommentLoaded(List<UserComment> comments) {
-                commentList.clear();
-                commentList.addAll(comments);
-                commentAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(getContext(), "Failed to load comments", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // add a comment when the add button is pressed
-        addCommentButton.setOnClickListener(v -> {
-            String comment = writeCommentBox.getText().toString();
-            // input validation
-            boolean isValid = true;
-            if (comment.isEmpty()) {
-                isValid = false;
-            }
-            // add the comment to firebase
-            if (isValid) {
-                commentManager.addCommentToEvent(eventId, comment);
-                // clear the text box
-                writeCommentBox.setText("");
-                // send a comment posted message
-                Toast.makeText(getContext(), "Comment posted!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
-            }
-
-            // TODO: update when a new comment is posted
-            
-
-        });
-
         // the lottery system info pop up (future implementation)
         infoButton.setOnClickListener(new View.OnClickListener() {
             // TODO: add the pop up
@@ -294,6 +252,98 @@ public class EventDetailsFragment extends Fragment {
             }
         });
         initializeUI(); // button update and get event details
+
+        // get the comment data from firebase
+        commentList = new ArrayList<>();
+        commentAdapter = new CommentAdapter(commentList);
+
+        RecyclerView recyclerView = view.findViewById(R.id.comment_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(commentAdapter);
+
+
+        // fetch all comments for event from firebase
+        initializeCommentList();
+
+        // add a comment when the add button is pressed
+        addComment();
+
+        // update the view when comment is added
+        updateComments();
+
+
+    }
+
+    /**
+     * Updates the comment list when a change occurs
+     */
+    public void updateComments() {
+        commentListener = commentManager.listenToComments(eventId, new UserCommentManager.UserCommentCallback() {
+            @Override
+            public void onCommentLoaded(List<UserComment> comments) {
+                commentList.clear();          // clear old list
+                commentList.addAll(comments); // add new data
+                commentAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(getContext(), "Failed to load comments: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * populates the comment list and updates the array adapter
+     */
+    public void initializeCommentList() {
+        commentManager.getCommentsFromEvent(eventId, new UserCommentManager.UserCommentCallback() {
+            @Override
+            public void onCommentLoaded(List<UserComment> comments) {
+                // populate list
+                commentList.clear();
+                commentList.addAll(comments);
+                commentAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(getContext(), "Failed to get comments", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Handles the behaviour for adding a comment when the add comment button is
+     * pressed
+     *
+     */
+    public void addComment() {
+        addCommentButton.setOnClickListener(v -> {
+            String comment = writeCommentBox.getText().toString();
+
+            if (comment.isEmpty()) {
+                Toast.makeText(getContext(), "Enter a comment", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
+                @Override
+                public void onSuccess(DocumentReference docRef) {
+
+
+                    writeCommentBox.setText("");
+                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
+
+
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     /**
@@ -408,6 +458,14 @@ public class EventDetailsFragment extends Fragment {
      */
     private void refreshWaitlistCount() {
         waitlistDb.getWaitlistCount(eventId).addOnSuccessListener(count -> valueWaitlistCount.setText(String.valueOf(count))).addOnFailureListener(e -> valueWaitlistCount.setText("—"));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (commentListener != null) {
+            commentListener.remove();
+        }
     }
 
 
