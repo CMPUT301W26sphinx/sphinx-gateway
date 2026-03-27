@@ -3,6 +3,7 @@ package com.example.eventlotterysystem.UI.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -78,6 +79,8 @@ public class EventDetailsFragment extends Fragment {
 
     private ListenerRegistration commentListener;
 
+    private Button seeCommentsButton;
+
     public EventDetailsFragment() {
         // Required empty public constructor
     }
@@ -149,9 +152,7 @@ public class EventDetailsFragment extends Fragment {
         backButton = view.findViewById(R.id.backbutton);
         registerButton = view.findViewById(R.id.registerbutton);
         viewWLButton = view.findViewById(R.id.viewWaitlistButton);
-        // editEventButton = view.findViewById(R.id.editEventButton);
-//        addCommentButton = view.findViewById(R.id.add_comment_button);
-//        writeCommentBox = view.findViewById(R.id.write_comment_box);
+        seeCommentsButton = view.findViewById(R.id.seeCommentsButton);
 
 
         // get the id
@@ -175,11 +176,6 @@ public class EventDetailsFragment extends Fragment {
             Fragment fragment = ViewWaitListFragment.newInstance(eventId);
             requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
         });
-
-//        editEventButton.setOnClickListener(v -> {
-//            Fragment fragment = EditEventFragment.newInstance(eventId);
-//            requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
-//        });
 
 
         // TODO: consider how to remove or change button when registration period closed
@@ -242,6 +238,19 @@ public class EventDetailsFragment extends Fragment {
             }
         });
 
+        seeCommentsButton.setOnClickListener(v -> {
+            Fragment fragment = new EventComments();
+
+            Bundle bundle = new Bundle();
+            bundle.putString("event_id", eventId);
+            fragment.setArguments(bundle);
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         // the lottery system info pop up (future implementation)
         infoButton.setOnClickListener(new View.OnClickListener() {
@@ -253,98 +262,9 @@ public class EventDetailsFragment extends Fragment {
         });
         initializeUI(); // button update and get event details
 
-//        // get the comment data from firebase
-//        commentList = new ArrayList<>();
-//        commentAdapter = new CommentAdapter(commentList);
-//
-//        RecyclerView recyclerView = view.findViewById(R.id.comment_recycler_view);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        recyclerView.setAdapter(commentAdapter);
-
-
-//        // fetch all comments for event from firebase
-//        initializeCommentList();
-//
-//        // add a comment when the add button is pressed
-//        addComment();
-//
-//        // update the view when comment is added
-//        updateComments();
-
 
     }
 
-    /**
-     * Updates the comment list when a change occurs
-     */
-    public void updateComments() {
-        commentListener = commentManager.listenToComments(eventId, new UserCommentManager.UserCommentCallback() {
-            @Override
-            public void onCommentLoaded(List<UserComment> comments) {
-                commentList.clear();          // clear old list
-                commentList.addAll(comments); // add new data
-                commentAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(getContext(), "Failed to load comments: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * populates the comment list and updates the array adapter
-     */
-    public void initializeCommentList() {
-        commentManager.getCommentsFromEvent(eventId, new UserCommentManager.UserCommentCallback() {
-            @Override
-            public void onCommentLoaded(List<UserComment> comments) {
-                // populate list
-                commentList.clear();
-                commentList.addAll(comments);
-                commentAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(getContext(), "Failed to get comments", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * Handles the behaviour for adding a comment when the add comment button is
-     * pressed
-     *
-     */
-    public void addComment() {
-        addCommentButton.setOnClickListener(v -> {
-            String comment = writeCommentBox.getText().toString();
-
-            if (comment.isEmpty()) {
-                Toast.makeText(getContext(), "Enter a comment", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
-                @Override
-                public void onSuccess(DocumentReference docRef) {
-
-
-                    writeCommentBox.setText("");
-                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
-
-
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-    }
 
     /**
      * This method is used to initialize the UI elements for the event details fragment
