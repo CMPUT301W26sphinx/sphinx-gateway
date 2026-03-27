@@ -1,5 +1,7 @@
 package com.example.eventlotterysystem.model;
 
+import android.util.Log;
+
 import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.NotificationSystem;
@@ -12,64 +14,89 @@ import java.util.Random;
  * @author Bryan Jonathan
  */
 public class LotterySystem {
-    private final NotificationSystem notificationSystem = new NotificationSystem();
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
     private final EventRepository eventRepository = new EventRepository();
+    private final Notification notification = new Notification();
 
     /** Starts the lottery system, looks at eventid, then chooses based on lottery.
+     * Checksum is built in. It is remainingSpots = capacity - invited - registered
+     * It then goes and chooses if the remainingspots or the entrantAmount is the minimum.
+     * This ensures that it will never surpass the limit.
      * @param eventId eventid is passed by from triggering lottery
-     * @param capacity capacity is passed by.
+     * @param entrantAmount the amount of entrant that is wanted on
      */
-    public void start(String eventId, int capacity) {
-        entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_INVITED)
-                .addOnSuccessListener(invitedEntrants -> {
-            entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_REGISTERED)
-                    .addOnSuccessListener(registeredEntrants -> {
-
-                //check if invited + registered is over capacity
-                int remainingSpots = capacity - invitedEntrants.size() - registeredEntrants.size();
-                if (remainingSpots <= 0) return;
-
-                entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_WAITLIST)
-                        .addOnSuccessListener(waitlistEntrants -> {
-
-                    //LOTTERY LOGIC
-                    Random rand = new Random();
-                    int inviteCount = Math.min(remainingSpots, waitlistEntrants.size());
-
-                    for (int i = 0; i < inviteCount; i++) {
-                        int randomIndex = rand.nextInt(waitlistEntrants.size());
-                        EntrantListEntry chosen = waitlistEntrants.remove(randomIndex);
-
-                        entrantListFirebase.updateStatus(
-                                eventId,
-                                chosen.getEntrantId(),
-                                EntrantListEntry.STATUS_INVITED
-                        );
-                        notifyEntrantLottery(chosen.getEntrantId(), eventId);
-                    }
-                });
-            });
-        });
-    }
-
-    /** Lottery System specific notification system.
-     * @param entrantId used to see which user to notify
-     * @param eventId eventid is passed by from triggering lottery
-     */
-    private void notifyEntrantLottery(String entrantId, String eventId) {
+    private void start(String eventId, int entrantAmount) {
         eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
             @Override
             public void onEventLoaded(Event event) {
-                notificationSystem.sendNotification(
-                        entrantId, "You have been selected for this event! Please confirm your registration.", eventId, "Organizer");
-            }
+                int capacity = event.getCapacity();
+
+                //CHECKSUM FOR THE LOTTERY, SEE IF IT HAS PASSED OR Not
+                entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_INVITED)
+                    .addOnSuccessListener(invitedEntrants ->
+                entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_REGISTERED)
+                    .addOnSuccessListener(registeredEntrants -> {
+                int remainingSpots = capacity - invitedEntrants.size() - registeredEntrants.size();
+                if (remainingSpots <= 0) return;
+
+                //LOTTERY STARTS HERE, IF PASSED CHECKSUM
+                entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_WAITLIST)
+                    .addOnSuccessListener(waitlistEntrants -> {
+
+                Random rand = new Random();
+                int inviteCount = Math.min(Math.min(remainingSpots, entrantAmount), waitlistEntrants.size());
+                for (int i = 0; i < inviteCount; i++) {
+                    int randomIndex = rand.nextInt(waitlistEntrants.size());
+                    EntrantListEntry chosen = waitlistEntrants.remove(randomIndex);
+                    entrantListFirebase.updateStatus(
+                            eventId,
+                            chosen.getEntrantId(),
+                            EntrantListEntry.STATUS_INVITED);
+                    notification.notifyWinner(chosen.getEntrantId(), eventId);
+                }
+            });
+        }));
+    }
             @Override
             public void onError(Exception e) {
-                notificationSystem.sendNotification(
-                        entrantId,"You have been selected for an event! Please confirm your registration in the Events tab.", "", ""
-                );
+                Log.e("LotterySystem", "Failed to fetch event capacity for eventId: " + eventId, e);
             }
         });
+    }
+    /** Starts the lottery system, for a singular person. Useful for when someone invited cancels
+     * @param eventId eventid is passed by from triggering lottery
+     */
+    public void singularLottery(String eventId){
+        start(eventId,1);
+    }
+
+    /** Starts the lottery system for a specified sample amount chosen by organizer
+     * @param eventId eventid is passed by from triggering lottery
+     * @param sampleAmount Sample amount that organizer chooses
+     */
+    public void sampleLottery(String eventId, int sampleAmount){
+        start(eventId,sampleAmount);
+    }
+
+    /** Starts the lottery system up to capacity, or as I like to call it, first lottery!
+     * @param eventId eventid is passed by from triggering lottery
+     */
+    public void firstLottery(String eventId){
+        //this is really awful, but entrant amount is just endcap. This will basically max it to capacity.
+        start(eventId, 9999999);
+
+        // Notify the losers aka people still in the waitlist
+        entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_WAITLIST)
+                .addOnSuccessListener(waitlistEntrants -> {
+                    for (EntrantListEntry entrant: waitlistEntrants) {
+                        notification.notifyLoser(entrant.getEntrantId(), eventId);
+                    }
+                });
+    }
+    /** Redraw lottery. Same as firstlottery, but without notification that entrant lost.
+     * @param eventId eventid is passed by from triggering lottery
+     */
+    public void redrawLottery(String eventId){
+        start(eventId,99999999);
     }
 }
