@@ -15,11 +15,12 @@ import android.widget.Toast;
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.EntrantAdapter;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.model.EntrantDisplay;
 import com.example.eventlotterysystem.model.EntrantListEntry;
+import com.example.eventlotterysystem.database.ProfileManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.example.eventlotterysystem.database.ProfileManager;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link OrganizerEventEntrantsFragment#newInstance} factory method to
@@ -42,38 +43,20 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     private Button notifyCancelledButton;
     private Button exportCsvButton;
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
-
+    private final ProfileManager profileManager = ProfileManager.getInstance();
 
     public OrganizerEventEntrantsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment OrganizerEventMapFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static OrganizerEventEntrantsFragment newInstance(String param1, String param2) {
+    public static OrganizerEventEntrantsFragment newInstance(String eventId) {
         OrganizerEventEntrantsFragment fragment = new OrganizerEventEntrantsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString("eventId", eventId);
         fragment.setArguments(args);
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,18 +78,19 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         notifySelectedButton = view.findViewById(R.id.notifySelectedButton);
         notifyCancelledButton = view.findViewById(R.id.notifyCancelledButton);
         exportCsvButton = view.findViewById(R.id.exportCsvButton);
+        // TODO: button functionalities, notifs and the csv export
 
         setupRecyclerViews();
 
-        String eventId = requireArguments().getString("eventId");
+        String eventId = null;
+        if (getArguments() != null) {eventId = getArguments().getString("eventId");}
+        if (eventId == null || eventId.isEmpty()) {Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();return;}
         loadEntrants(eventId);
-        // TODO: button functionalities, notifs and the csv export
+
     }
 
     /**
      * This method is used to load the entrants for the event.
-     * @param eventId
-     *  The id of the event to load the entrants for.
      *  No parameters or returns.
      */
     private void setupRecyclerViews() {
@@ -116,17 +100,18 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         enrolledAdapter = new EntrantAdapter();
         cancelledAdapter = new EntrantAdapter();
 
-        waitlistRecyclerView.setAdapter(waitlistAdapter);
-        selectedRecyclerView.setAdapter(selectedAdapter);
-        enrolledRecyclerView.setAdapter(enrolledAdapter);
-        cancelledRecyclerView.setAdapter(cancelledAdapter);
-
         // Set up layout managers for each RecyclerView
         waitlistRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         selectedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         enrolledRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         cancelledRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-    }
+
+        waitlistRecyclerView.setAdapter(waitlistAdapter);
+        selectedRecyclerView.setAdapter(selectedAdapter);
+        enrolledRecyclerView.setAdapter(enrolledAdapter);
+        cancelledRecyclerView.setAdapter(cancelledAdapter);
+
+            }
 
     /**
      * This method is used to load the entrants for the event.
@@ -135,6 +120,65 @@ public class OrganizerEventEntrantsFragment extends Fragment {
      *  No parameters or returns.
      */
     private void loadEntrants(String eventId){
+        entrantListFirebase.getEntrantList(eventId)
+                .addOnSuccessListener(entries -> {
+                    if (!isAdded()) return;
+                    if (entries == null || entries.isEmpty()) {
+                        waitlistAdapter.setEntrants(new ArrayList<>());
+                        selectedAdapter.setEntrants(new ArrayList<>());
+                        enrolledAdapter.setEntrants(new ArrayList<>());
+                        cancelledAdapter.setEntrants(new ArrayList<>());
+                        return;
+                    }
 
+                    List<EntrantDisplay> waitlist = new ArrayList<>();
+                    List<EntrantDisplay> selected = new ArrayList<>();
+                    List<EntrantDisplay> enrolled = new ArrayList<>();
+                    List<EntrantDisplay> cancelled = new ArrayList<>();
+
+                    final int totalEntries = entries.size();
+                    final int[] completedCount = {0}; // count helps with the firebase delay loading stuff in
+
+                    for (EntrantListEntry entry : entries) {
+                        profileManager.getUserProfileById(entry.getEntrantId(), user -> {
+                            if (!isAdded()) return;
+
+                            EntrantDisplay display = new EntrantDisplay(
+                                    entry.getEntrantId(),
+                                    user != null ? user.getFirstName() : null,
+                                    user != null ? user.getLastName() : null,
+                                    user != null ? user.getEmail() : null,
+                                    entry.getStatus()
+                            );
+
+                            switch (entry.getStatus()) {
+                                case EntrantListEntry.STATUS_WAITLIST:
+                                    waitlist.add(display);
+                                    break;
+
+                                case EntrantListEntry.STATUS_INVITED:
+                                    selected.add(display);
+                                    break;
+
+                                case EntrantListEntry.STATUS_REGISTERED:
+                                    enrolled.add(display);
+                                    break;
+
+                                case EntrantListEntry.STATUS_CANCELLED_OR_REJECTED:
+                                    cancelled.add(display);
+                                    break;
+                            }
+
+                            completedCount[0]++;
+
+                            if (completedCount[0] == totalEntries) {
+                                waitlistAdapter.setEntrants(waitlist);
+                                selectedAdapter.setEntrants(selected);
+                                enrolledAdapter.setEntrants(enrolled);
+                                cancelledAdapter.setEntrants(cancelled);
+                            }
+                        });
+                    }
+                }).addOnFailureListener(e -> {if (!isAdded()) return;Toast.makeText(requireContext(), "Failed to load entrants", Toast.LENGTH_SHORT).show();});
     }
 }
