@@ -101,9 +101,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/waitlistRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
+                android:nestedScrollingEnabled="true"
                 tools:listitem="@layout/item_profile" />
 
             <!-- Selected -->
@@ -134,9 +134,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/selectedRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
+                android:nestedScrollingEnabled="true"
                 tools:listitem="@layout/item_profile" />
 
             <!-- Enrolled -->
@@ -167,9 +167,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/enrolledRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
+                android:nestedScrollingEnabled="true"
                 tools:listitem="@layout/item_profile" />
 
             <!-- Cancelled -->
@@ -200,10 +200,10 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/cancelledRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="24dp"
-                android:nestedScrollingEnabled="false"
+                android:nestedScrollingEnabled="true"
                 tools:listitem="@layout/item_profile" />
 
         </LinearLayout>
