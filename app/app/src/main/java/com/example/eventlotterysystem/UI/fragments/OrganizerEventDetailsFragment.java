@@ -118,7 +118,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
         valueStarttime = view.findViewById(R.id.valueStartTime);
         valueLocation = view.findViewById(R.id.valueLocation);
         eventPoster = view.findViewById(R.id.eventposter);
-        infoButton = view.findViewById(R.id.infoButton);
+        //infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         editEventButton = view.findViewById(R.id.editEventButton);
         addCommentButton = view.findViewById(R.id.add_comment_button);
@@ -174,6 +174,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
             }
 
         });
+        /**
         // the lottery system info pop up (future implementation)
         infoButton.setOnClickListener(new View.OnClickListener() {
             // TODO: add the pop up
@@ -181,9 +182,10 @@ public class OrganizerEventDetailsFragment extends Fragment{
             public void onClick(View v) {
                 //TODO
             }
-        });
+        });*/
         initializeUI(); // button update and get event details
     }
+
 
     /**
      * This method is used to initialize the UI elements for the event details fragment
