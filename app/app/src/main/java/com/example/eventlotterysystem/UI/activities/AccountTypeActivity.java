@@ -20,7 +20,7 @@ public class AccountTypeActivity extends AppCompatActivity {
     private Button btnNext;
 
     // Admin Android ID
-    private static final String AUTHORIZED_DEVICE_ID = "85e1384542b9313d";
+    private static final String AUTHORIZED_DEVICE_ID = "85e1384542b9313";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
