@@ -12,6 +12,11 @@ public class Event implements Serializable {
     private int waitingListCount;         // number of users on waiting list
     // TODO: poster image URL
 
+    private String organizerId;
+
+    public String getOrganizerId() { return organizerId; }
+    public void setOrganizerId(String organizerId) { this.organizerId = organizerId; }
+
     // Required no-arg constructor for Firestore
     public Event() {}
 
