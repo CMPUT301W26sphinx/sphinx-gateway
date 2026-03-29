@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,8 +18,6 @@ import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import android.util.Log;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,21 +36,25 @@ public class OrganizerFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.organizer_eventlist, container, false);
 
-
-        // 🔥 STEP 1: Initialize RecyclerView
+        // ✅ STEP 1: Setup RecyclerView
         recyclerView = view.findViewById(R.id.OrganizerEventsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // 🔥 STEP 2: Create list + adapter
+        // ✅ STEP 2: Initialize list + adapter
         eventList = new ArrayList<>();
 
         adapter = new OrganizerAdapter(eventList, event -> {
-            // TODO: Navigate to organizer event details
+            // 🔥 NAVIGATION FIX
+            Bundle bundle = new Bundle();
+            bundle.putString("eventId", event.getEventId());
+
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.organizerEventNavigationFragment, bundle);
         });
 
         recyclerView.setAdapter(adapter);
 
-        // 🔥 STEP 3: Load data from Firebase
+        // ✅ STEP 3: Load events
         loadEvents();
 
         return view;
@@ -63,7 +66,8 @@ public class OrganizerFragment extends Fragment {
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         db.collection("events")
-                .whereEqualTo("organizerId", currentUserId) // IMPORTANT
+                // 🔥 FIXED: supports multiple organizers
+                .whereArrayContains("organizerIds", currentUserId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 

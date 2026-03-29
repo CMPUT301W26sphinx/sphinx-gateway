@@ -18,4 +18,9 @@
         android:id="@+id/profileEditFragment"
         android:name="com.example.eventlotterysystem.UI.fragments.ProfileEditFragment"
         android:label="ProfileEditFragment" />
+    <fragment
+        android:id="@+id/organizerEventNavigationFragment"
+        android:name="com.example.eventlotterysystem.UI.fragments.OrganizerEventNavigationFragment"
+        android:label="OrganizerEventNavigationFragment"
+        tools:layout="@layout/fragment_organizer_event_navigation" />
 </navigation>

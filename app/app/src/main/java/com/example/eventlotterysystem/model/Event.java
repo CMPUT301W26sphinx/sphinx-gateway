@@ -1,33 +1,35 @@
 package com.example.eventlotterysystem.model;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Event implements Serializable {
     private String eventId;
-    private String title;           // was eventName
-    private String description;     // was eventDescription
+    private String title;
+    private String description;
     private int capacity;
-    private long registrationStartDate;   // timestamp (milliseconds)
-    private long registrationEndDate;     // timestamp
-    private int waitingListCount;         // number of users on waiting list
-    // TODO: poster image URL
-    private String category;              // event category (e.g., Swimming, Dance)
+    private long registrationStartDate;
+    private long registrationEndDate;
+    private int waitingListCount;
+    private String category;
 
-    private String organizerId;
+    // ✅ FIX: support multiple organizers
+    private List<String> organizerIds;
 
-    public String getOrganizerId() { return organizerId; }
-    public void setOrganizerId(String organizerId) { this.organizerId = organizerId; }
-
-    // Required no-arg constructor for Firestore
-    public Event() {}
+    // Required no-arg constructor
+    public Event() {
+        organizerIds = new ArrayList<>();
+    }
 
     public Event(String eventId, String title, String description) {
         this.eventId = eventId;
         this.title = title;
         this.description = description;
+        this.organizerIds = new ArrayList<>();
     }
 
-    // Getters and setters
+    // Getters & setters
     public String getEventId() { return eventId; }
     public void setEventId(String eventId) { this.eventId = eventId; }
 
@@ -51,4 +53,16 @@ public class Event implements Serializable {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    // ✅ NEW METHODS
+    public List<String> getOrganizerIds() { return organizerIds; }
+
+    public void setOrganizerIds(List<String> organizerIds) {
+        this.organizerIds = organizerIds;
+    }
+
+    // Optional helper (clean filtering)
+    public boolean isOrganizer(String userId) {
+        return organizerIds != null && organizerIds.contains(userId);
+    }
 }
