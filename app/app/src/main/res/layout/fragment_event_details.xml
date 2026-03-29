@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".UI.fragments.EventDetailsFragment">
 
+    <!-- Title -->
     <TextView
         android:id="@+id/eventTitle"
         android:layout_width="wrap_content"
@@ -16,148 +17,139 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Info Button -->
     <ImageButton
         android:id="@+id/infoButton"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_margin="8dp"
         android:contentDescription="Lottery System Information"
         android:background="@color/material_on_background_disabled"
         android:src="@drawable/ic_infoicon"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-
-    <!-- Content -->
-
-    <ImageView
-        android:id="@+id/eventposter"
-        android:layout_width="158dp"
-        android:layout_height="202dp"
-        android:layout_marginTop="20dp"
-        android:contentDescription="No Event Poster Uploaded"
-        android:src="@drawable/ic_emptyimageplaceholder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventInfoColumn" />
-
-    <LinearLayout
-        android:id="@+id/eventInfoColumn"
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/eventTitle"
+        app:layout_constraintBottom_toTopOf="@id/buttonRow"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventTitle">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
-            android:id="@+id/editEventButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Edit Event"
-            android:backgroundTint="@color/nav_blue"
-            android:layout_marginTop="8dp"/>
-        <!-- Description -->
-        <TextView
-            android:id="@+id/labelStartTime"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/event_starttime_title"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/valueStartTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="12dp"
-            android:text="Placeholder"
-            android:textSize="14sp" />
+            <!-- Poster -->
+            <ImageView
+                android:id="@+id/eventposter"
+                android:layout_width="158dp"
+                android:layout_height="202dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:contentDescription="No Event Poster Uploaded"
+                android:src="@drawable/ic_emptyimageplaceholder"/>
 
-        <TextView
-            android:id="@+id/labelLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/event_location_title"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            <!-- Info Column -->
+            <LinearLayout
+                android:id="@+id/eventInfoColumn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/valueLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="12dp"
-            android:text="Placeholder description from Firestore."
-            android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/labelStartTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/event_starttime_title"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/labelDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/event_description_title"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/valueStartTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Placeholder"
+                    android:layout_marginBottom="12dp"/>
 
-        <TextView
-            android:id="@+id/valueDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="12dp"
-            android:text="Placeholder description from Firestore."
-            android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/labelLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/event_location_title"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-        <!-- Registration period -->
-        <TextView
-            android:id="@+id/labelRegistration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/event_reg_title"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/valueLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Placeholder"
+                    android:layout_marginBottom="12dp"/>
 
-        <TextView
-            android:id="@+id/valueRegistration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="12dp"
-            android:text="date – date, placeholder"
-            android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/labelDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/event_description_title"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-        <!-- Waitlist count -->
-        <TextView
-            android:id="@+id/labelWaitlistCount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/event_waitnum_title"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/valueDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Placeholder"
+                    android:layout_marginBottom="12dp"/>
 
-        <TextView
-            android:id="@+id/valueWaitlistCount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="xx placeholder for firestore"
-            android:textSize="14sp" />
-        <Button
-            android:id="@+id/viewWaitlistButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/nav_blue"
-            android:text="View Waiting List"/>
+                <TextView
+                    android:id="@+id/labelRegistration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/event_reg_title"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/valueRegistration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Placeholder"
+                    android:layout_marginBottom="12dp"/>
 
+                <TextView
+                    android:id="@+id/labelWaitlistCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/event_waitnum_title"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/valueWaitlistCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Placeholder"/>
+
+            </LinearLayout>
+            <!-- comments -->
+            <include
+                layout="@layout/comments">
+            </include>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Buttons -->
     <LinearLayout
         android:id="@+id/buttonRow"
         android:layout_width="0dp"
@@ -165,29 +157,29 @@
         android:layout_margin="16dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventposter">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/backbutton"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/nav_blue"
-            android:text="@string/backbutton" />
+            android:text="@string/backbutton"
+            android:backgroundTint="@color/nav_blue"/>
 
         <Space
             android:layout_width="8dp"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
 
         <Button
             android:id="@+id/registerbutton"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/nav_blue"
-            android:text="@string/registerbutton" />
+            android:text="@string/registerbutton"
+            android:backgroundTint="@color/nav_blue"/>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
