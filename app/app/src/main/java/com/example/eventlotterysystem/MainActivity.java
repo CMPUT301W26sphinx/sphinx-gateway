@@ -2,17 +2,26 @@ package com.example.eventlotterysystem;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventlotterysystem.UI.activities.AccountTypeActivity;
 import com.example.eventlotterysystem.UI.fragments.EventListFragment;
 import com.example.eventlotterysystem.UI.fragments.OrganizerFragment;
 import com.example.eventlotterysystem.UI.fragments.ProfileFragment;
@@ -24,7 +33,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -56,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Set default fragment (Events)
         setCurrentFragment(eventListFragment);
+
+        boolean showTermsPopup = getIntent().getBooleanExtra("show_terms_popup", false);
+        if (showTermsPopup) {
+            showTermsDialog();
+        }
 
         // No Login!!
         bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -107,6 +120,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void showTermsDialog() {
+        View dialogView = getLayoutInflater().inflate(R.layout.activity_terms, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        Button understandBtn = dialogView.findViewById(R.id.btn_understand);
+        understandBtn.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
     /**
      * Replaces current fragment with the specified fragment
      * @param fragment the fragment to display next
@@ -116,5 +147,24 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_switch_account, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_switch_account) {
+            // Navigate to AccountTypeActivity and clear back stack
+            Intent intent = new Intent(this, AccountTypeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

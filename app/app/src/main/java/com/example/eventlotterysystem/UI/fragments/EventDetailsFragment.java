@@ -13,6 +13,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
@@ -237,10 +240,30 @@ public class EventDetailsFragment extends Fragment {
 
         // the lottery system info pop up (future implementation)
         infoButton.setOnClickListener(new View.OnClickListener() {
-            // TODO: add the pop up
             @Override
             public void onClick(View v) {
-                //TODO
+                View dialogView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.activity_terms, null);
+
+                AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .create();
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                }
+
+                Button understandBtn = dialogView.findViewById(R.id.btn_understand);
+                understandBtn.setOnClickListener(view -> dialog.dismiss());
+
+                dialog.show();
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setLayout(
+                            (int) (getResources().getDisplayMetrics().widthPixels * 0.9),
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                }
             }
         });
         initializeUI(); // button update and get event details

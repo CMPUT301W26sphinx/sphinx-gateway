@@ -11,6 +11,7 @@ public class Event implements Serializable {
     private long registrationEndDate;     // timestamp
     private int waitingListCount;         // number of users on waiting list
     // TODO: poster image URL
+    private String category;              // event category (e.g., Swimming, Dance)
 
     // Required no-arg constructor for Firestore
     public Event() {}
@@ -43,5 +44,6 @@ public class Event implements Serializable {
     public int getWaitingListCount() { return waitingListCount; }
     public void setWaitingListCount(int waitingListCount) { this.waitingListCount = waitingListCount; }
 
-
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 }

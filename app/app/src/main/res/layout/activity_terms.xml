@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:background="@drawable/profile_item_border">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sphinx Gateway"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="24dp"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lottery System Information"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="This event uses a fair lottery system so everyone has an equal chance to participate!\n\nWhen you join the waiting list, you do not get a spot immediately. After the registration period ends, we randomly select participants from the waiting list.\n\nIf you are selected, you’ll receive an invitation in the app and can choose to accept or decline.\n\nIf you are not selected in the first draw, you may still be chosen later if spots become available."
+                android:textSize="16sp"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginBottom="24dp" />
+
+            <Button
+                android:id="@+id/btn_understand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="I Understand"
+                android:backgroundTint="@color/admin_nav_blue" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>
