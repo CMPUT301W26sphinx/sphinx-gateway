@@ -88,17 +88,8 @@ public class OrganizerEventNavigationFragment extends Fragment {
 
         tabDetails.setOnClickListener(v -> showDetailsTab());
         tabEntrants.setOnClickListener(v -> showEntrantsTab());
-
-        tabMap.setOnClickListener(v -> {
-            indicatorDetails.setVisibility(View.INVISIBLE);
-            indicatorEntrants.setVisibility(View.INVISIBLE);
-            indicatorMap.setVisibility(View.VISIBLE);
-
-            // Placeholder until map fragment is ready
-        });
-        if (savedInstanceState == null && eventId != null && !eventId.isEmpty()) {
-            showDetailsTab();
-        }
+        tabMap.setOnClickListener(v -> showMapsTab());
+        showDetailsTab();
     }
 
     private void showEntrantsTab() {
@@ -115,6 +106,14 @@ public class OrganizerEventNavigationFragment extends Fragment {
         indicatorMap.setVisibility(View.INVISIBLE);
 
         OrganizerEventDetailsFragment fragment = OrganizerEventDetailsFragment.newInstance(eventId);
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+    }
+    private void showMapsTab(){
+        indicatorDetails.setVisibility(View.INVISIBLE);
+        indicatorEntrants.setVisibility(View.INVISIBLE);
+        indicatorMap.setVisibility(View.VISIBLE);
+
+        OrganizerEventMapFragment fragment = OrganizerEventMapFragment.newInstance(eventId);
         getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
 }
