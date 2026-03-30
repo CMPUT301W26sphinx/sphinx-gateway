@@ -33,7 +33,6 @@ public class OrganizerEventMapFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment OrganizerEventMapFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -50,7 +49,6 @@ public class OrganizerEventMapFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
