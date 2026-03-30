@@ -142,8 +142,8 @@ public class MyEventsNavigation extends Fragment {
         indicatorRegistered.setVisibility(View.VISIBLE);
         indicatorHistory.setVisibility(View.INVISIBLE);
 
-        // UPDATE: OrganizerEventMapFragment fragment = OrganizerEventMapFragment.newInstance(eventId);
-        //getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+        ViewRegisteredListFragment fragment = new ViewRegisteredListFragment();
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
     private void showHistoryTab(){
         indicatorWaitlist.setVisibility(View.INVISIBLE);
@@ -151,7 +151,7 @@ public class MyEventsNavigation extends Fragment {
         indicatorRegistered.setVisibility(View.INVISIBLE);
         indicatorHistory.setVisibility(View.VISIBLE);
 
-        // UPDATE: OrganizerEventMapFragment fragment = OrganizerEventMapFragment.newInstance(eventId);
-        //getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+        ViewHistoryListFragment fragment = new ViewHistoryListFragment();
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
 }
