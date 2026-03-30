@@ -39,8 +39,8 @@ public class OrganizerAdapter extends RecyclerView.Adapter<OrganizerAdapter.View
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            eventName = itemView.findViewById(R.id.user_comment_name);
-            eventDescription = itemView.findViewById(R.id.user_comment_text);
+            eventName = itemView.findViewById(R.id.eventName);
+            eventDescription = itemView.findViewById(R.id.eventDescription);
         }
     }
 
