@@ -124,7 +124,7 @@ public class MyEventsNavigation extends Fragment {
         indicatorRegistered.setVisibility(View.INVISIBLE);
         indicatorHistory.setVisibility(View.INVISIBLE);
 
-        ViewWaitListFragment fragment = ViewWaitListFragment.newInstance(eventId);
+        ViewWaitListFragment fragment = new ViewWaitListFragment();
         getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
     private void showInvitesTab() {

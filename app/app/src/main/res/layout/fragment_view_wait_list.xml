@@ -1,30 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <LinearLayout
-        android:id="@+id/waitlistContainer"
-        android:orientation="vertical"
+    <TextView
+        android:id="@+id/emptyText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/backButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/nav_blue"
-            android:text="Back"/>
-        <TextView
-            android:id="@+id/waitlistTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Waiting List"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:paddingBottom="12dp"/>
+        android:layout_height="wrap_content"
+        android:text="No matching events found"
+        android:visibility="gone"
+        android:textSize="16sp" />
 
-    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewEvents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-</ScrollView>
+</LinearLayout>

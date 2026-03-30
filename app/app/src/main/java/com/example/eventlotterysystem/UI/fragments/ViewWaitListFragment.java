@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +16,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.UI.adapters.EventAdapter;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.EntrantListEntry;
+import com.example.eventlotterysystem.model.Event;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -24,24 +30,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewWaitListFragment extends Fragment {
-    private static final String EVENT_ID = "event_id";
-    private String eventId;
-    private List<EntrantListEntry> waitlist = new ArrayList<>();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private Button backButton;
+
+    private RecyclerView recyclerView;
+    private TextView emptyText;
+    private EventAdapter adapter;
+    private List<Event> waitlistedEvents = new ArrayList<>();
+
+    private EventRepository eventRepository;
+    private EntrantListFirebase entrantListFirebase;
 
     public ViewWaitListFragment() {}
-    public static ViewWaitListFragment newInstance(String eventId) {
-        ViewWaitListFragment fragment = new ViewWaitListFragment();
-        Bundle args = new Bundle();
-        args.putString(EVENT_ID, eventId);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     /**
-     * Allows the user to view the current waiting list
+     * Allows the user to view the current events in which they are on the waiting list
      * @param inflater The LayoutInflater object that can be used to inflate
      * any views in the fragment,
      * @param container If non-null, this is the parent view that the fragment's
@@ -56,72 +58,63 @@ public class ViewWaitListFragment extends Fragment {
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_view_wait_list, container, false);
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Bundle args = getArguments();
-        if (args != null) {
-            eventId = args.getString(EVENT_ID);
-        }
-        backButton = view.findViewById(R.id.backButton);
-
-        backButton.setOnClickListener(v -> {
-            getParentFragmentManager().popBackStack();
+        recyclerView = view.findViewById(R.id.recyclerViewEvents);
+        emptyText = view.findViewById(R.id.emptyText);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        adapter = new EventAdapter(waitlistedEvents, event -> {
+            // TODO: add go to event details
         });
+        recyclerView.setAdapter(adapter);
+        eventRepository = new EventRepository();
+        entrantListFirebase = new EntrantListFirebase();
         loadWaitlist();
     }
 
     /**
-     * Load the waiting list from database
-     * Store the data in --waitlist
+     * Loads the waitlisted events for the current user
+     * @return void
      */
     private void loadWaitlist() {
+        String currentUserId;
+        try {currentUserId = ProfileManager.getInstance().getUserID();
+        } catch (IllegalStateException e) {showEmptyState();return;} //if fail show empty, dont crash
+        eventRepository.getEvents(new EventRepository.EventCallback() {
+            @Override
+            public void onEventsLoaded(List<Event> events) {
+                waitlistedEvents.clear();
+                if (events.isEmpty()) {updateDisplay();return;}
+                final int[] processed = {0};// make sure check all events
+                // if status=1, then the entrant is on the waitlist, should be shown
+                for (Event event : events) {
+                entrantListFirebase.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {if (status != null && status == 1) {waitlistedEvents.add(event);}
+                processed[0]++;
+                if (processed[0] == events.size()) {updateDisplay();}}).addOnFailureListener(e -> {processed[0]++;if (processed[0] == events.size()) {updateDisplay();}});}
+            }
 
-        if (eventId == null) return;
-
-        db.collection("events")
-            .document(eventId)
-            .collection("EntrantList")
-            .whereEqualTo("status", EntrantListEntry.STATUS_WAITLIST) // status = 1
-            .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-
-                waitlist.clear();
-
-                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                    EntrantListEntry entry = doc.toObject(EntrantListEntry.class);
-                    waitlist.add(entry);
-                }
-                showWaitList();
+            @Override
+            public void onError(Exception e) {
+                showEmptyState();
+            }
         });
     }
 
-    /**
-     * To show all the entrant in --waitlist
-     */
-
-    private void showWaitList() {
-        LinearLayout waitlistContainer = getView().findViewById(R.id.waitlistContainer);
-
-        // Clear all views (except the title)
-        waitlistContainer.removeViews(1, waitlistContainer.getChildCount() - 1);
-
-        if (waitlist.isEmpty()) {
-            TextView tv = new TextView(getContext());
-            tv.setText("No Entrant in the waiting list.");
-            tv.setTextSize(16f);
-            tv.setPadding(8, 8, 8, 8);
-            waitlistContainer.addView(tv);
-            return;
+    private void updateDisplay() {
+        adapter.notifyDataSetChanged();
+        if (waitlistedEvents.isEmpty()) {
+            emptyText.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            emptyText.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
         }
-
-        // Generate TextView for each entrant in the waiting list
-        for (EntrantListEntry entry : waitlist) {
-            TextView tv = new TextView(getContext());
-            tv.setText(entry.getEntrantId()); // replace by name later
-            tv.setTextSize(18f);
-            tv.setPadding(8, 8, 8, 8);
-            waitlistContainer.addView(tv);
-        }
+    }
+    private void showEmptyState() {
+        waitlistedEvents.clear();
+        adapter.notifyDataSetChanged();
+        emptyText.setVisibility(View.VISIBLE);
     }
 }
