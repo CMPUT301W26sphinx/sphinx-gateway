@@ -67,7 +67,7 @@ public class MyEventsNavigation extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_organizer_event_navigation, container, false);
+        return inflater.inflate(R.layout.fragment_my_events_navigation, container, false);
     }
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
