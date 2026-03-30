@@ -1,12 +1,18 @@
 package com.example.eventlotterysystem.UI.activities.admin;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.UI.activities.AccountTypeActivity;
 import com.example.eventlotterysystem.UI.fragments.admin.AdminEventsFragment;
 import com.example.eventlotterysystem.UI.fragments.admin.AdminImagesFragment;
 import com.example.eventlotterysystem.UI.fragments.admin.AdminLogsFragment;
@@ -27,6 +33,13 @@ public class AdminHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_admin_home);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
 
         bottomNavigationView = findViewById(R.id.admin_bottom_nav);
 
@@ -59,5 +72,24 @@ public class AdminHomeActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.admin_fragment_container, fragment)
                 .commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_switch_account, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_switch_account) {
+            // Go back to account type selection and clear back stack
+            Intent intent = new Intent(this, AccountTypeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
