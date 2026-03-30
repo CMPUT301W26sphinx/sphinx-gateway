@@ -56,8 +56,8 @@ public class CreateEventFragment extends Fragment {
         db = FirebaseFirestore.getInstance(); // will replaced by the database of Event
 
         // Edit text
-        nameInput = view.findViewById(R.id.user_comment_name);
-        descInput = view.findViewById(R.id.user_comment_text);
+        nameInput = view.findViewById(R.id.eventName);
+        descInput = view.findViewById(R.id.eventDescription);
         timeInput = view.findViewById(R.id.eventTime);
         placeInput = view.findViewById(R.id.eventPlace);
         startRegInput = view.findViewById(R.id.regStart);
