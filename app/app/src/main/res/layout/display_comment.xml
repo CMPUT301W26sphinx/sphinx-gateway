@@ -15,15 +15,15 @@
         android:id="@+id/user_comment_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Event Name"
-        android:textStyle="bold"
-        android:textSize="16sp"/>
+        android:text="Name"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/user_comment_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Event description"
-        android:textSize="14sp"/>
+        android:text="Comment"
+        android:textSize="14sp" />
 
 </LinearLayout>

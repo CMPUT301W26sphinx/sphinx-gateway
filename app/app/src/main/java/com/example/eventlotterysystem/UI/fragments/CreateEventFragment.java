@@ -14,14 +14,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
-import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 public class CreateEventFragment extends Fragment {
@@ -59,8 +56,8 @@ public class CreateEventFragment extends Fragment {
         db = FirebaseFirestore.getInstance(); // will replaced by the database of Event
 
         // Edit text
-        nameInput = view.findViewById(R.id.eventName);
-        descInput = view.findViewById(R.id.eventDescription);
+        nameInput = view.findViewById(R.id.user_comment_name);
+        descInput = view.findViewById(R.id.user_comment_text);
         timeInput = view.findViewById(R.id.eventTime);
         placeInput = view.findViewById(R.id.eventPlace);
         startRegInput = view.findViewById(R.id.regStart);
