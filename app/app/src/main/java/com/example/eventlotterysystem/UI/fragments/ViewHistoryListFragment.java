@@ -87,7 +87,7 @@ public class ViewHistoryListFragment extends Fragment {
                 final int[] processed = {0};// make sure check all events
                 // if status show on entrant list at all, should be shown
                 for (Event event : events) {
-                    entrantListFirebase.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {if (status != null) {historyEvents.add(event);}
+                    entrantListFirebase.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {if (status != null && status >= 0) {historyEvents.add(event);}
                         processed[0]++;
                         if (processed[0] == events.size()) {updateDisplay();}}).addOnFailureListener(e -> {processed[0]++;if (processed[0] == events.size()) {updateDisplay();}});}
             }
