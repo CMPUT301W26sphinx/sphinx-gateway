@@ -2,13 +2,26 @@ package com.example.eventlotterysystem.UI.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.UI.adapters.EventAdapter;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.database.ProfileManager;
+import com.example.eventlotterysystem.model.Event;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,50 +30,110 @@ import com.example.eventlotterysystem.R;
  */
 public class ViewHistoryListFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private RecyclerView recyclerView;
+    private TextView emptyText;
+    private EventAdapter adapter;
+    private List<Event> waitlistedEvents = new ArrayList<>();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private EventRepository eventRepository;
+    private EntrantListFirebase entrantListFirebase;
 
-    public ViewHistoryListFragment() {
-        // Required empty public constructor
+    public ViewWaitListFragment() {}
+
+    @Override
+    /**
+     * Allows the user to view the current events in which they are on the waiting list
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return The view of waiting list
+     */
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_view_wait_list, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        recyclerView = view.findViewById(R.id.recyclerViewEvents);
+        emptyText = view.findViewById(R.id.emptyText);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        adapter = new EventAdapter(waitlistedEvents, this::onEventClick);
+        recyclerView.setAdapter(adapter);
+        eventRepository = new EventRepository();
+        entrantListFirebase = new EntrantListFirebase();
+        loadWaitlist();
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ViewHistoryListFragment.
+     * Loads the waitlisted events for the current user
+     * @return void
      */
-    // TODO: Rename and change types and number of parameters
-    public static ViewHistoryListFragment newInstance(String param1, String param2) {
-        ViewHistoryListFragment fragment = new ViewHistoryListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    private void loadWaitlist() {
+        String currentUserId;
+        try {currentUserId = ProfileManager.getInstance().getUserID();
+        } catch (IllegalStateException e) {showEmptyState();return;} //if fail show empty, dont crash
+        eventRepository.getEvents(new EventRepository.EventCallback() {
+            @Override
+            public void onEventsLoaded(List<Event> events) {
+                waitlistedEvents.clear();
+                if (events.isEmpty()) {updateDisplay();return;}
+                final int[] processed = {0};// make sure check all events
+                // if status=1, then the entrant is on the waitlist, should be shown
+                for (Event event : events) {
+                    entrantListFirebase.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {if (status != null && status == 1) {waitlistedEvents.add(event);}
+                        processed[0]++;
+                        if (processed[0] == events.size()) {updateDisplay();}}).addOnFailureListener(e -> {processed[0]++;if (processed[0] == events.size()) {updateDisplay();}});}
+            }
+
+            @Override
+            public void onError(Exception e) {
+                showEmptyState();
+            }
+        });
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    private void updateDisplay() {
+        adapter.notifyDataSetChanged();
+        if (waitlistedEvents.isEmpty()) {
+            emptyText.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            emptyText.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
         }
     }
+    private void showEmptyState() {
+        waitlistedEvents.clear();
+        adapter.notifyDataSetChanged();
+        emptyText.setVisibility(View.VISIBLE);
+    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_view_history_list, container, false);
+    /**
+     * Handles click on an event item.
+     * From the initial EventListFragment, written by Hammad
+     * @param event
+     */
+    private void onEventClick(Event event) {
+        // Pass selected event ID to details fragment
+        Bundle bundle = new Bundle();
+        bundle.putString("event_id", event.getEventId());
+
+        EventDetailsFragment detailsFragment = new EventDetailsFragment();
+        detailsFragment.setArguments(bundle);
+
+        // Replace current fragment with EventDetailsFragment
+        requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, detailsFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
