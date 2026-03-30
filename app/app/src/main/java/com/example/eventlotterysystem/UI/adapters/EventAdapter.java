@@ -70,8 +70,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            eventName = itemView.findViewById(R.id.user_comment_name);
-            eventDescription = itemView.findViewById(R.id.user_comment_text);
+            eventName = itemView.findViewById(R.id.eventName);
+            eventDescription = itemView.findViewById(R.id.eventDescription);
 
             // Example of commented-out debug line
             // System.out.println("EventViewHolder initialized");
