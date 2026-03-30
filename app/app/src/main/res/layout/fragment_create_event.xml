@@ -29,7 +29,7 @@
             android:textSize="15dp"
             android:text="Name: " />
         <EditText
-            android:id="@+id/eventName"
+            android:id="@+id/user_comment_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Event Name" />
@@ -40,7 +40,7 @@
             android:textSize="15dp"
             android:text="Description: " />
         <EditText
-            android:id="@+id/eventDescription"
+            android:id="@+id/user_comment_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Description" />

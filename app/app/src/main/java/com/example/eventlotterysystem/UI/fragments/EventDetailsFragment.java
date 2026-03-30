@@ -3,6 +3,9 @@ package com.example.eventlotterysystem.UI.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,17 +21,24 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.UI.adapters.CommentAdapter;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.model.EntrantListEntry;
+import com.example.eventlotterysystem.model.UserComment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.auth.User;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -64,6 +74,14 @@ public class EventDetailsFragment extends Fragment {
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
     private final EventRepository eventRepository = new EventRepository();
 
+    private CommentAdapter commentAdapter;
+    private List<UserComment> commentList;
+    private UserCommentManager commentManager = UserCommentManager.getInstance();
+
+    private ListenerRegistration commentListener;
+
+    private Button seeCommentsButton;
+
     public EventDetailsFragment() {
         // Required empty public constructor
     }
@@ -88,6 +106,7 @@ public class EventDetailsFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -133,8 +152,7 @@ public class EventDetailsFragment extends Fragment {
         infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         registerButton = view.findViewById(R.id.registerbutton);
-        addCommentButton = view.findViewById(R.id.add_comment_button);
-        writeCommentBox = view.findViewById(R.id.write_comment_box);
+        seeCommentsButton = view.findViewById(R.id.seeCommentsButton);
 
 
         // get the id
@@ -215,27 +233,18 @@ public class EventDetailsFragment extends Fragment {
             }
         });
 
+        seeCommentsButton.setOnClickListener(v -> {
+            Fragment fragment = new EventComments();
 
-        // add a comment when the add button is pressed
-        addCommentButton.setOnClickListener(v -> {
-            String comment = writeCommentBox.getText().toString();
-            // input validation
-            boolean isValid = true;
-            if (comment.isEmpty()){
-                isValid = false;
-            }
-            // add the comment to firebase
-            if (isValid){
-                UserCommentManager commentManager = UserCommentManager.getInstance();
-                commentManager.addCommentToEvent(eventId, comment);
-                // clear the text box
-                writeCommentBox.setText("");
-                // send a comment posted message
-                Toast.makeText(getContext(), "Comment posted!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
-            }
+            Bundle bundle = new Bundle();
+            bundle.putString("event_id", eventId);
+            fragment.setArguments(bundle);
 
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         // the lottery system info pop up (future implementation)
@@ -267,7 +276,10 @@ public class EventDetailsFragment extends Fragment {
             }
         });
         initializeUI(); // button update and get event details
+
+
     }
+
 
     /**
      * This method is used to initialize the UI elements for the event details fragment
@@ -381,6 +393,14 @@ public class EventDetailsFragment extends Fragment {
      */
     private void refreshWaitlistCount() {
         waitlistDb.getWaitlistCount(eventId).addOnSuccessListener(count -> valueWaitlistCount.setText(String.valueOf(count))).addOnFailureListener(e -> valueWaitlistCount.setText("—"));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (commentListener != null) {
+            commentListener.remove();
+        }
     }
 
 

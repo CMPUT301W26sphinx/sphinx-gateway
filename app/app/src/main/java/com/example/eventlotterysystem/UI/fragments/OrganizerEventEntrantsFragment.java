@@ -43,6 +43,8 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     private Button notifySelectedButton;
     private Button notifyCancelledButton;
     private Button exportCsvButton;
+    private List<EntrantDisplay> enrolledList = new ArrayList<>();
+
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
     private final ProfileManager profileManager = ProfileManager.getInstance();
 
@@ -80,6 +82,8 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         notifyCancelledButton = view.findViewById(R.id.notifyCancelledButton);
         exportCsvButton = view.findViewById(R.id.exportCsvButton);
         // TODO: button functionalities, notifs and the csv export
+        exportCsvButton.setOnClickListener(v -> exportCsv());
+
 
         setupRecyclerViews();
 
@@ -181,5 +185,13 @@ public class OrganizerEventEntrantsFragment extends Fragment {
                         });
                     }
                 }).addOnFailureListener(e -> {if (!isAdded()) return;Toast.makeText(requireContext(), "Failed to load entrants", Toast.LENGTH_SHORT).show();});
+    }
+
+    private void exportCsv() {
+        if (enrolledList == null || enrolledList.isEmpty()) {
+            Toast.makeText(requireContext(), "No registered entrants", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // TODO: fill
     }
 }
