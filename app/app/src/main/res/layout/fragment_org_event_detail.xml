@@ -190,10 +190,7 @@
                 android:textSize="14sp" />
 
             </LinearLayout>
-            <!-- comments -->
-            <include
-                layout="@layout/comments">
-            </include>
+
         </LinearLayout>
     </ScrollView>
 
