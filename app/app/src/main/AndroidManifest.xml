@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,12 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EventLotterySystem">
 
-        <activity android:name=".UI.activities.admin.AdminHomeActivity" />
-        <activity android:name=".UI.activities.admin.AdminEventDetailActivity" />
-        <activity android:name=".UI.activities.admin.AdminProfileDetailActivity" />
-
         <activity
-            android:name=".MainActivity"
+            android:name=".UI.activities.AccountTypeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,9 +25,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".UI.activities.admin.AdminHomeActivity" />
+        <activity android:name=".UI.activities.admin.AdminEventDetailActivity" />
+        <activity android:name=".UI.activities.admin.AdminLoginActivity" />
+        <activity android:name=".UI.activities.admin.AdminProfileDetailActivity" />
+        <activity android:name=".UI.activities.admin.AdminImageDetailActivity" />
+
+        <activity android:name=".MainActivity" />
+
     </application>
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
 </manifest>
