@@ -115,7 +115,7 @@ public class MyEventsNavigation extends Fragment {
         indicatorRegistered.setVisibility(View.INVISIBLE);
         indicatorHistory.setVisibility(View.INVISIBLE);
 
-        AcceptEventInviteFragment fragment = AcceptEventInviteFragment.newInstance(eventId);
+        AcceptEventInviteFragment fragment = new AcceptEventInviteFragment();
         getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
     private void showRegisteredTab(){
