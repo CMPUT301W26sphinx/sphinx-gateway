@@ -25,7 +25,6 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ViewRegisteredListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class ViewRegisteredListFragment extends Fragment {
@@ -33,12 +32,12 @@ public class ViewRegisteredListFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView emptyText;
     private EventAdapter adapter;
-    private List<Event> waitlistedEvents = new ArrayList<>();
+    private List<Event> registeredEvents = new ArrayList<>();
 
     private EventRepository eventRepository;
     private EntrantListFirebase entrantListFirebase;
 
-    public ViewWaitListFragment() {}
+    public ViewRegisteredListFragment() {}
 
     @Override
     /**
@@ -55,7 +54,7 @@ public class ViewRegisteredListFragment extends Fragment {
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_view_wait_list, container, false);
+        return inflater.inflate(R.layout.fragment_view_registered_list, container, false);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class ViewRegisteredListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewEvents);
         emptyText = view.findViewById(R.id.emptyText);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new EventAdapter(waitlistedEvents, this::onEventClick);
+        adapter = new EventAdapter(registeredEvents, this::onEventClick);
         recyclerView.setAdapter(adapter);
         eventRepository = new EventRepository();
         entrantListFirebase = new EntrantListFirebase();
@@ -82,12 +81,12 @@ public class ViewRegisteredListFragment extends Fragment {
         eventRepository.getEvents(new EventRepository.EventCallback() {
             @Override
             public void onEventsLoaded(List<Event> events) {
-                waitlistedEvents.clear();
+                registeredEvents.clear();
                 if (events.isEmpty()) {updateDisplay();return;}
                 final int[] processed = {0};// make sure check all events
-                // if status=1, then the entrant is on the waitlist, should be shown
+                // if status=3, then the entrant is on the registered list, should be shown
                 for (Event event : events) {
-                    entrantListFirebase.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {if (status != null && status == 1) {waitlistedEvents.add(event);}
+                    entrantListFirebase.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {if (status != null && status == 3) {registeredEvents.add(event);}
                         processed[0]++;
                         if (processed[0] == events.size()) {updateDisplay();}}).addOnFailureListener(e -> {processed[0]++;if (processed[0] == events.size()) {updateDisplay();}});}
             }
@@ -101,7 +100,7 @@ public class ViewRegisteredListFragment extends Fragment {
 
     private void updateDisplay() {
         adapter.notifyDataSetChanged();
-        if (waitlistedEvents.isEmpty()) {
+        if (registeredEvents.isEmpty()) {
             emptyText.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
@@ -110,7 +109,7 @@ public class ViewRegisteredListFragment extends Fragment {
         }
     }
     private void showEmptyState() {
-        waitlistedEvents.clear();
+        registeredEvents.clear();
         adapter.notifyDataSetChanged();
         emptyText.setVisibility(View.VISIBLE);
     }
