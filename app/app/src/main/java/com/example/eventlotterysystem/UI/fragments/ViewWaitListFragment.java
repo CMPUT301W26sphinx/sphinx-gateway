@@ -65,9 +65,7 @@ public class ViewWaitListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewEvents);
         emptyText = view.findViewById(R.id.emptyText);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new EventAdapter(waitlistedEvents, event -> {
-            // TODO: add go to event details
-        });
+        adapter = new EventAdapter(waitlistedEvents, this::onEventClick);
         recyclerView.setAdapter(adapter);
         eventRepository = new EventRepository();
         entrantListFirebase = new EntrantListFirebase();
@@ -116,5 +114,27 @@ public class ViewWaitListFragment extends Fragment {
         waitlistedEvents.clear();
         adapter.notifyDataSetChanged();
         emptyText.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Handles click on an event item.
+     * From the initial EventListFragment, written by Hammad
+     * @param event
+     */
+    private void onEventClick(Event event) {
+        // Pass selected event ID to details fragment
+        Bundle bundle = new Bundle();
+        bundle.putString("event_id", event.getEventId());
+
+        EventDetailsFragment detailsFragment = new EventDetailsFragment();
+        detailsFragment.setArguments(bundle);
+
+        // Replace current fragment with EventDetailsFragment
+        requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, detailsFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
