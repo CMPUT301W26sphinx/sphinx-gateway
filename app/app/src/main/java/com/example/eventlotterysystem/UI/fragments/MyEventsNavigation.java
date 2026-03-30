@@ -7,10 +7,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.example.eventlotterysystem.R;
+import com.google.android.material.button.MaterialButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +37,8 @@ public class MyEventsNavigation extends Fragment {
     private View indicatorInvites;
     private View indicatorRegistered;
     private View indicatorHistory;
+    private MaterialButton buttonAll;
+
 
     public MyEventsNavigation() {
         // Required empty public constructor
@@ -83,7 +88,7 @@ public class MyEventsNavigation extends Fragment {
         indicatorInvites = view.findViewById(R.id.indicatorInvites);
         indicatorRegistered = view.findViewById(R.id.indicatorRegistered);
         indicatorHistory = view.findViewById(R.id.indicatorHistory);
-
+        MaterialButton buttonAll = view.findViewById(R.id.buttonAll);
 
         if (infoButton != null) {
             infoButton.setOnClickListener(v -> {
@@ -93,11 +98,24 @@ public class MyEventsNavigation extends Fragment {
 
         tabWaitlist.setOnClickListener(v -> showWaitlistTab());
         tabInvites.setOnClickListener(v -> showInvitesTab());
-        //tabRegistered.setOnClickListener(v -> showRegisteredTab());
-        //tabHistory.setOnClickListener(v -> showHistoryTab());
+        tabRegistered.setOnClickListener(v -> showRegisteredTab());
+        tabHistory.setOnClickListener(v -> showHistoryTab());
 
 
         showWaitlistTab();
+
+        if (buttonAll != null) {
+            buttonAll.setOnClickListener(v -> {
+                EventListFragment fragment = new EventListFragment();
+
+                requireActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            });
+        }
     }
 
     private void showWaitlistTab() {
