@@ -93,43 +93,47 @@ public class MyEventsNavigation extends Fragment {
 
         tabWaitlist.setOnClickListener(v -> showWaitlistTab());
         tabInvites.setOnClickListener(v -> showInvitesTab());
-        tabRegistered.setOnClickListener(v -> showRegisteredTab());
-        tabHistory.setOnClickListener(v -> showHistoryTab());
+        //tabRegistered.setOnClickListener(v -> showRegisteredTab());
+        //tabHistory.setOnClickListener(v -> showHistoryTab());
 
 
         showWaitlistTab();
     }
 
     private void showWaitlistTab() {
-        indicatorDetails.setVisibility(View.INVISIBLE);
-        indicatorEntrants.setVisibility(View.VISIBLE);
-        indicatorMap.setVisibility(View.INVISIBLE);
+        indicatorWaitlist.setVisibility(View.VISIBLE);
+        indicatorInvites.setVisibility(View.INVISIBLE);
+        indicatorRegistered.setVisibility(View.INVISIBLE);
+        indicatorHistory.setVisibility(View.INVISIBLE);
 
-        viewWaitlistFragment fragment = viewWaitlistFragment.newInstance(eventId);
+        ViewWaitListFragment fragment = ViewWaitListFragment.newInstance(eventId);
         getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
     private void showInvitesTab() {
-        indicatorDetails.setVisibility(View.VISIBLE);
-        indicatorEntrants.setVisibility(View.INVISIBLE);
-        indicatorMap.setVisibility(View.INVISIBLE);
+        indicatorWaitlist.setVisibility(View.INVISIBLE);
+        indicatorInvites.setVisibility(View.VISIBLE);
+        indicatorRegistered.setVisibility(View.INVISIBLE);
+        indicatorHistory.setVisibility(View.INVISIBLE);
 
         AcceptEventInviteFragment fragment = AcceptEventInviteFragment.newInstance(eventId);
         getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
     private void showRegisteredTab(){
-        indicatorDetails.setVisibility(View.INVISIBLE);
-        indicatorEntrants.setVisibility(View.INVISIBLE);
-        indicatorMap.setVisibility(View.VISIBLE);
+        indicatorWaitlist.setVisibility(View.INVISIBLE);
+        indicatorInvites.setVisibility(View.INVISIBLE);
+        indicatorRegistered.setVisibility(View.VISIBLE);
+        indicatorHistory.setVisibility(View.INVISIBLE);
 
         // UPDATE: OrganizerEventMapFragment fragment = OrganizerEventMapFragment.newInstance(eventId);
-        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+        //getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
     private void showHistoryTab(){
-        indicatorDetails.setVisibility(View.INVISIBLE);
-        indicatorEntrants.setVisibility(View.INVISIBLE);
-        indicatorMap.setVisibility(View.VISIBLE);
+        indicatorWaitlist.setVisibility(View.INVISIBLE);
+        indicatorInvites.setVisibility(View.INVISIBLE);
+        indicatorRegistered.setVisibility(View.INVISIBLE);
+        indicatorHistory.setVisibility(View.VISIBLE);
 
         // UPDATE: OrganizerEventMapFragment fragment = OrganizerEventMapFragment.newInstance(eventId);
-        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+        //getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
 }
