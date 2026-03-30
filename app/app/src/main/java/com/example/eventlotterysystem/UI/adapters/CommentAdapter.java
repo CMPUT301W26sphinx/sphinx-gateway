@@ -27,8 +27,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             super(view);
             // Define click listener for the ViewHolder's View
 
-            name = view.findViewById(R.id.eventName);
-            comment = view.findViewById(R.id.eventDescription);
+            name = view.findViewById(R.id.user_comment_name);
+            comment = view.findViewById(R.id.user_comment_text);
         }
 
     }
