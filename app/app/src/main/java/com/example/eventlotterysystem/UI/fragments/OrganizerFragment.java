@@ -48,8 +48,14 @@ public class OrganizerFragment extends Fragment {
             Bundle bundle = new Bundle();
             bundle.putString("eventId", event.getEventId());
 
-            NavHostFragment.findNavController(this)
-                    .navigate(R.id.organizerEventNavigationFragment, bundle);
+            OrganizerEventNavigationFragment fragment =
+                    OrganizerEventNavigationFragment.newInstance(event.getEventId());
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         recyclerView.setAdapter(adapter);
