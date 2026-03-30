@@ -45,7 +45,6 @@ public class OrganizerEventNavigationFragment extends Fragment {
      * @param eventId The unique identifier for the event.
      * @return A new instance of fragment OrganizerEventNavigationFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static OrganizerEventNavigationFragment newInstance(String eventId) {
         OrganizerEventNavigationFragment fragment = new OrganizerEventNavigationFragment();
         Bundle args = new Bundle();
