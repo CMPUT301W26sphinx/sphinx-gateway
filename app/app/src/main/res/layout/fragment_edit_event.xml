@@ -17,7 +17,7 @@
             android:text="Back"/>
 
         <TextView
-            android:id="@+id/user_comment_name"
+            android:id="@+id/eventName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Should be replaced by Event Name"
@@ -30,7 +30,7 @@
             android:textSize="15dp"
             android:text="Description: " />
         <EditText
-            android:id="@+id/user_comment_text"
+            android:id="@+id/eventDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Description" />
