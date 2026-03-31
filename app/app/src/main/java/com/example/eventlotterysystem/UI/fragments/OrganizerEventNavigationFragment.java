@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.model.Event;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,6 +72,21 @@ public class OrganizerEventNavigationFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // For title of the event.
+        EventRepository eventRepository = new EventRepository();
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+            @Override
+            public void onEventLoaded(Event event) {
+                if (!isAdded()) return;
+                eventTitle.setText(event.getTitle());
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (!isAdded()) return;
+                eventTitle.setText("Unknown Event");
+            }
+        });
 
         eventTitle = view.findViewById(R.id.eventTitle);
         infoButton = view.findViewById(R.id.infoButton);

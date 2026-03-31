@@ -6,11 +6,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.example.eventlotterysystem.model.LotterySystem;
+import com.example.eventlotterysystem.model.Notification;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.EntrantAdapter;
@@ -39,6 +46,10 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     private EntrantAdapter enrolledAdapter;
     private EntrantAdapter cancelledAdapter;
 
+    private Button startLotteryButton;
+    private Button sampleButton;
+    private EditText sampleAmountInput;
+
     private Button notifyWaitlistButton;
     private Button notifySelectedButton;
     private Button notifyCancelledButton;
@@ -47,6 +58,8 @@ public class OrganizerEventEntrantsFragment extends Fragment {
 
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
     private final ProfileManager profileManager = ProfileManager.getInstance();
+    private final Notification notification = new Notification();
+    private final LotterySystem lotterySystem = new LotterySystem();
 
     public OrganizerEventEntrantsFragment() {
         // Required empty public constructor
@@ -77,11 +90,83 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         enrolledRecyclerView = view.findViewById(R.id.enrolledRecyclerView);
         cancelledRecyclerView = view.findViewById(R.id.cancelledRecyclerView);
 
+        startLotteryButton = view.findViewById(R.id.startLotteryButton);
+        sampleButton = view. findViewById(R.id.sampleButton);
+        sampleAmountInput = view.findViewById(R.id.sampleAmountInput);
+
         notifyWaitlistButton = view.findViewById(R.id.notifyWaitlistButton);
         notifySelectedButton = view.findViewById(R.id.notifySelectedButton);
         notifyCancelledButton = view.findViewById(R.id.notifyCancelledButton);
         exportCsvButton = view.findViewById(R.id.exportCsvButton);
-        // TODO: button functionalities, notifs and the csv export
+
+        notifyWaitlistButton.setOnClickListener(v -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+            showNotifyDialog("Notify Waitlist", message ->
+                    notification.notifyAllWaiting(message, eventId));
+        });
+
+        notifySelectedButton.setOnClickListener(v -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+            showNotifyDialog("Notify Selected", message ->
+                    notification.notifyAllSelected(message, eventId));
+        });
+
+        notifyCancelledButton.setOnClickListener(v -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+            showNotifyDialog("Notify Cancelled", message ->
+                    notification.notifyAllCancelled(message, eventId));
+        });
+
+        startLotteryButton.setOnClickListener(v -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Start Lottery")
+                    .setMessage("This will run the lottery up to full capacity and notify all losers. Continue?")
+                    .setPositiveButton("Start", (dialog, which) -> {
+                        lotterySystem.firstLottery(eventId);
+                        Toast.makeText(requireContext(), "Lottery started!", Toast.LENGTH_SHORT).show();
+                        loadEntrants(eventId);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+
+        sampleButton.setOnClickListener(v -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+
+            String input = sampleAmountInput.getText().toString().trim();
+            if (input.isEmpty()) {
+                Toast.makeText(requireContext(), "Enter a sample amount", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int sampleAmount = Integer.parseInt(input);
+            if (sampleAmount <= 0) {
+                Toast.makeText(requireContext(), "Sample amount must be greater than 0", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            lotterySystem.sampleLottery(eventId, sampleAmount);
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Start Lottery")
+                    .setMessage("This will try run the lottery by "+ sampleAmount +". Continue?")
+                    .setPositiveButton("Start", (dialog, which) -> {
+                        lotterySystem.firstLottery(eventId);
+                        Toast.makeText(requireContext(), "Sampling Started!", Toast.LENGTH_SHORT).show();
+                        loadEntrants(eventId);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            loadEntrants(eventId);
+        });
+
+        // TODO: CSV export
         exportCsvButton.setOnClickListener(v -> exportCsv());
 
 
@@ -92,6 +177,36 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         if (eventId == null || eventId.isEmpty()) {Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();return;}
         loadEntrants(eventId);
 
+    }
+    /**
+     * Notify dialog popup, for the custom messages that organizers can send.
+     * @param title title of the dialog
+     * @param action action of what the notify gon be
+     * @Author Bryan Jonathan
+     */
+    private void showNotifyDialog(String title, NotifyAction action) {
+        EditText input = new EditText(requireContext());
+        input.setHint("Enter your message");
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        input.setMinLines(3);
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle(title)
+                .setView(input)
+                .setPositiveButton("Send", (dialog, which) -> {
+                    String message = input.getText().toString().trim();
+                    if (message.isEmpty()) {
+                        Toast.makeText(requireContext(), "Message cannot be empty", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    action.notify(message);
+                    Toast.makeText(requireContext(), "Notification sent!", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+    private interface NotifyAction {
+        void notify(String message);
     }
 
     /**

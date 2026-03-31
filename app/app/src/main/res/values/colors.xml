@@ -5,4 +5,6 @@
     <color name="admin_nav_blue">#2D6EFF</color>
     <color name="nav_blue">#2D6EFF</color>
     <color name="textbox_line">#D5D5D5</color>
+    <color name="accept_green">#4AB45F</color>
+    <color name="decline_red">#C00F0C</color>
 </resources>

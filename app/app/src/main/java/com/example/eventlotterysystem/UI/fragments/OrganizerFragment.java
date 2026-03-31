@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,7 @@ import java.util.List;
 public class OrganizerFragment extends Fragment {
 
     private RecyclerView recyclerView;
+    private Button createEventButton;
     private OrganizerAdapter adapter;
     private List<Event> eventList;
 
@@ -36,11 +38,9 @@ public class OrganizerFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.organizer_eventlist, container, false);
 
-        // ✅ STEP 1: Setup RecyclerView
         recyclerView = view.findViewById(R.id.OrganizerEventsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // ✅ STEP 2: Initialize list + adapter
         eventList = new ArrayList<>();
 
         adapter = new OrganizerAdapter(eventList, event -> {
@@ -60,8 +60,20 @@ public class OrganizerFragment extends Fragment {
 
         recyclerView.setAdapter(adapter);
 
-        // ✅ STEP 3: Load events
         loadEvents();
+        /**
+         * Creates new event button, moved from original place.
+         */
+        createEventButton = view.findViewById(R.id.createEventButton);
+        createEventButton.setOnClickListener(v -> {
+            Fragment fragment = CreateEventFragment.newInstance();
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         return view;
     }

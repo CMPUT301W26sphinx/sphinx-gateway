@@ -42,7 +42,7 @@ public class Notification extends NotificationSystem {
                     for (EntrantListEntry entrant : entrantList) {
                         String entrantId = entrant.getEntrantId();
                         sendNotification(entrantId, message, eventId, "Organizer");
-                        logNotification(entrantId, eventId, message);
+                        logNotification(eventId, message);
                     }
                 });
     }
@@ -50,10 +50,10 @@ public class Notification extends NotificationSystem {
     public void notifyAllWaiting(String message, String eventId) {
         notifyAllWithStatus(message, eventId, 1);
     }
-    public void notifyAllInvited(String message, String eventId) {
+    public void notifyAllSelected(String message, String eventId) {
         notifyAllWithStatus(message, eventId, 2);
     }
-    public void notifyAllAccepted(String message, String eventId) {
+    public void notifyAllEnrolled(String message, String eventId) {
         notifyAllWithStatus(message, eventId, 3);
     }
     public void notifyAllCancelled(String message, String eventId) {

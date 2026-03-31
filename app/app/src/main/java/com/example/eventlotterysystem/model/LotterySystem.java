@@ -31,38 +31,47 @@ public class LotterySystem {
             public void onEventLoaded(Event event) {
                 int capacity = event.getCapacity();
 
-                //CHECKSUM FOR THE LOTTERY, SEE IF IT HAS PASSED OR Not
+                //CHECKSUM FOR THE LOTTERY, SEE IF IT HAS PASSED OR not
+                // Seperated this because checksum is confused when capacity 0.
                 entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_INVITED)
-                    .addOnSuccessListener(invitedEntrants ->
+                        .addOnSuccessListener(invitedEntrants ->
                 entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_REGISTERED)
-                    .addOnSuccessListener(registeredEntrants -> {
-                int remainingSpots = capacity - invitedEntrants.size() - registeredEntrants.size();
-                if (remainingSpots <= 0) return;
+                        .addOnSuccessListener(registeredEntrants -> {
+                            if (capacity <= 0) {
+                                runLottery(eventId, entrantAmount, entrantAmount);
+                                return;
+                            }
+                            int remainingSpots = capacity - invitedEntrants.size() - registeredEntrants.size();
+                            if (remainingSpots <= 0) return;
 
-                //LOTTERY STARTS HERE, IF PASSED CHECKSUM
-                entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_WAITLIST)
-                    .addOnSuccessListener(waitlistEntrants -> {
-
-                Random rand = new Random();
-                int inviteCount = Math.min(Math.min(remainingSpots, entrantAmount), waitlistEntrants.size());
-                for (int i = 0; i < inviteCount; i++) {
-                    int randomIndex = rand.nextInt(waitlistEntrants.size());
-                    EntrantListEntry chosen = waitlistEntrants.remove(randomIndex);
-                    entrantListFirebase.updateStatus(
-                            eventId,
-                            chosen.getEntrantId(),
-                            EntrantListEntry.STATUS_INVITED);
-                    notification.notifyWinner(chosen.getEntrantId(), eventId);
-                }
-            });
-        }));
-    }
+                            runLottery(eventId, entrantAmount, remainingSpots);
+                        })
+                    );
+            }
             @Override
             public void onError(Exception e) {
                 Log.e("LotterySystem", "Failed to fetch event capacity for eventId: " + eventId, e);
             }
         });
     }
+    private void runLottery(String eventId, int entrantAmount, int remainingSpots) {
+        entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_WAITLIST)
+                .addOnSuccessListener(waitlistEntrants -> {
+                    Random rand = new Random();
+                    int inviteCount = Math.min(Math.min(remainingSpots, entrantAmount), waitlistEntrants.size());
+                    Log.d("LotterySystem", "inviteCount=" + inviteCount + " waitlist=" + waitlistEntrants.size());
+
+                    for (int i = 0; i < inviteCount; i++) {
+                        int randomIndex = rand.nextInt(waitlistEntrants.size());
+                        EntrantListEntry chosen = waitlistEntrants.remove(randomIndex);
+                        entrantListFirebase.updateStatus(eventId, chosen.getEntrantId(), EntrantListEntry.STATUS_INVITED)
+                                .addOnSuccessListener(unused -> Log.d("LotterySystem", "Invited: " + chosen.getEntrantId()))
+                                .addOnFailureListener(e -> Log.e("LotterySystem", "Failed to invite", e));
+                        notification.notifyWinner(chosen.getEntrantId(), eventId);
+                    }
+                });
+    }
+
     /** Starts the lottery system, for a singular person. Useful for when someone invited cancels
      * @param eventId eventid is passed by from triggering lottery
      */
@@ -93,6 +102,7 @@ public class LotterySystem {
                     }
                 });
     }
+
     /** Redraw lottery. Same as firstlottery, but without notification that entrant lost.
      * @param eventId eventid is passed by from triggering lottery
      */
