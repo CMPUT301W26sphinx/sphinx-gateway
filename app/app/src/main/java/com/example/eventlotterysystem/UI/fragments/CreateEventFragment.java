@@ -257,6 +257,9 @@ public class CreateEventFragment extends Fragment {
 
         Event event = new Event();
         ProfileManager manager = ProfileManager.getInstance();
+        List<String> OrgIds = new ArrayList<>();
+        OrgIds.add(manager.getUserID());
+        event.setOrganizerIds(OrgIds); 
         event.setOrg_id(manager.getUserID());
         final String uuid = UUID.randomUUID().toString().replace("-", "");
         event.setEventId(uuid);
