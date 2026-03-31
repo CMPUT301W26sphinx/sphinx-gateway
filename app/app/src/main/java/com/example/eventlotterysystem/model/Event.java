@@ -90,10 +90,13 @@ public class Event implements Serializable {
         this.organizerId = Id;
     }
 
-    // Adding Co_Organizer function later 
+    public List<String> getCoOrganizerIds() { return co_organizerIds; }
+    public void setCoOrganizerIds(List<String> ids) { this.co_organizerIds = ids; }
     
     // Optional helper (clean filtering)
     public boolean isOrganizer(String userId) {
+        if (userId == null) return false;
+        if (userId.equals(organizerId)) return true;
         return co_organizerIds != null && co_organizerIds.contains(userId);
     }
 }
