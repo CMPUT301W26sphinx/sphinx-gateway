@@ -243,6 +243,7 @@ public class CreateEventFragment extends Fragment {
      * upload it to the database
      */
     private void createEvent() {
+        String privacy = privacySwitch.getText().toString().trim();
         String name = nameInput.getText().toString().trim();
         String description = descInput.getText().toString().trim();
         String place = placeInput.getText().toString().trim();
@@ -258,6 +259,7 @@ public class CreateEventFragment extends Fragment {
         Event event = new Event();
         ProfileManager manager = ProfileManager.getInstance();
         event.setOrganizerId(manager.getUserID());
+        event.setPrivacy(privacy);
         final String uuid = UUID.randomUUID().toString().replace("-", "");
         event.setEventId(uuid);
         event.setTitle(name);
