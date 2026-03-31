@@ -2,30 +2,44 @@ package com.example.eventlotterysystem.model;
 
 import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.NotificationSystem;
+import com.example.eventlotterysystem.database.ProfileManager;
 
 import java.util.List;
 
 /** Notification class, premade notification that is called instead of using notificationsystem.
+ * TODO: loadOrganizerName(); is always repeating.
  */
 public class Notification extends NotificationSystem {
-
+    private String organizerName;
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
 
-    //Lottery Winner or Loser. Maybe add event name in the future?
+    private void loadOrganizerName() {
+        ProfileManager manager = ProfileManager.getInstance();
+        manager.getUserProfile(user -> {
+            if (user.getFirstName() != null && user.getLastName() != null) {
+                organizerName = user.getFirstName() + " " + user.getLastName();
+            }
+        });
+    }
+    //Lottery Winner or Loser.
     public void notifyWinner(String entrantId, String eventId) {
-        sendNotification(entrantId, "You have won the lottery for an event! Please click to see more.", eventId, "System");
+        loadOrganizerName();
+        sendNotification(entrantId, "You have won the lottery for an event! Please click to see more.", eventId, "Organizer" + organizerName);
     }
 
     public void notifyLoser(String entrantId, String eventId) {
-        sendNotification(entrantId, "You have lost the lottery for an event! Please click to see more.", eventId, "System");
+        loadOrganizerName();
+        sendNotification(entrantId, "You have lost the lottery for an event! Please click to see more.", eventId, "Organizer" + organizerName);
     }
 
     public void notifyPrivateInvite(String entrantId, String eventId) {
-        sendNotification(entrantId, "You have been invited to a private event", eventId, "System");
+        loadOrganizerName();
+        sendNotification(entrantId, "You have been invited to a private event by "+ organizerName, eventId, "System");
     }
 
     public void notifyOrganizerInvite(String entrantId, String eventId) {
-        sendNotification(entrantId, "You have been invited to become a co-organizer of this event.", eventId, "System");
+        loadOrganizerName();
+        sendNotification(entrantId, "You have been invited to become a co-organizer of an event by "+ organizerName, eventId, "System");
     }
 
     /**
@@ -37,11 +51,12 @@ public class Notification extends NotificationSystem {
      * @param status
      */
     private void notifyAllWithStatus(String message, String eventId, int status) {
+        loadOrganizerName();
         entrantListFirebase.getEntrantsByStatus(eventId, status)
                 .addOnSuccessListener(entrantList -> {
                     for (EntrantListEntry entrant : entrantList) {
                         String entrantId = entrant.getEntrantId();
-                        sendNotification(entrantId, message, eventId, "Organizer");
+                        sendNotification(entrantId, message, eventId, "Organizer" + organizerName);
                         logNotification(eventId, message);
                     }
                 });
