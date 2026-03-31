@@ -72,6 +72,10 @@ public class Event implements Serializable {
         this.privacy = privacy;
     }
 
+    public String getPrivacy() {
+        return privacy;
+    }
+
     public String getPlace() {
         return place;
     }
