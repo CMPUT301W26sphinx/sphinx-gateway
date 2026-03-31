@@ -19,18 +19,19 @@ public class Event implements Serializable {
     private String category;
 
     // ✅ FIX: support multiple organizers
-    private List<String> organizerIds;
+    private String organizerId;
+    private List<String> co_organizerIds;
 
     // Required no-arg constructor
     public Event() {
-        organizerIds = new ArrayList<>();
+        this.co_organizerIds = new ArrayList<>();
     }
 
     public Event(String eventId, String title, String description) {
         this.eventId = eventId;
         this.title = title;
         this.description = description;
-        this.organizerIds = new ArrayList<>();
+        this.co_organizerIds = new ArrayList<>();
     }
 
     // Getters & setters
@@ -83,14 +84,16 @@ public class Event implements Serializable {
     public void setCategory(String category) { this.category = category; }
 
     // ✅ NEW METHODS
-    public List<String> getOrganizerIds() { return organizerIds; }
+    public String getOrganizerId() { return organizerId; }
 
-    public void setOrganizerIds(List<String> organizerIds) {
-        this.organizerIds = organizerIds;
+    public void setOrganizerId(String Id) {
+        this.organizerId = Id;
     }
 
+    // Adding Co_Organizer function later 
+    
     // Optional helper (clean filtering)
     public boolean isOrganizer(String userId) {
-        return organizerIds != null && organizerIds.contains(userId);
+        return co_organizerIds != null && co_organizerIds.contains(userId);
     }
 }
