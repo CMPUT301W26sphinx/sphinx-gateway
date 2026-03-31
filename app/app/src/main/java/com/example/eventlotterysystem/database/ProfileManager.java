@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * Handles communication between local user profiles and firebase.
+ *
  * @author Noah Zapisocki
  */
 public class ProfileManager {
@@ -33,15 +34,16 @@ public class ProfileManager {
         private static final ProfileManager instance = new ProfileManager();
     }
 
-    public static ProfileManager getInstance(){
+    public static ProfileManager getInstance() {
         return Holder.instance;
     }
 
     /**
      * Get the user id of the signed in user
+     *
      * @return
      */
-    public String getUserID(){
+    public String getUserID() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
             throw new IllegalStateException("User not authenticated");
@@ -71,6 +73,7 @@ public class ProfileManager {
 
     /**
      * Get the user profile of the current signed in user
+     *
      * @param callback
      */
     public void getUserProfile(UserProfileCallBack callback) {
@@ -78,7 +81,7 @@ public class ProfileManager {
         String uid = getUserID();
         // retrieve the user in firebase
         usersRef.document(uid).get().addOnSuccessListener(document -> {
-            if (document.exists()){
+            if (document.exists()) {
                 UserProfile userProfile = document.toObject(UserProfile.class);
                 callback.onComplete(userProfile);
             }
@@ -87,39 +90,37 @@ public class ProfileManager {
 
     public interface AllUsersCallback {
         void onUsersLoaded(List<UserProfile> users);
+
         void onError(Exception e);
     }
 
     public void getAllUsers(AllUsersCallback callback) {
-        usersRef.get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<UserProfile> users = new ArrayList<>();
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        UserProfile user = doc.toObject(UserProfile.class);
-                        user.setUserID(doc.getId()); // ensure ID is set
-                        users.add(user);
-                    }
-                    callback.onUsersLoaded(users);
-                })
-                .addOnFailureListener(callback::onError);
+        usersRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            List<UserProfile> users = new ArrayList<>();
+            for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                UserProfile user = doc.toObject(UserProfile.class);
+                user.setUserID(doc.getId()); // ensure ID is set
+                users.add(user);
+            }
+            callback.onUsersLoaded(users);
+        }).addOnFailureListener(callback::onError);
     }
 
 
     public interface OnDeleteListener {
         void onSuccess();
+
         void onError(Exception e);
     }
 
     public void deleteUser(String userId, OnDeleteListener listener) {
-        usersRef.document(userId)
-                .delete()
-                .addOnSuccessListener(aVoid -> listener.onSuccess())
-                .addOnFailureListener(listener::onError);
+        usersRef.document(userId).delete().addOnSuccessListener(aVoid -> listener.onSuccess()).addOnFailureListener(listener::onError);
     }
 
     /**
      * Get the user profile of any user by their ID.
      * Used by systems like NotificationSystem that need to look up other users.
+     *
      * @param userId   The ID of the user to fetch.
      * @param callback Returns the UserProfile, or null if not found.
      */
@@ -133,7 +134,6 @@ public class ProfileManager {
             }
         });
     }
-
 
 
 }

@@ -3,27 +3,42 @@ package com.example.eventlotterysystem.UI.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.UI.adapters.CommentAdapter;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.model.EntrantListEntry;
+import com.example.eventlotterysystem.model.UserComment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.auth.User;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -48,8 +63,8 @@ public class EventDetailsFragment extends Fragment {
     private ImageButton infoButton;
     private Button backButton;
     private Button registerButton;
-    private Button viewWLButton;
-    private Button editEventButton;
+    private Button addCommentButton;
+    private EditText writeCommentBox;
     //Firestore data for these variables
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
@@ -59,16 +74,24 @@ public class EventDetailsFragment extends Fragment {
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
     private final EventRepository eventRepository = new EventRepository();
 
+    private CommentAdapter commentAdapter;
+    private List<UserComment> commentList;
+    private UserCommentManager commentManager = UserCommentManager.getInstance();
+
+    private ListenerRegistration commentListener;
+
+    private Button seeCommentsButton;
+
     public EventDetailsFragment() {
         // Required empty public constructor
     }
 
     /**
-     *Create Event Details fragment for specific event with eventId
-     * @param eventId
-     *  The unique identifier for the event
+     * Create Event Details fragment for specific event with eventId
+     *
+     * @param eventId The unique identifier for the event
      * @return fragment
-     *  A new instance of EventDetailsFragment
+     * A new instance of EventDetailsFragment
      */
     public static EventDetailsFragment newInstance(String eventId) {
         /*
@@ -84,24 +107,22 @@ public class EventDetailsFragment extends Fragment {
         return fragment;
     }
 
+
     /**
      * Called to have the fragment instantiate its user interface view.
      * Default from fragment creation.
-     * @param inflater
-     *  The LayoutInflater object that can be used to inflate
-     *  any views in the fragment,
-     * @param container
-     *  If non-null, this is the parent view that the fragment's
-     *  UI should be attached to.  The fragment should not add the view itself,
-     *  but this can be used to generate the LayoutParams of the view.
-     * @param savedInstanceState
-     *  If non-null, this fragment is being re-constructed
-     *  from a previous saved state as given here.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate
+     *                           any views in the fragment,
+     * @param container          If non-null, this is the parent view that the fragment's
+     *                           UI should be attached to.  The fragment should not add the view itself,
+     *                           but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here.
      * @return Return the View for the fragment's UI, or null.
      */
-   @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_event_details, container, false);
     }
@@ -111,11 +132,10 @@ public class EventDetailsFragment extends Fragment {
      * has returned, but before any saved state has been restored in to the view.
      * This gives subclasses a chance to initialize themselves once
      * they know their view hierarchy has been completely created.
-     * @param view
-     *  The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
-     * @param savedInstanceState
-     *  If non-null, this fragment is being re-constructed
-     *  from a previous saved state as given here.
+     *
+     * @param view               The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here.
      */
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -132,8 +152,7 @@ public class EventDetailsFragment extends Fragment {
         infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         registerButton = view.findViewById(R.id.registerbutton);
-        viewWLButton = view.findViewById(R.id.viewWaitlistButton);
-        editEventButton = view.findViewById(R.id.editEventButton);
+        seeCommentsButton = view.findViewById(R.id.seeCommentsButton);
 
 
         // get the id
@@ -153,36 +172,12 @@ public class EventDetailsFragment extends Fragment {
             valueWaitlistCount.setText("—");
             return;
         }
-        viewWLButton.setOnClickListener(v -> {
-            Fragment fragment = ViewWaitListFragment.newInstance(eventId);
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        editEventButton.setOnClickListener(v -> {
-            Fragment fragment = EditEventFragment.newInstance(eventId);
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit();
-        });
-
 
         // TODO: consider how to remove or change button when registration period closed
         registerButton.setOnClickListener(v -> {
             switch (currentStatus) {
                 case EntrantListEntry.STATUS_WAITLIST: //if on waitlist, remove from waitlist button
-                    waitlistDb.updateStatus(
-                            eventId,
-                            entrantId,
-                            EntrantListEntry.STATUS_CANCELLED_OR_REJECTED
-                    ).addOnSuccessListener(unused -> {
+                    waitlistDb.updateStatus(eventId, entrantId, EntrantListEntry.STATUS_CANCELLED_OR_REJECTED).addOnSuccessListener(unused -> {
                         currentStatus = EntrantListEntry.STATUS_CANCELLED_OR_REJECTED;
                         updateActionButton();
                         refreshWaitlistCount();
@@ -195,11 +190,7 @@ public class EventDetailsFragment extends Fragment {
                     break;
 
                 case EntrantListEntry.STATUS_REGISTERED: //if registered, cancel registration button
-                    waitlistDb.updateStatus(
-                            eventId,
-                            entrantId,
-                            EntrantListEntry.STATUS_CANCELLED_OR_REJECTED
-                    ).addOnSuccessListener(unused -> {
+                    waitlistDb.updateStatus(eventId, entrantId, EntrantListEntry.STATUS_CANCELLED_OR_REJECTED).addOnSuccessListener(unused -> {
                         currentStatus = EntrantListEntry.STATUS_CANCELLED_OR_REJECTED;
                         updateActionButton();
                         Toast.makeText(getContext(), "Registration cancelled", Toast.LENGTH_SHORT).show();
@@ -209,45 +200,27 @@ public class EventDetailsFragment extends Fragment {
                 case EntrantListEntry.STATUS_CANCELLED_OR_REJECTED: //if cancelled or rejected, register button
                 default: // if not on list or cancelled, option to register
                     // TODO: add to entrant list of registered events for myevent screen
-                    waitlistDb.getEntry(eventId, entrantId)
-                            .addOnSuccessListener(entry -> {
-                                if(entry == null){
-                                    EntrantListEntry newEntry = new EntrantListEntry(
-                                            eventId,
-                                            entrantId,
-                                            EntrantListEntry.STATUS_WAITLIST
-                                    );
-                                    waitlistDb.upsertEntry(eventId, newEntry)
-                                            .addOnSuccessListener(unused -> {
-                                                currentStatus = EntrantListEntry.STATUS_WAITLIST;
-                                                updateActionButton();
-                                                refreshWaitlistCount();
+                    waitlistDb.getEntry(eventId, entrantId).addOnSuccessListener(entry -> {
+                        if (entry == null) {
+                            EntrantListEntry newEntry = new EntrantListEntry(eventId, entrantId, EntrantListEntry.STATUS_WAITLIST);
+                            waitlistDb.upsertEntry(eventId, newEntry).addOnSuccessListener(unused -> {
+                                currentStatus = EntrantListEntry.STATUS_WAITLIST;
+                                updateActionButton();
+                                refreshWaitlistCount();
 
-                                                Toast.makeText(
-                                                        getContext(),
-                                                        "Joined waiting list",
-                                                        Toast.LENGTH_SHORT
-                                                ).show();
-                                            });
-
-                                } else{
-                                    waitlistDb.updateStatus(
-                                            eventId,
-                                            entrantId,
-                                            EntrantListEntry.STATUS_WAITLIST
-                                    ).addOnSuccessListener(unused -> {
-                                        currentStatus = EntrantListEntry.STATUS_WAITLIST;
-                                        updateActionButton();
-                                        refreshWaitlistCount();
-
-                                        Toast.makeText(
-                                                getContext(),
-                                                "Joined waiting list",
-                                                Toast.LENGTH_SHORT
-                                        ).show();
-                                    });
-                                }
+                                Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
                             });
+
+                        } else {
+                            waitlistDb.updateStatus(eventId, entrantId, EntrantListEntry.STATUS_WAITLIST).addOnSuccessListener(unused -> {
+                                currentStatus = EntrantListEntry.STATUS_WAITLIST;
+                                updateActionButton();
+                                refreshWaitlistCount();
+
+                                Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    });
                     break;
             }
         });
@@ -260,35 +233,70 @@ public class EventDetailsFragment extends Fragment {
             }
         });
 
+        seeCommentsButton.setOnClickListener(v -> {
+            Fragment fragment = new EventComments();
+
+            Bundle bundle = new Bundle();
+            bundle.putString("event_id", eventId);
+            fragment.setArguments(bundle);
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
         // the lottery system info pop up (future implementation)
         infoButton.setOnClickListener(new View.OnClickListener() {
-            // TODO: add the pop up
             @Override
             public void onClick(View v) {
-                //TODO
+                View dialogView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.activity_terms, null);
+
+                AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .create();
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                }
+
+                Button understandBtn = dialogView.findViewById(R.id.btn_understand);
+                understandBtn.setOnClickListener(view -> dialog.dismiss());
+
+                dialog.show();
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setLayout(
+                            (int) (getResources().getDisplayMetrics().widthPixels * 0.9),
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                }
             }
         });
         initializeUI(); // button update and get event details
+
+
     }
 
-        /**
-         * This method is used to initialize the UI elements for the event details fragment
-         * based on if the entrant is on the waitlist or not, as the button text will be changed.
-         */
-        private void initializeUI() {
-            waitlistDb.getEntrantStatus(eventId, entrantId)
-                    .addOnSuccessListener(status -> {
-                        currentStatus = status;
-                        updateActionButton();
-                    })
-                    .addOnFailureListener(e -> {
-                        currentStatus = -1;
-                        updateActionButton();
-                    });
 
-            refreshWaitlistCount();
-            loadEventDetails();
-        }
+    /**
+     * This method is used to initialize the UI elements for the event details fragment
+     * based on if the entrant is on the waitlist or not, as the button text will be changed.
+     */
+    private void initializeUI() {
+        waitlistDb.getEntrantStatus(eventId, entrantId).addOnSuccessListener(status -> {
+            currentStatus = status;
+            updateActionButton();
+        }).addOnFailureListener(e -> {
+            currentStatus = -1;
+            updateActionButton();
+        });
+
+        refreshWaitlistCount();
+        loadEventDetails();
+    }
 
     /**
      * This method is used to load the event details from the database.
@@ -309,10 +317,7 @@ public class EventDetailsFragment extends Fragment {
                 valueDescription.setText(event.getDescription());
 
                 // Registration period
-                String regPeriod = formatRegistrationPeriod(
-                        event.getRegistrationStartDate(),
-                        event.getRegistrationEndDate()
-                );
+                String regPeriod = formatRegistrationPeriod(event.getRegistrationStartDate(), event.getRegistrationEndDate());
                 valueRegistration.setText(regPeriod);
 
                 // These fields are not yet in the Event model
@@ -326,11 +331,7 @@ public class EventDetailsFragment extends Fragment {
             public void onError(Exception e) {
                 if (!isAdded()) return;
 
-                Toast.makeText(
-                        getContext(),
-                        "Failed to load event: " + e.getMessage(),
-                        Toast.LENGTH_SHORT
-                ).show();
+                Toast.makeText(getContext(), "Failed to load event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
 
                 eventTitle.setText("Unknown Event");
                 valueDescription.setText("N/A");
@@ -343,6 +344,7 @@ public class EventDetailsFragment extends Fragment {
 
     /**
      * This method is used to format the registration period for the event.
+     *
      * @param start
      * @param end
      * @return
@@ -358,11 +360,12 @@ public class EventDetailsFragment extends Fragment {
 
         return startStr + " - " + endStr;
     }
+
     /**
      * Updates register button label based on registration state.
      * Update text when pressed (Register/Remove)
      * No parameters or returns.
-    */
+     */
     private void updateActionButton() {
         switch (currentStatus) {
             case EntrantListEntry.STATUS_WAITLIST:
@@ -389,8 +392,16 @@ public class EventDetailsFragment extends Fragment {
      * No parameters or returns.
      */
     private void refreshWaitlistCount() {
-        waitlistDb.getWaitlistCount(eventId)
-                .addOnSuccessListener(count -> valueWaitlistCount.setText(String.valueOf(count)))
-                .addOnFailureListener(e -> valueWaitlistCount.setText("—"));
+        waitlistDb.getWaitlistCount(eventId).addOnSuccessListener(count -> valueWaitlistCount.setText(String.valueOf(count))).addOnFailureListener(e -> valueWaitlistCount.setText("—"));
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (commentListener != null) {
+            commentListener.remove();
+        }
+    }
+
+
 }

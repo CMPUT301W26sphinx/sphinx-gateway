@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFFF"
+    android:background="#F5F5F5"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:paddingTop="12dp"
@@ -21,20 +21,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Events"
-            android:textSize="18sp"
+            android:textSize="25sp"
             android:textStyle="bold"
             android:textColor="#222222" />
 
-        <ImageButton
-            android:id="@+id/header_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end|center_vertical"
-            android:background="@android:color/transparent"
-            android:contentDescription="Open actions"
-            android:padding="8dp"
-            android:src="@android:drawable/ic_menu_share"
-            app:tint="#222222" />
+
     </FrameLayout>
 
     <TextView
