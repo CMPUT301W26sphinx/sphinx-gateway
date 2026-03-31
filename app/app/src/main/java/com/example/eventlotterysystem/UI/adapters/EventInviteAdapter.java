@@ -14,6 +14,8 @@ import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.model.LotterySystem;
+import com.example.eventlotterysystem.model.Notification;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
 
 import java.util.List;
