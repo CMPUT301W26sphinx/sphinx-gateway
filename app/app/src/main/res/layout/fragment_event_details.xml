@@ -58,10 +58,10 @@
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@id/seeCommentsButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventposter"
-        app:layout_constraintBottom_toTopOf="@id/seeCommentsButton">
+        app:layout_constraintTop_toBottomOf="@+id/eventposter">
 
         <LinearLayout
             android:id="@+id/eventInfoColumn"
@@ -153,14 +153,26 @@
 
     <Button
         android:id="@+id/seeCommentsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="175dp"
+        android:layout_height="47dp"
         android:backgroundTint="@color/nav_blue"
         android:text="See Comments"
+        app:layout_constraintBottom_toTopOf="@id/buttonRow"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.875"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_details_scroll_view"
-        app:layout_constraintBottom_toTopOf="@id/buttonRow"/>
+        app:layout_constraintTop_toBottomOf="@+id/event_details_scroll_view" />
+
+    <Button
+        android:id="@+id/mapButton"
+        android:layout_width="181dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/nav_blue"
+        android:text="View Entrants Map"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRow"
+        app:layout_constraintEnd_toStartOf="@+id/seeCommentsButton"
+        app:layout_constraintTop_toBottomOf="@+id/event_details_scroll_view" />
 
     <LinearLayout
         android:id="@+id/buttonRow"
