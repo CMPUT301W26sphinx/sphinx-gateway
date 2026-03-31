@@ -114,36 +114,7 @@ public class EventListFragment extends Fragment {
         // Initialize repository
         repository = new EventRepository();
 
-<<<<<<< HEAD
-        /**
-         * Retrieve all events from the "events" collection in Firestore.
-         * Each document is converted into an Event object.
-         */
-        db.collection("events")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-
-                        // Extract event information from Firestore document
-                        String name = document.getString("title");
-                        String description = document.getString("description");
-                        String privacy = document.getString("privacy");
-                        // Create Event object using constructor compatible with Event.java
-                        Event event = new Event(
-                                document.getId(),
-                                name,
-                                description
-                        );
-                        event.setPrivacy(privacy);
-
-                        // Only piublic event shown
-                        if (privacy == "public") {
-                            // Add event to list
-                            eventList.add(event);
-                        }
-=======
-        // Retrieve all events from Firestore
+        // Retrieve all events from Firestore 
         repository.getEvents(new EventRepository.EventCallback() {
             @Override
             public void onEventsLoaded(List<Event> events) {
@@ -153,7 +124,6 @@ public class EventListFragment extends Fragment {
                     allEvents.add(event);
                     if (event.getCategory() != null && !event.getCategory().isEmpty()) {
                         allCategories.add(event.getCategory());
->>>>>>> 17fb52be6aec067650178567ba54a397b50dc29d
                     }
                 }
                 filteredEvents.clear();

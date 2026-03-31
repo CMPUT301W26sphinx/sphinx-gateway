@@ -19,20 +19,14 @@ import android.widget.Toast;
 import android.widget.Switch;
 
 import com.example.eventlotterysystem.R;
-<<<<<<< HEAD
 import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.auth.FirebaseAuth;
-=======
->>>>>>> 17fb52be6aec067650178567ba54a397b50dc29d
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Calendar;
-=======
->>>>>>> 17fb52be6aec067650178567ba54a397b50dc29d
 import java.util.Date;
 import java.util.UUID;
 
