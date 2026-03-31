@@ -64,10 +64,6 @@ public class Event implements Serializable {
         this.date = date;
     }
 
-    public String getPrivacy() {
-        return privacy;
-    }
-
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
     }
