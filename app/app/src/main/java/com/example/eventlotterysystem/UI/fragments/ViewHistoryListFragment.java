@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.eventlotterysystem.R;
@@ -20,26 +18,27 @@ import com.example.eventlotterysystem.UI.adapters.EventAdapter;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.ProfileManager;
-import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.model.Event;
-import com.example.eventlotterysystem.model.profiles.UserProfile;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewWaitListFragment extends Fragment {
+/**
+ * A simple {@link Fragment} subclass.
+ *
+ * create an instance of this fragment.
+ */
+public class ViewHistoryListFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private TextView emptyText;
     private EventAdapter adapter;
-    private List<Event> waitlistedEvents = new ArrayList<>();
+    private List<Event> historyEvents = new ArrayList<>();
 
     private EventRepository eventRepository;
     private EntrantListFirebase entrantListFirebase;
 
-    public ViewWaitListFragment() {}
+    public ViewHistoryListFragment() {}
 
     @Override
     /**
@@ -56,7 +55,7 @@ public class ViewWaitListFragment extends Fragment {
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_view_wait_list, container, false);
+        return inflater.inflate(R.layout.fragment_view_history_list, container, false);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class ViewWaitListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewEvents);
         emptyText = view.findViewById(R.id.emptyText);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new EventAdapter(waitlistedEvents, this::onEventClick);
+        adapter = new EventAdapter(historyEvents, this::onEventClick);
         recyclerView.setAdapter(adapter);
         eventRepository = new EventRepository();
         entrantListFirebase = new EntrantListFirebase();
@@ -83,14 +82,14 @@ public class ViewWaitListFragment extends Fragment {
         eventRepository.getEvents(new EventRepository.EventCallback() {
             @Override
             public void onEventsLoaded(List<Event> events) {
-                waitlistedEvents.clear();
+                historyEvents.clear();
                 if (events.isEmpty()) {updateDisplay();return;}
                 final int[] processed = {0};// make sure check all events
-                // if status=1, then the entrant is on the waitlist, should be shown
+                // if status show on entrant list at all, should be shown
                 for (Event event : events) {
-                entrantListFirebase.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {if (status != null && status == 1) {waitlistedEvents.add(event);}
-                processed[0]++;
-                if (processed[0] == events.size()) {updateDisplay();}}).addOnFailureListener(e -> {processed[0]++;if (processed[0] == events.size()) {updateDisplay();}});}
+                    entrantListFirebase.getEntrantStatus(event.getEventId(), currentUserId).addOnSuccessListener(status -> {if (status != null && status >= 0) {historyEvents.add(event);}
+                        processed[0]++;
+                        if (processed[0] == events.size()) {updateDisplay();}}).addOnFailureListener(e -> {processed[0]++;if (processed[0] == events.size()) {updateDisplay();}});}
             }
 
             @Override
@@ -102,7 +101,7 @@ public class ViewWaitListFragment extends Fragment {
 
     private void updateDisplay() {
         adapter.notifyDataSetChanged();
-        if (waitlistedEvents.isEmpty()) {
+        if (historyEvents.isEmpty()) {
             emptyText.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
@@ -111,7 +110,7 @@ public class ViewWaitListFragment extends Fragment {
         }
     }
     private void showEmptyState() {
-        waitlistedEvents.clear();
+        historyEvents.clear();
         adapter.notifyDataSetChanged();
         emptyText.setVisibility(View.VISIBLE);
     }

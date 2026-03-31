@@ -163,7 +163,7 @@ public class EventListFragment extends Fragment {
         Button myEventsButton = view.findViewById(R.id.buttonMyEvents);
         myEventsButton.setOnClickListener(v -> {
             // Replace the current fragment with AcceptEventInviteFragment
-            AcceptEventInviteFragment fragment = new AcceptEventInviteFragment();
+            MyEventsNavigation fragment = new MyEventsNavigation();
 
             requireActivity()
                     .getSupportFragmentManager()
