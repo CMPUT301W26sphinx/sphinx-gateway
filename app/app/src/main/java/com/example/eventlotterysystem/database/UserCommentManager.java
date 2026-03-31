@@ -1,7 +1,6 @@
 package com.example.eventlotterysystem.database;
 
 import com.example.eventlotterysystem.model.UserComment;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -88,7 +87,7 @@ public class UserCommentManager {
     }
 
     /**
-     * Listens to the comments subcollection and sends updates when changed
+     * Listens to the comments subcollection and sends the updated list when changed
      *
      * @param eventID
      * @param callback
@@ -108,20 +107,15 @@ public class UserCommentManager {
     }
 
     // TODO: add a delete comment for a given event function
-    public interface DeleteCommentListener {
-        void onSuccess(DocumentReference docRef);
-
-        void onFailure(Exception e);
-    }
-
     public interface OnCommentDeletedListener {
-        void onSuccess(Task<Void> docRef);
-
         void onFailure(Exception e);
+
+        void onSuccess(Void unused);
     }
 
     public void deleteComment(String eventID, String commentID, OnCommentDeletedListener listener) {
-       listener.onSuccess(eventRef.document(eventID).collection("comments").document(commentID).delete());
+        eventRef.document(eventID).collection("comments").document(commentID).delete().addOnSuccessListener(listener::onSuccess).addOnFailureListener(listener::onFailure);
     }
+
 
 }
