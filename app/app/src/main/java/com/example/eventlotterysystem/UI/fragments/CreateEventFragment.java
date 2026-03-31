@@ -19,8 +19,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
@@ -182,7 +180,6 @@ public class CreateEventFragment extends Fragment {
         String description = descInput.getText().toString().trim();
         String start = startRegInput.getText().toString().trim();
         String end = endRegInput.getText().toString().trim();
-        String organizerId = ProfileManager.getInstance().getUserID(); //This is the device UUID that created it.
 
         int maxEntrants = 0;
         if (!maxInput.getText().toString().trim().isEmpty()) {
@@ -195,7 +192,6 @@ public class CreateEventFragment extends Fragment {
         event.setTitle(name);
         event.setDescription(description);
         event.setCapacity(maxEntrants);
-        event.setOrganizerIds(new ArrayList<>(Collections.singletonList(organizerId)));
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
