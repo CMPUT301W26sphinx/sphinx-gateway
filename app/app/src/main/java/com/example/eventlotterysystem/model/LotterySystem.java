@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.EventRepository;
-import com.example.eventlotterysystem.database.NotificationSystem;
 
 import java.util.Random;
 /** Basic Lottery System
@@ -102,7 +101,6 @@ public class LotterySystem {
                     }
                 });
     }
-
     /** Redraw lottery. Same as firstlottery, but without notification that entrant lost.
      * @param eventId eventid is passed by from triggering lottery
      */
