@@ -5,7 +5,7 @@ import com.example.eventlotterysystem.database.NotificationSystem;
 
 import java.util.List;
 
-/** TODO: JavaDoc to be made.
+/** Notification class, premade notification that is called instead of using notificationsystem.
  */
 public class Notification extends NotificationSystem {
 
