@@ -89,8 +89,13 @@ public class EventRepository {
         Long registrationEndDate = doc.getLong("registrationEndDate");
         Long waitingListCount = doc.getLong("waitingListCount");
         String category = doc.getString("category");   // new field
+        String privacy = doc.getString("privacy");
+        String organizerId = doc.getString("organizerId");
+        // To do: co_organizer
 
         Event event = new Event(id, title, description);
+        event.setOrganizerId(organizerId);
+        event.setPrivacy(privacy);
         if (capacity != null) event.setCapacity(capacity.intValue());
         if (registrationStartDate != null) event.setRegistrationStartDate(registrationStartDate);
         if (registrationEndDate != null) event.setRegistrationEndDate(registrationEndDate);
