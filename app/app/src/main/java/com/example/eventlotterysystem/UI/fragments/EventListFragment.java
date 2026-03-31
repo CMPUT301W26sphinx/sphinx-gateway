@@ -121,7 +121,7 @@ public class EventListFragment extends Fragment {
                 allEvents.clear();
                 allCategories.clear();
                 for (Event event : events) {
-                    if (!"Private".equals(event.getPrivacy()) || !"private".equals(event.getPrivacy())){ // just in case
+                    if (!"Private".equals(event.getPrivacy())){
                         allEvents.add(event);
                         if (event.getCategory() != null && !event.getCategory().isEmpty()) {
                             allCategories.add(event.getCategory());
