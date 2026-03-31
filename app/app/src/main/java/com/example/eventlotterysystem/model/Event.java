@@ -16,7 +16,6 @@ public class Event implements Serializable {
     private String place;
     private String privacy;              // For public/private
     // TODO: poster image URL
-    private int waitingListCount;
     private String category;
 
     // ✅ FIX: support multiple organizers
