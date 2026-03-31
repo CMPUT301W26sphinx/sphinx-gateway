@@ -114,16 +114,18 @@ public class EventListFragment extends Fragment {
         // Initialize repository
         repository = new EventRepository();
 
-        // Retrieve all events from Firestore
+        // Retrieve all events from Firestore 
         repository.getEvents(new EventRepository.EventCallback() {
             @Override
             public void onEventsLoaded(List<Event> events) {
                 allEvents.clear();
                 allCategories.clear();
                 for (Event event : events) {
-                    allEvents.add(event);
-                    if (event.getCategory() != null && !event.getCategory().isEmpty()) {
-                        allCategories.add(event.getCategory());
+                    if (!"Private".equals(event.getPrivacy())){
+                        allEvents.add(event);
+                        if (event.getCategory() != null && !event.getCategory().isEmpty()) {
+                            allCategories.add(event.getCategory());
+                        }
                     }
                 }
                 filteredEvents.clear();

@@ -9,24 +9,29 @@ public class Event implements Serializable {
     private String title;
     private String description;
     private int capacity;
-    private long registrationStartDate;
-    private long registrationEndDate;
-    private int waitingListCount;
+    private long registrationStartDate;   // timestamp (milliseconds)
+    private long registrationEndDate;     // timestamp
+    private int waitingListCount;         // number of users on waiting list
+    private long date;
+    private String place;
+    private String privacy;              // For public/private
+    // TODO: poster image URL
     private String category;
 
     // ✅ FIX: support multiple organizers
-    private List<String> organizerIds;
+    private String organizerId;
+    private List<String> co_organizerIds;
 
     // Required no-arg constructor
     public Event() {
-        organizerIds = new ArrayList<>();
+        this.co_organizerIds = new ArrayList<>();
     }
 
     public Event(String eventId, String title, String description) {
         this.eventId = eventId;
         this.title = title;
         this.description = description;
-        this.organizerIds = new ArrayList<>();
+        this.co_organizerIds = new ArrayList<>();
     }
 
     // Getters & setters
@@ -51,18 +56,47 @@ public class Event implements Serializable {
     public int getWaitingListCount() { return waitingListCount; }
     public void setWaitingListCount(int waitingListCount) { this.waitingListCount = waitingListCount; }
 
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public void setPrivacy(String privacy) {
+        this.privacy = privacy;
+    }
+
+    public String getPrivacy() {
+        return privacy;
+    }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
     // ✅ NEW METHODS
-    public List<String> getOrganizerIds() { return organizerIds; }
+    public String getOrganizerId() { return organizerId; }
 
-    public void setOrganizerIds(List<String> organizerIds) {
-        this.organizerIds = organizerIds;
+    public void setOrganizerId(String Id) {
+        this.organizerId = Id;
     }
 
+    public List<String> getCoOrganizerIds() { return co_organizerIds; }
+    public void setCoOrganizerIds(List<String> ids) { this.co_organizerIds = ids; }
+    
     // Optional helper (clean filtering)
     public boolean isOrganizer(String userId) {
-        return organizerIds != null && organizerIds.contains(userId);
+        if (userId == null) return false;
+        if (userId.equals(organizerId)) return true;
+        return co_organizerIds != null && co_organizerIds.contains(userId);
     }
 }
