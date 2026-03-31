@@ -156,7 +156,7 @@
                 android:paddingRight="8dp"
                 android:paddingBottom="6dp"
                 android:text="Comments"
-                android:textColor="#888888"
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <View
