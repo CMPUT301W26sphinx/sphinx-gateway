@@ -1,24 +1,23 @@
 package com.example.eventlotterysystem.UI.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+
 import com.example.eventlotterysystem.R;
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.*;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
-public class EntrantsMapFragment extends Fragment implements OnMapReadyCallback {
+import org.osmdroid.config.Configuration;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 
-    private GoogleMap mMap;
+public class EntrantsMapFragment extends Fragment {
+
+    private MapView mapView;
     private String eventId;
 
     public EntrantsMapFragment() {}
@@ -33,34 +32,22 @@ public class EntrantsMapFragment extends Fragment implements OnMapReadyCallback 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_map, container, false);
-    }
 
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        // REQUIRED for osmdroid
+        Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
+
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        mapView = view.findViewById(R.id.map);
+        mapView.setMultiTouchControls(true);
 
         if (getArguments() != null) {
             eventId = getArguments().getString("event_id");
         }
 
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getChildFragmentManager()
-                        .findFragmentById(R.id.map);
-
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
-    }
-
-    @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        mMap = googleMap;
-        Log.d("MAP_DEBUG", "Map is ready");
-        LatLng test = new LatLng(53.5461, -113.4938);
-        mMap.addMarker(new MarkerOptions().position(test).title("TEST"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(test, 12f));
         loadEntrants();
+
+        return view;
     }
 
     /**
@@ -75,8 +62,9 @@ public class EntrantsMapFragment extends Fragment implements OnMapReadyCallback 
                 .get()
                 .addOnSuccessListener(query -> {
 
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    boolean hasMarkers = false;
+                    mapView.getOverlays().clear();
+
+                    org.osmdroid.util.GeoPoint firstLocation = null;
 
                     for (var doc : query.getDocuments()) {
 
@@ -84,40 +72,50 @@ public class EntrantsMapFragment extends Fragment implements OnMapReadyCallback 
 
                         if (geoPoint != null) {
 
-                            LatLng position = new LatLng(
-                                    geoPoint.getLatitude(),
-                                    geoPoint.getLongitude()
-                            );
+                            org.osmdroid.util.GeoPoint position =
+                                    new org.osmdroid.util.GeoPoint(
+                                            geoPoint.getLatitude(),
+                                            geoPoint.getLongitude()
+                                    );
 
-                            // 🔥 FORCE visible marker (bright color)
-                            mMap.addMarker(new MarkerOptions()
-                                    .position(position)
-                                    .title("Entrant")
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                            Marker marker = new Marker(mapView);
+                            marker.setPosition(position);
+                            marker.setTitle("Entrant");
 
-                            builder.include(position);
-                            hasMarkers = true;
+                            mapView.getOverlays().add(marker);
+
+                            if (firstLocation == null) {
+                                firstLocation = position;
+                            }
                         }
                     }
 
-                    if (hasMarkers) {
-                        LatLngBounds bounds = builder.build();
-
-                        mMap.setOnMapLoadedCallback(() -> {
-                            mMap.animateCamera(
-                                    CameraUpdateFactory.newLatLngBounds(bounds, 200)
-                            );
-                        });
+                    // Center map
+                    if (firstLocation != null) {
+                        mapView.getController().setZoom(12.0);
+                        mapView.getController().setCenter(firstLocation);
                     } else {
-                        // fallback test
-                        LatLng test = new LatLng(53.5461, -113.4938);
+                        // fallback (Edmonton)
+                        org.osmdroid.util.GeoPoint fallback =
+                                new org.osmdroid.util.GeoPoint(53.5461, -113.4938);
 
-                        mMap.addMarker(new MarkerOptions().position(test).title("TEST"));
-
-                        mMap.moveCamera(
-                                CameraUpdateFactory.newLatLngZoom(test, 12f)
-                        );
+                        mapView.getController().setZoom(12.0);
+                        mapView.getController().setCenter(fallback);
                     }
+
+                    mapView.invalidate();
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
     }
 }
