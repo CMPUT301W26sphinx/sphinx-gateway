@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.ProfileManager;
 import com.google.android.material.button.MaterialButton;
 
 /**
@@ -116,6 +117,22 @@ public class MyEventsNavigation extends Fragment {
                         .commit();
             });
         }
+
+        //NOTIFICATIONS!
+        ProfileManager manager = ProfileManager.getInstance();
+        view.findViewById(R.id.NotificationButton).setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("userId", manager.getUserID());
+
+            NotificationFragment notificationFragment = new NotificationFragment();
+            notificationFragment.setArguments(args);
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, notificationFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
 
     private void showWaitlistTab() {

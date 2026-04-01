@@ -372,7 +372,7 @@ public class EditEventFragment extends Fragment {
                 .addOnSuccessListener(unused -> {
                             Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
                             // direct back to EventDetailsFragment after updating
-                            EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventId);
+                            OrganizerEventNavigationFragment fragment = OrganizerEventNavigationFragment.newInstance(eventId);
                             getParentFragmentManager()
                                     .beginTransaction()
                                     .replace(R.id.fragment_container, fragment)

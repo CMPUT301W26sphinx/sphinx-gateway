@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.OrganizerAdapter;
+import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.Event;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -76,6 +77,22 @@ public class OrganizerFragment extends Fragment {
                     .getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        //NOTIFICATIONS!
+        ProfileManager manager = ProfileManager.getInstance();
+        view.findViewById(R.id.NotificationButton).setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("userId", manager.getUserID());
+
+            NotificationFragment notificationFragment = new NotificationFragment();
+            notificationFragment.setArguments(args);
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, notificationFragment)
                     .addToBackStack(null)
                     .commit();
         });
