@@ -65,6 +65,7 @@ public class InviteEntrantFragment extends Fragment {
         if (args != null) {
             eventId = args.getString(EVENT_ID);
         }
+        profileManager = ProfileManager.getInstance();
         recyclerView = view.findViewById(R.id.entrantsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter = new ProfileAdapter(searchProfiles, this::inviteEntrant);
@@ -110,7 +111,7 @@ public class InviteEntrantFragment extends Fragment {
             String data_lastName = profile.getLastName() != null ? profile.getLastName().toLowerCase() : "";
             String data_fullName = (data_firstName + " " + data_lastName).trim();
             String data_email = profile.getEmail() != null ? profile.getEmail().toLowerCase() : "";
-            String data_phoneNum = profile.getPhoneNumber() != null ? profile.getPhoneNumber() : "";
+            String data_phoneNum = profile.getPhoneNumber() != null ? profile.getPhoneNumber().replace("-", "") : "";
 
             if (data_fullName.contains(target_nameStr)
                     && data_email.contains(target_emailStr)

@@ -104,7 +104,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         inviteButton.setOnClickListener(v -> {
             String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
             if (eventId == null) return;
-            Fragment fragment = privateInvite.newInstance(eventId);
+            Fragment fragment = InviteEntrantFragment.newInstance(eventId);
             requireActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
