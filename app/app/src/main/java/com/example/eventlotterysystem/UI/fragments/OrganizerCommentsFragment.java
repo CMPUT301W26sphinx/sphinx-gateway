@@ -160,7 +160,7 @@ public class OrganizerCommentsFragment extends Fragment {
                 return;
             }
 
-            commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
+            commentManager.addCommentToEvent(eventId, comment, true, new UserCommentManager.OnCommentAddedListener() {
 
 
                 @Override

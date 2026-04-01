@@ -148,7 +148,7 @@ public class EventComments extends Fragment {
                 return;
             }
 
-            commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
+            commentManager.addCommentToEvent(eventId, comment, false ,new UserCommentManager.OnCommentAddedListener() {
 
 
                 @Override

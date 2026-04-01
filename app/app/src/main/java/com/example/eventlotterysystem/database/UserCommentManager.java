@@ -48,7 +48,7 @@ public class UserCommentManager {
      * @param eventID
      * @param comment
      */
-    public void addCommentToEvent(String eventID, String comment, OnCommentAddedListener listener) {
+    public void addCommentToEvent(String eventID, String comment, boolean isOrganizer, OnCommentAddedListener listener) {
         ProfileManager manager = ProfileManager.getInstance();
         // get userID
         String uid = manager.getUserID();
@@ -62,6 +62,7 @@ public class UserCommentManager {
             Map<String, Object> data = new HashMap<>();
             data.put("text", comment);
             data.put("userID", uid);
+            data.put("isOrganizer", isOrganizer);
             data.put("userName", firstName);
             data.put("timestamp", FieldValue.serverTimestamp());
             data.put("commentID", commentID);

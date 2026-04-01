@@ -31,7 +31,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         private final TextView name;
         private final TextView comment;
         private Button deleteCommentButton;
-        private String currentCommentID;
 
         public ViewHolder(View view, OnDeleteClickListener listener) {
             super(view);
