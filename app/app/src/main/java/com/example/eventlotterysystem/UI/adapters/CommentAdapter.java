@@ -74,7 +74,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         UserComment userComment = comments.get(position);
 
         // set information to UI
-        viewHolder.name.setText(userComment.getUserName());
+        if(userComment.getIsOrganizer()){
+            viewHolder.name.setText(userComment.getUserName() + " (Organizer)");
+        } else {
+            viewHolder.name.setText(userComment.getUserName());
+        }
         viewHolder.comment.setText(userComment.getText());
 
         // set the delete button to invisible if not organizer
