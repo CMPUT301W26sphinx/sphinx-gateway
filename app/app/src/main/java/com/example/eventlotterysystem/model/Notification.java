@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class Notification extends NotificationSystem {
     private String organizerName;
+    private String eventName;
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
 
     private void loadOrganizerName() {
@@ -23,13 +24,11 @@ public class Notification extends NotificationSystem {
     }
     //Lottery Winner or Loser.
     public void notifyWinner(String entrantId, String eventId) {
-        loadOrganizerName();
-        sendNotification(entrantId, "You have won the lottery for an event! Please click to see more.", eventId, "Organizer" + organizerName);
+        sendNotification(entrantId, "You have won the lottery for an event! Please click to see more.", eventId, "System");
     }
 
     public void notifyLoser(String entrantId, String eventId) {
-        loadOrganizerName();
-        sendNotification(entrantId, "You have lost the lottery for an event! Please click to see more.", eventId, "Organizer" + organizerName);
+        sendNotification(entrantId, "You have lost the lottery for an event! Please click to see more.", eventId, "System");
     }
 
     public void notifyPrivateInvite(String entrantId, String eventId) {
@@ -56,7 +55,7 @@ public class Notification extends NotificationSystem {
                 .addOnSuccessListener(entrantList -> {
                     for (EntrantListEntry entrant : entrantList) {
                         String entrantId = entrant.getEntrantId();
-                        sendNotification(entrantId, message, eventId, "Organizer" + organizerName);
+                        sendNotification(entrantId, message, eventId, "Organizer " + organizerName);
                         logNotification(eventId, message);
                     }
                 });
