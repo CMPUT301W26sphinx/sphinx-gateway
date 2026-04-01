@@ -52,6 +52,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
     //Firestore data for these variables
     private Button editEventButton;
     //Firestore data for these variables
+    private Button inviteCo_OrgButton;
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
@@ -127,6 +128,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
         valueStarttime = view.findViewById(R.id.valueStartTime);
         valueLocation = view.findViewById(R.id.valueLocation);
         eventPoster = view.findViewById(R.id.eventposter);
+        inviteCo_OrgButton = view.findViewById(R.id.inviteCoOrganizerButton);
         //infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         editEventButton = view.findViewById(R.id.editEventButton);
@@ -145,6 +147,15 @@ public class OrganizerEventDetailsFragment extends Fragment{
             entrantId = user.getUid();
         }
 
+        inviteCo_OrgButton.setOnClickListener(v -> {
+            Fragment fragment = InviteCoOrganizerFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
         editEventButton.setOnClickListener(v -> {
             Fragment fragment = EditEventFragment.newInstance(eventId);
             requireActivity()
