@@ -87,7 +87,7 @@ public class OrganizerCommentsFragment extends Fragment {
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
 
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(commentList);
+        commentAdapter = new CommentAdapter(commentList, true);
 
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentRecyclerView.setAdapter(commentAdapter);
@@ -98,6 +98,7 @@ public class OrganizerCommentsFragment extends Fragment {
         addComment();
 
         // TODO: let the organizer delete a comment by swiping
+
     }
 
 

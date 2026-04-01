@@ -76,7 +76,7 @@ public class EventComments extends Fragment {
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
 
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(commentList);
+        commentAdapter = new CommentAdapter(commentList, false);
 
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentRecyclerView.setAdapter(commentAdapter);

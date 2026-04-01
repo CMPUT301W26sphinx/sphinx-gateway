@@ -3,6 +3,7 @@ package com.example.eventlotterysystem.UI.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +15,7 @@ import java.util.List;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
     private List<UserComment> comments;
+    private boolean isOrganizer;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -22,6 +24,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView name;
         private final TextView comment;
+        private Button deleteCommentButton;
 
         public ViewHolder(View view) {
             super(view);
@@ -29,6 +32,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
             name = view.findViewById(R.id.user_comment_name);
             comment = view.findViewById(R.id.user_comment_text);
+            deleteCommentButton = view.findViewById(R.id.delete_comment_button);
         }
 
     }
@@ -39,8 +43,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
      * @param dataSet String[] containing the data to populate views to be used
      *                by RecyclerView
      */
-    public CommentAdapter(List<UserComment> dataSet) {
+    public CommentAdapter(List<UserComment> dataSet, boolean isOrganizer) {
+
         this.comments = dataSet;
+        this.isOrganizer = isOrganizer;
     }
 
     // Create new views (invoked by the layout manager)
@@ -61,13 +67,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         viewHolder.name.setText(userComment.getUserName());
         viewHolder.comment.setText(userComment.getText());
 
-        // Alternative debug example (commented out)
-        // Log.d("EventAdapter", "Binding event: " + event.getTitle());
+        // set the delete button to invisible if not organizer
+        if (isOrganizer){
+            viewHolder.deleteCommentButton.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.deleteCommentButton.setVisibility(View.INVISIBLE);
+        }
 
-        // Handle click event for the item
-//        viewHolder.itemView.setOnClickListener(v -> {
-//
-//        });
     }
 
     // Return the size of your dataset (invoked by the layout manager)
