@@ -91,12 +91,12 @@ public class OrganizerCommentsFragment extends Fragment {
             commentManager.deleteComment(eventId, commentID, new UserCommentManager.OnCommentDeletedListener() {
                 @Override
                 public void onFailure(Exception e) {
-
+                    Toast.makeText(getContext(), "Comment could not be deleted", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onSuccess(Void unused) {
-
+                    Toast.makeText(getContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
                 }
             });
         });
