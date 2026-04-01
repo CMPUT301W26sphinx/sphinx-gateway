@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.eventlotterysystem.R;
+
 public class OrganizerCommentsFragment extends Fragment {
     private static final String EVENT_ID = "event_id";
 
@@ -26,5 +28,9 @@ public class OrganizerCommentsFragment extends Fragment {
         args.putString(EVENT_ID, eventId);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public OrganizerCommentsFragment() {
+        super(R.layout.view_user_comments);
     }
 }

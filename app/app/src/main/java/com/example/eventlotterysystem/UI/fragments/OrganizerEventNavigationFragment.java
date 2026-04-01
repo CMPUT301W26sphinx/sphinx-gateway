@@ -151,7 +151,6 @@ public class OrganizerEventNavigationFragment extends Fragment {
         indicatorEntrants.setVisibility(View.INVISIBLE);
         indicatorMap.setVisibility(View.INVISIBLE);
         // navigate to the comments fragment
-        // TODO: implement fragment navigation
         OrganizerCommentsFragment fragment = OrganizerCommentsFragment.newInstance(eventId);
         getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
 
