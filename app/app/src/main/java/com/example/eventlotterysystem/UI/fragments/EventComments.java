@@ -76,7 +76,9 @@ public class EventComments extends Fragment {
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
 
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(commentList, false);
+        commentAdapter = new CommentAdapter(commentList, false, listener -> {
+            // do nothing
+        });
 
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentRecyclerView.setAdapter(commentAdapter);
@@ -147,18 +149,18 @@ public class EventComments extends Fragment {
             }
 
             commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
-                @Override
-                public void onSuccess(DocumentReference docRef) {
-                    if (!isAdded()) return;
 
-                    writeCommentBox.setText("");
-                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
-                }
 
                 @Override
                 public void onFailure(Exception e) {
                     if (!isAdded()) return;
                     Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSuccess(Void unused) {
+                    writeCommentBox.setText("");
+                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
                 }
             });
         });

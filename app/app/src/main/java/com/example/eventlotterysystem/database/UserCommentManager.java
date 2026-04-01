@@ -36,9 +36,10 @@ public class UserCommentManager {
 
 
     public interface OnCommentAddedListener {
-        void onSuccess(DocumentReference docRef);
 
         void onFailure(Exception e);
+
+        void onSuccess(Void unused);
     }
 
     /**
@@ -54,13 +55,18 @@ public class UserCommentManager {
         // get the user
         manager.getUserProfile(user -> {
             String firstName = user.getFirstName();
+            // generate ID
+            DocumentReference docRef = eventRef.document(eventID).collection("comments").document();
+            String commentID = docRef.getId();
             // set fields
             Map<String, Object> data = new HashMap<>();
             data.put("text", comment);
             data.put("userID", uid);
             data.put("userName", firstName);
             data.put("timestamp", FieldValue.serverTimestamp());
-            eventRef.document(eventID).collection("comments").add(data).addOnSuccessListener(listener::onSuccess).addOnFailureListener(listener::onFailure);
+            data.put("commentID", commentID);
+            // save document to firestore
+            docRef.set(data).addOnSuccessListener(listener::onSuccess).addOnFailureListener(listener::onFailure);
         });
 
 

@@ -9,13 +9,19 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.model.UserComment;
+import com.google.firebase.firestore.auth.User;
+
+
+import org.w3c.dom.Comment;
 
 import java.util.List;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
     private List<UserComment> comments;
     private boolean isOrganizer;
+    private OnDeleteClickListener listener;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -25,14 +31,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         private final TextView name;
         private final TextView comment;
         private Button deleteCommentButton;
+        private String currentCommentID;
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, OnDeleteClickListener listener) {
             super(view);
             // Define click listener for the ViewHolder's View
 
             name = view.findViewById(R.id.user_comment_name);
             comment = view.findViewById(R.id.user_comment_text);
             deleteCommentButton = view.findViewById(R.id.delete_comment_button);
+
+
         }
 
     }
@@ -43,10 +52,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
      * @param dataSet String[] containing the data to populate views to be used
      *                by RecyclerView
      */
-    public CommentAdapter(List<UserComment> dataSet, boolean isOrganizer) {
+    public CommentAdapter(List<UserComment> dataSet, boolean isOrganizer, OnDeleteClickListener listener) {
 
         this.comments = dataSet;
         this.isOrganizer = isOrganizer;
+        this.listener = listener;
+
     }
 
     // Create new views (invoked by the layout manager)
@@ -55,7 +66,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.display_comment, viewGroup, false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(view, listener);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -68,11 +79,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         viewHolder.comment.setText(userComment.getText());
 
         // set the delete button to invisible if not organizer
-        if (isOrganizer){
+        if (isOrganizer) {
             viewHolder.deleteCommentButton.setVisibility(View.VISIBLE);
         } else {
             viewHolder.deleteCommentButton.setVisibility(View.INVISIBLE);
         }
+
+        // get the user ID when delete is clicked
+        viewHolder.deleteCommentButton.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteClick(userComment.getCommentID());
+            }
+        });
+
 
     }
 
@@ -80,5 +99,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     @Override
     public int getItemCount() {
         return comments.size();
+    }
+
+    public interface OnDeleteClickListener {
+        void onDeleteClick(String currentCommentID);
     }
 }

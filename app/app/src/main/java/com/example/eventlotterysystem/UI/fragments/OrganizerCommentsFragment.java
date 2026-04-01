@@ -87,7 +87,19 @@ public class OrganizerCommentsFragment extends Fragment {
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
 
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(commentList, true);
+        commentAdapter = new CommentAdapter(commentList, true, commentID -> {
+            commentManager.deleteComment(eventId, commentID, new UserCommentManager.OnCommentDeletedListener() {
+                @Override
+                public void onFailure(Exception e) {
+
+                }
+
+                @Override
+                public void onSuccess(Void unused) {
+
+                }
+            });
+        });
 
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentRecyclerView.setAdapter(commentAdapter);
@@ -97,7 +109,6 @@ public class OrganizerCommentsFragment extends Fragment {
         updateComments();
         addComment();
 
-        // TODO: let the organizer delete a comment by swiping
 
     }
 
@@ -150,18 +161,18 @@ public class OrganizerCommentsFragment extends Fragment {
             }
 
             commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
-                @Override
-                public void onSuccess(DocumentReference docRef) {
-                    if (!isAdded()) return;
 
-                    writeCommentBox.setText("");
-                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
-                }
 
                 @Override
                 public void onFailure(Exception e) {
                     if (!isAdded()) return;
                     Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSuccess(Void unused) {
+                    writeCommentBox.setText("");
+                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
                 }
             });
         });
