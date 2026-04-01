@@ -238,8 +238,10 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 valueRegistration.setText(regPeriod);
 
                 // These fields are not yet in the Event model
-                valueStarttime.setText("Not available");
-                valueLocation.setText("Not available");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String datetStr = sdf.format(new Date(event.getDate()));
+                valueStarttime.setText(datetStr);
+                valueLocation.setText(event.getPlace());
 
                 // Waitlist count is handled by refreshWaitlistCount()
             }

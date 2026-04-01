@@ -54,6 +54,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     private Button notifySelectedButton;
     private Button notifyCancelledButton;
     private Button exportCsvButton;
+    private Button inviteButton;
     private List<EntrantDisplay> enrolledList = new ArrayList<>();
 
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
@@ -98,6 +99,19 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         notifySelectedButton = view.findViewById(R.id.notifySelectedButton);
         notifyCancelledButton = view.findViewById(R.id.notifyCancelledButton);
         exportCsvButton = view.findViewById(R.id.exportCsvButton);
+        inviteButton = view.findViewById(R.id.inviteButton);
+
+        inviteButton.setOnClickListener(v -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+            Fragment fragment = privateInvite.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         notifyWaitlistButton.setOnClickListener(v -> {
             String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
@@ -231,7 +245,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         enrolledRecyclerView.setAdapter(enrolledAdapter);
         cancelledRecyclerView.setAdapter(cancelledAdapter);
 
-            }
+    }
 
     /**
      * This method is used to load the entrants for the event.
