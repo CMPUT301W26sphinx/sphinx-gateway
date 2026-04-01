@@ -2,6 +2,7 @@ package com.example.eventlotterysystem.model;
 
 
 import com.google.firebase.Timestamp;
+
 public class UserComment {
     /**
      * This defines the structure of a comment to be stored in an event
@@ -10,6 +11,8 @@ public class UserComment {
     private Timestamp timestamp;
     private String userID;
     private String userName;
+    private String commentID;
+    private boolean isOrganizer;
 
     // empty constructor for firebase
     public UserComment() {
@@ -23,6 +26,13 @@ public class UserComment {
     }
 
     // getters
+    public boolean getIsOrganizer(){
+        return isOrganizer;
+    }
+    public String getCommentID() {
+        return commentID;
+    }
+
     public String getText() {
         return text;
     }
@@ -40,6 +50,9 @@ public class UserComment {
     }
 
     // setters
+    public void setIsOrganizer(boolean isOrganizer){
+        this.isOrganizer = isOrganizer;
+    }
     public void setText(String text) {
         this.text = text;
     }
@@ -54,5 +67,9 @@ public class UserComment {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setCommentID(String commentID) {
+        this.commentID = commentID;
     }
 }

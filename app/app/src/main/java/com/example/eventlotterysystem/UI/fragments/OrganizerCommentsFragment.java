@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,80 +25,93 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventComments extends Fragment {
-
+public class OrganizerCommentsFragment extends Fragment {
     private static final String EVENT_ID = "event_id";
-
-    private String eventId;
-
     private EditText writeCommentBox;
+    private String eventId;
     private Button addCommentButton;
     private RecyclerView commentRecyclerView;
-
+    private ArrayList commentList;
     private CommentAdapter commentAdapter;
-    private List<UserComment> commentList;
-
     private final UserCommentManager commentManager = UserCommentManager.getInstance();
     private ListenerRegistration commentListener;
 
-    public EventComments() {
 
-    }
-
-    public static EventComments newInstance(String eventId) {
-        EventComments fragment = new EventComments();
+    /**
+     * Create Event Details fragment for specific event with eventId
+     *
+     * @param eventId The unique identifier for the event
+     * @return fragment
+     * A new instance of EventDetailsFragment
+     */
+    public static OrganizerCommentsFragment newInstance(String eventId) {
+        /*
+         Author: RobinHood https://stackoverflow.com/users/646806/robinhood
+         Title: "How can I transfer data from one fragment to another fragment android"
+         Answer: https://stackoverflow.com/a/19333288
+         Date: Oct 12, 2013
+         */
+        OrganizerCommentsFragment fragment = new OrganizerCommentsFragment();
         Bundle args = new Bundle();
         args.putString(EVENT_ID, eventId);
         fragment.setArguments(args);
         return fragment;
     }
 
-    @Nullable
+    public OrganizerCommentsFragment() {
+        super(R.layout.view_user_comments);
+    }
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_event_comments, container, false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            eventId = getArguments().getString(EVENT_ID);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.view_user_comments, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            eventId = args.getString(EVENT_ID);
-        }
-
+        // initialize recycler view
         writeCommentBox = view.findViewById(R.id.write_comment_box);
         addCommentButton = view.findViewById(R.id.add_comment_button);
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
 
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(commentList, false, listener -> {
-            // do nothing
+        commentAdapter = new CommentAdapter(commentList, true, commentID -> {
+            commentManager.deleteComment(eventId, commentID, new UserCommentManager.OnCommentDeletedListener() {
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(getContext(), "Comment could not be deleted", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSuccess(Void unused) {
+                    Toast.makeText(getContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentRecyclerView.setAdapter(commentAdapter);
 
-        if (eventId == null) {
-            Toast.makeText(getContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
-            addCommentButton.setEnabled(false);
-            return;
-        }
-
+        // populate recycler
         initializeCommentList();
         updateComments();
         addComment();
 
-        Button backButton = view.findViewById(R.id.comment_back_button);
-
-        backButton.setOnClickListener(v -> {
-            requireActivity().getOnBackPressedDispatcher().onBackPressed();
-        });
 
     }
+
 
     private void initializeCommentList() {
         commentManager.getCommentsFromEvent(eventId, new UserCommentManager.UserCommentCallback() {
@@ -148,7 +160,7 @@ public class EventComments extends Fragment {
                 return;
             }
 
-            commentManager.addCommentToEvent(eventId, comment, false ,new UserCommentManager.OnCommentAddedListener() {
+            commentManager.addCommentToEvent(eventId, comment, true, new UserCommentManager.OnCommentAddedListener() {
 
 
                 @Override
@@ -164,13 +176,5 @@ public class EventComments extends Fragment {
                 }
             });
         });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (commentListener != null) {
-            commentListener.remove();
-        }
     }
 }
