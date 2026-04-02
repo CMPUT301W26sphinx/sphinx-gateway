@@ -299,6 +299,7 @@ public class CreateEventFragment extends Fragment {
 
                     // direct to EventDetailsFragment after it is created
                     OrganizerEventNavigationFragment fragment = OrganizerEventNavigationFragment.newInstance(documentReference.getId());
+
                     getParentFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, fragment)

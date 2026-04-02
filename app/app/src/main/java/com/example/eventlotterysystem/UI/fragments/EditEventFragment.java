@@ -191,8 +191,9 @@ public class EditEventFragment extends Fragment {
                 }
 
                 // Max Entrant
-                maxInput.setText(String.valueOf(event.getCapacity()));
-
+                if (event.getCapacity() != 0){
+                    maxInput.setText(String.valueOf(event.getCapacity()));
+                }
                 // Waitlist count is handled by refreshWaitlistCount()
             }
 
