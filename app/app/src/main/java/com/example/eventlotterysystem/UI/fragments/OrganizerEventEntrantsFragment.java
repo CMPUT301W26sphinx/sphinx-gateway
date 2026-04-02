@@ -58,8 +58,10 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     private Button notifySelectedButton;
     private Button notifyCancelledButton;
     private Button exportCsvButton;
+    private Button inviteButton;
     // To figure out how to create a csv, I looked at these sources:
     // https://medium.com/@sanjayajosep/offline-first-challenge-making-csv-pdf-reports-right-on-android-faf2ee7946dc
+  
     private List<EntrantDisplay> enrolledList = new ArrayList<>();
     private ActivityResultLauncher<String> createCsvLauncher;
     private CsvExporter entrantCsvExporter;
@@ -126,6 +128,19 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         notifySelectedButton = view.findViewById(R.id.notifySelectedButton);
         notifyCancelledButton = view.findViewById(R.id.notifyCancelledButton);
         exportCsvButton = view.findViewById(R.id.exportCsvButton);
+        inviteButton = view.findViewById(R.id.inviteButton);
+
+        inviteButton.setOnClickListener(v -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+            Fragment fragment = InviteEntrantFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         notifyWaitlistButton.setOnClickListener(v -> {
             String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
@@ -259,7 +274,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         enrolledRecyclerView.setAdapter(enrolledAdapter);
         cancelledRecyclerView.setAdapter(cancelledAdapter);
 
-            }
+    }
 
     /**
      * This method is used to load the entrants for the event.
