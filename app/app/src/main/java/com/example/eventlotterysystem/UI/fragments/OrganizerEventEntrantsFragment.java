@@ -2,6 +2,8 @@ package com.example.eventlotterysystem.UI.fragments;
 
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.eventlotterysystem.model.CsvExporter;
 import com.example.eventlotterysystem.model.LotterySystem;
 import com.example.eventlotterysystem.model.Notification;
 
@@ -26,6 +29,7 @@ import com.example.eventlotterysystem.model.EntrantDisplay;
 import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.database.ProfileManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -54,7 +58,11 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     private Button notifySelectedButton;
     private Button notifyCancelledButton;
     private Button exportCsvButton;
+    // To figure out how to create a csv, I looked at these sources:
+    // https://medium.com/@sanjayajosep/offline-first-challenge-making-csv-pdf-reports-right-on-android-faf2ee7946dc
     private List<EntrantDisplay> enrolledList = new ArrayList<>();
+    private ActivityResultLauncher<String> createCsvLauncher;
+    private CsvExporter entrantCsvExporter;
 
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
     private final ProfileManager profileManager = ProfileManager.getInstance();
@@ -72,6 +80,25 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    //https://medium.com/@sanjayajosep/offline-first-challenge-making-csv-pdf-reports-right-on-android-faf2ee7946dc
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        createCsvLauncher = registerForActivityResult(
+                new ActivityResultContracts.CreateDocument("text/csv"),
+                uri -> {
+                    if (uri == null || !isAdded()) { // uri is where to put the file
+                        return;
+                    }
+                    try {
+                        entrantCsvExporter.writeCsv(uri, enrolledList);
+                        Toast.makeText(requireContext(), "CSV exported", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        Toast.makeText(requireContext(), "Export failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+    }
 
 
     @Override
@@ -84,7 +111,8 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        // initialize the csv
+        entrantCsvExporter = new CsvExporter(requireContext());
         waitlistRecyclerView = view.findViewById(R.id.waitlistRecyclerView);
         selectedRecyclerView = view.findViewById(R.id.selectedRecyclerView);
         enrolledRecyclerView = view.findViewById(R.id.enrolledRecyclerView);
@@ -282,6 +310,8 @@ public class OrganizerEventEntrantsFragment extends Fragment {
 
                                 case EntrantListEntry.STATUS_REGISTERED:
                                     enrolled.add(display);
+                                    // add entry to list for csv
+                                    enrolledList.add(display);
                                     break;
 
                                 case EntrantListEntry.STATUS_CANCELLED_OR_REJECTED:
@@ -307,6 +337,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
             Toast.makeText(requireContext(), "No registered entrants", Toast.LENGTH_SHORT).show();
             return;
         }
-        // TODO: fill
+        if (!isAdded()) return;
+        createCsvLauncher.launch("registered_entrants.csv");
     }
 }
