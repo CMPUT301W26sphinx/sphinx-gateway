@@ -178,7 +178,7 @@
         android:id="@+id/search_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="24dp"
         android:backgroundTint="@color/admin_nav_blue"
         android:text="Search"
         app:layout_constraintEnd_toEndOf="parent"
