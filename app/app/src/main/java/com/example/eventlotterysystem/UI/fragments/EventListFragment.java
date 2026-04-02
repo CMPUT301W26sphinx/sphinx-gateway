@@ -24,7 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.EventAdapter;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.model.EntrantSearch;
 import com.example.eventlotterysystem.model.Event;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -69,6 +71,9 @@ public class EventListFragment extends Fragment {
 
     /** Repository for event data */
     EventRepository repository;
+
+    EditText searchBar;
+    Button searchButton;
 
     /**
      * Inflates the fragment layout.
@@ -175,6 +180,27 @@ public class EventListFragment extends Fragment {
             }
         });
         toggleGroup.check(R.id.buttonAll);
+
+        // handle the search bar behavior
+        searchBar = view.findViewById(R.id.event_search_bar);
+        searchButton = view.findViewById(R.id.event_search_button);
+
+        searchButton.setOnClickListener(v -> {
+            // get the text in the search bar
+            String keyword = searchBar.getText().toString();
+            // TODO: filter the events using keyword
+            EntrantSearch entrantSearch = new EntrantSearch();
+            List<Event> results = entrantSearch.filterEventsByKeyword(filteredEvents, keyword);
+
+            filteredEvents.clear();
+            filteredEvents.addAll(results);
+
+            adapter.notifyDataSetChanged();
+            updateEmptyState();
+
+
+        });
+
     }
 
     /**
