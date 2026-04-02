@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.EventAdapter;
 import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.Event;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -175,6 +176,22 @@ public class EventListFragment extends Fragment {
             }
         });
         toggleGroup.check(R.id.buttonAll);
+
+        //NOTIFICATIONS!
+        ProfileManager manager = ProfileManager.getInstance();
+        view.findViewById(R.id.NotificationButton).setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("userId", manager.getUserID());
+
+            NotificationFragment notificationFragment = new NotificationFragment();
+            notificationFragment.setArguments(args);
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, notificationFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
 
     /**

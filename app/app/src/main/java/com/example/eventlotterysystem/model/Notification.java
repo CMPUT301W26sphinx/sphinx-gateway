@@ -1,6 +1,9 @@
 package com.example.eventlotterysystem.model;
 
+import android.util.Log;
+
 import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.NotificationSystem;
 import com.example.eventlotterysystem.database.ProfileManager;
 
@@ -11,6 +14,8 @@ import java.util.List;
  */
 public class Notification extends NotificationSystem {
     private String organizerName;
+    private String eventName;
+    private final EventRepository eventRepository = new EventRepository();
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
 
     private void loadOrganizerName() {
@@ -21,15 +26,34 @@ public class Notification extends NotificationSystem {
             }
         });
     }
-    //Lottery Winner or Loser.
-    public void notifyWinner(String entrantId, String eventId) {
-        loadOrganizerName();
-        sendNotification(entrantId, "You have won the lottery for an event! Please click to see more.", eventId, "Organizer" + organizerName);
-    }
 
+    //Lottery Winner or Loser.
+    //Really cursed setup, maybe compact it somehow.
+    public void notifyWinner(String entrantId, String eventId) {
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+            @Override
+            public void onEventLoaded(Event event) {
+                String eventName = event.getTitle();
+                sendNotification(entrantId, "You have won the lottery for the event " + eventName + "! Please click to see more.", eventId, "System");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Notification", "Failed to fetch event for notifyWinner: " + eventId, e);
+            }
+        });
+    }
     public void notifyLoser(String entrantId, String eventId) {
-        loadOrganizerName();
-        sendNotification(entrantId, "You have lost the lottery for an event! Please click to see more.", eventId, "Organizer" + organizerName);
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+            @Override
+            public void onEventLoaded(Event event) {
+                String eventName = event.getTitle();
+                sendNotification(entrantId, "You have lost the lottery for the event " + eventName + "! Please click to see more.", eventId, "System");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Notification", "Failed to fetch event for notifyLoser: " + eventId, e);
+            }
+        });
     }
 
     public void notifyPrivateInvite(String entrantId, String eventId) {
@@ -45,8 +69,7 @@ public class Notification extends NotificationSystem {
     /**
      * Prebased NotificationStatus for the Organizers.
      * Also logs it for the System.
-     * TODO: Maybe add organizer name who triggered this state?
-     * @param message
+     * * @param message
      * @param eventId
      * @param status
      */
@@ -56,7 +79,7 @@ public class Notification extends NotificationSystem {
                 .addOnSuccessListener(entrantList -> {
                     for (EntrantListEntry entrant : entrantList) {
                         String entrantId = entrant.getEntrantId();
-                        sendNotification(entrantId, message, eventId, "Organizer" + organizerName);
+                        sendNotification(entrantId, message, eventId, "Organizer " + organizerName);
                         logNotification(eventId, message);
                     }
                 });
