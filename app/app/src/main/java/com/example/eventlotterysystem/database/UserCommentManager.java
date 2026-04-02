@@ -7,11 +7,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.auth.User;
 
-import org.w3c.dom.Comment;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +36,10 @@ public class UserCommentManager {
 
 
     public interface OnCommentAddedListener {
-        void onSuccess(DocumentReference docRef);
 
         void onFailure(Exception e);
+
+        void onSuccess(Void unused);
     }
 
     /**
@@ -51,20 +48,26 @@ public class UserCommentManager {
      * @param eventID
      * @param comment
      */
-    public void addCommentToEvent(String eventID, String comment, OnCommentAddedListener listener) {
+    public void addCommentToEvent(String eventID, String comment, boolean isOrganizer, OnCommentAddedListener listener) {
         ProfileManager manager = ProfileManager.getInstance();
         // get userID
         String uid = manager.getUserID();
         // get the user
         manager.getUserProfile(user -> {
             String firstName = user.getFirstName();
+            // generate ID
+            DocumentReference docRef = eventRef.document(eventID).collection("comments").document();
+            String commentID = docRef.getId();
             // set fields
             Map<String, Object> data = new HashMap<>();
             data.put("text", comment);
             data.put("userID", uid);
+            data.put("isOrganizer", isOrganizer);
             data.put("userName", firstName);
             data.put("timestamp", FieldValue.serverTimestamp());
-            eventRef.document(eventID).collection("comments").add(data).addOnSuccessListener(listener::onSuccess).addOnFailureListener(listener::onFailure);
+            data.put("commentID", commentID);
+            // save document to firestore
+            docRef.set(data).addOnSuccessListener(listener::onSuccess).addOnFailureListener(listener::onFailure);
         });
 
 
@@ -78,6 +81,7 @@ public class UserCommentManager {
 
     /**
      * Get the comments from an event, sorted by descending date
+     *
      * @param eventID
      * @param callback
      */
@@ -90,7 +94,8 @@ public class UserCommentManager {
     }
 
     /**
-     * Listens to the comments subcollection and sends updates when changed
+     * Listens to the comments subcollection and sends the updated list when changed
+     *
      * @param eventID
      * @param callback
      * @return
@@ -107,4 +112,17 @@ public class UserCommentManager {
             }
         });
     }
+
+    // TODO: add a delete comment for a given event function
+    public interface OnCommentDeletedListener {
+        void onFailure(Exception e);
+
+        void onSuccess(Void unused);
+    }
+
+    public void deleteComment(String eventID, String commentID, OnCommentDeletedListener listener) {
+        eventRef.document(eventID).collection("comments").document(commentID).delete().addOnSuccessListener(listener::onSuccess).addOnFailureListener(listener::onFailure);
+    }
+
+
 }

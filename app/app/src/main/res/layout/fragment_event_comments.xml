@@ -1,58 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <TextView
-        android:id="@+id/comments_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Comments"
-        android:textSize="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/comment_back_button">
-
-    </TextView>
-
-
-    <EditText
-        android:id="@+id/write_comment_box"
-        android:layout_width="321dp"
-        android:layout_height="57dp"
-        android:hint="Add a comment..."
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/comments_title">
-
-    </EditText>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/comment_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:nestedScrollingEnabled="false"
-        app:layout_constraintTop_toBottomOf="@+id/write_comment_box"
-        tools:layout_editor_absoluteX="0dp">
-
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <Button
-        android:id="@+id/add_comment_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:backgroundTint="@color/admin_nav_blue"
-        android:text="↑"
-        android:textColor="@android:color/white"
-        android:textSize="20dp"
-        app:cornerRadius="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/comment_recycler_view"
-        app:layout_constraintStart_toEndOf="@+id/write_comment_box"
-        app:rippleColor="@color/white">
-
-    </Button>
 
     <Button
         android:id="@+id/comment_back_button"
@@ -62,5 +12,14 @@
         android:text="Back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Comment view -->
+    <include
+        layout="@layout/view_user_comments"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/comment_back_button" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
