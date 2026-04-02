@@ -21,8 +21,8 @@ public class Notification extends NotificationSystem {
     private void loadOrganizerName() {
         ProfileManager manager = ProfileManager.getInstance();
         manager.getUserProfile(user -> {
-            if (user.getFirstName() != null && user.getLastName() != null) {
-                organizerName = user.getFirstName() + " " + user.getLastName();
+            if (user.getFirstName() != null) {
+                organizerName = user.getFirstName();
             }
         });
     }
