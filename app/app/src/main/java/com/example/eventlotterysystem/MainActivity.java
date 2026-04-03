@@ -39,9 +39,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class MainActivity extends AppCompatActivity {
     /**
      * Creates a new instance that goes to the Events, without login.
+     *
      * @param savedInstanceState If the activity is being re-initialized after
-     *     previously being shut down then this Bundle contains the data it most
-     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
      *
      */
     @Override
@@ -55,6 +56,50 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+
+        // loads database and auth for firebase
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Sign in anonymously
+        mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "signInAnonymously:success");
+
+                    String uid = mAuth.getCurrentUser().getUid();
+                    DocumentReference docRef = db.collection("users").document(uid);
+
+                    docRef.get().addOnSuccessListener(document -> {
+                        if (!document.exists()) {
+
+                            ProfileManager profileManager = ProfileManager.getInstance();
+
+                            // create profile
+                            UserProfile userProfile = new UserProfile();
+
+                            // save to Firestore
+                            profileManager.saveUser(userProfile);
+
+                        }
+                    });
+
+                    // setup bottom nav
+                    initializeBottomNavigation();
+
+                    // Stay on entrant UI (no redirect)
+                } else {
+                    Log.w(TAG, "signInAnonymously:failure", task.getException());
+                }
+            }
+        });
+    }
+
+    /**
+     * Creates the bottom navigation
+     */
+    private void initializeBottomNavigation() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         EventListFragment eventListFragment = new EventListFragment();
@@ -84,42 +129,11 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-
-        // loads database and auth for firebase
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Sign in anonymously
-        mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "signInAnonymously:success");
-
-                    String uid = mAuth.getCurrentUser().getUid();
-                    DocumentReference docRef = db.collection("users").document(uid);
-
-                    docRef.get().addOnSuccessListener(document -> {
-                        if (!document.exists()){
-
-                            ProfileManager profileManager = ProfileManager.getInstance();
-
-                            // create profile
-                            UserProfile userProfile = new UserProfile();
-
-                            // save to Firestore
-                            profileManager.saveUser(userProfile);
-                        }
-                    });
-
-                    // Stay on entrant UI (no redirect)
-                } else {
-                    Log.w(TAG, "signInAnonymously:failure", task.getException());
-                }
-            }
-        });
     }
 
+    /**
+     * Shows the terms and conditions pop-up
+     */
     private void showTermsDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.activity_terms, null);
 
@@ -140,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Replaces current fragment with the specified fragment
+     *
      * @param fragment the fragment to display next
      */
     private void setCurrentFragment(Fragment fragment) {
