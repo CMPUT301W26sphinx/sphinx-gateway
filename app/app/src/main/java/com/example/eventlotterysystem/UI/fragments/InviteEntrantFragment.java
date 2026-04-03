@@ -41,6 +41,7 @@ public class InviteEntrantFragment extends Fragment {
     private EditText phoneNum;
     private EditText email;
     private Button searchButton;
+    private Button backButton;
 
     public InviteEntrantFragment() {}
 
@@ -74,14 +75,23 @@ public class InviteEntrantFragment extends Fragment {
         phoneNum = view.findViewById(R.id.phoneNum);
         email = view.findViewById(R.id.email);
         searchButton = view.findViewById(R.id.search_button);
+        backButton = view.findViewById(R.id.backButton);
 
         loadProfiles();
+
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
         searchButton.setOnClickListener(v -> {
             searchProfiles.clear();
             search();
         });
 
     }
+    /**
+     * loading all the user porfile from the database
+     */
     private void loadProfiles() {
         profileManager.getAllUsers(new ProfileManager.AllUsersCallback() {
             @Override
@@ -102,6 +112,9 @@ public class InviteEntrantFragment extends Fragment {
         });
     }
 
+    /**
+     * Search users base on given name, phone number and email
+     */
     private void search() {
         String target_nameStr = name.getText().toString().trim().toLowerCase();
         String target_phoneNumStr = phoneNum.getText().toString().trim();

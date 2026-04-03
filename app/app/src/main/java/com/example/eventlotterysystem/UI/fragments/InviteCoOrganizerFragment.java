@@ -17,11 +17,18 @@ import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.fragments.admin.ProfileAdapter;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.ProfileManager;
+import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.model.Notification;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,6 +48,12 @@ public class InviteCoOrganizerFragment extends Fragment {
     private EditText phoneNum;
     private EditText email;
     private Button searchButton;
+    private Button backButton;
+    private List<String> coOrganizer_List;
+    private String organizer;
+    private final Notification notification = new Notification();
+    private final EventRepository eventRepository = new EventRepository();
+    private final EntrantListFirebase entrantList = new EntrantListFirebase();
 
     public InviteCoOrganizerFragment() {}
 
@@ -74,14 +87,24 @@ public class InviteCoOrganizerFragment extends Fragment {
         phoneNum = view.findViewById(R.id.phoneNum);
         email = view.findViewById(R.id.email);
         searchButton = view.findViewById(R.id.search_button);
+        backButton = view.findViewById(R.id.backButton);
 
         loadProfiles();
+        loadEvent();
+
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
         searchButton.setOnClickListener(v -> {
             searchProfiles.clear();
             search();
         });
 
     }
+    /**
+     * loading all the user porfile from the database
+     */
     private void loadProfiles() {
         profileManager.getAllUsers(new ProfileManager.AllUsersCallback() {
             @Override
@@ -102,6 +125,35 @@ public class InviteCoOrganizerFragment extends Fragment {
         });
     }
 
+    /**
+     * Loading the event from database
+     * Aim to getting the organizer's Id and co-organizers' Id
+     */
+    private void loadEvent() {
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+
+            @Override
+            public void onEventLoaded(Event event) {
+                if (!isAdded()) return;
+                organizer = event.getOrganizerId();
+                coOrganizer_List = event.getCoOrganizerIds();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (!isAdded()) return;
+
+                Toast.makeText(
+                        getContext(),
+                        "Failed to load event: " + e.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+    }
+    /**
+     * Search users base on given name, phone number and email
+     */
     private void search() {
         String target_nameStr = name.getText().toString().trim().toLowerCase();
         String target_phoneNumStr = phoneNum.getText().toString().trim();
@@ -122,9 +174,36 @@ public class InviteCoOrganizerFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Invite an user to be a co-organizer
+     * kick the user out if he/she is in any list of the event
+     * @param profile
+     * the one who is invited to be the co-organizer
+     */
     private void inviteCoOrganizer(UserProfile profile){
         // check if entrants already in any list(wait , cancel, etc)
         // if no sending notification for invite
         // if yes, pop message like "already in list"
+        if (organizer.equals(profile.getProfileID()) ||
+                coOrganizer_List.contains(profile.getProfileID())) {
+            Toast.makeText(
+                    getContext(),
+                    "User is already organizer or co-organizer ",
+                    Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+        else {
+            coOrganizer_List.add(profile.getProfileID());
+            entrantList.removeEntrantListEntry(eventId, profile.getProfileID());
+            String fulll_name = profile.getFirstName() + " " + profile.getLastName();
+            Toast.makeText(
+                    getContext(),
+                    fulll_name +" is now a co-organizer",
+                    Toast.LENGTH_SHORT
+            ).show();
+            notification.notifyOrganizerInvite(profile.getProfileID(), eventId);
+            
+        }
     }
 }

@@ -54,6 +54,7 @@ dependencies {
     
     // QR Code dependancies - google based dependancies
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     // CameraX Dependencies
     val camerax_version = "1.5.3"
