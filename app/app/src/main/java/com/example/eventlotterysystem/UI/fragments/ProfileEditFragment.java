@@ -121,6 +121,12 @@ public class ProfileEditFragment extends Fragment {
 
             }
 
+            if (email.length() > 50){
+                isValid = false;
+                Toast myToast = Toast.makeText(getActivity(), "Email is too long",
+                        Toast.LENGTH_SHORT);
+                myToast.show();
+            }
             // update user information in firebase
             if (isValid){
                 manager.saveUser(userProfile);

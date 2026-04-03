@@ -7,8 +7,14 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.ProfileManager;
+import com.google.android.material.button.MaterialButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,14 +23,23 @@ import com.example.eventlotterysystem.R;
  */
 public class MyEventsNavigation extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String ARG_EVENT_ID = "eventId";
+
+    private String eventId;
+
+    private TextView eventTitle;
+    private ImageButton infoButton;
+    private TextView tabWaitlist;
+    private TextView tabInvites;
+    private TextView tabRegistered;
+    private TextView tabHistory;
+    private View indicatorWaitlist;
+    private View indicatorInvites;
+    private View indicatorRegistered;
+    private View indicatorHistory;
+    private MaterialButton buttonAll;
+
 
     public MyEventsNavigation() {
         // Required empty public constructor
@@ -34,16 +49,14 @@ public class MyEventsNavigation extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MyEventsNavigation.
+     * @param eventId The unique identifier for the event.
+     * @return A new instance of fragment OrganizerEventNavigationFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MyEventsNavigation newInstance(String param1, String param2) {
+    public static MyEventsNavigation newInstance(String eventId) {
         MyEventsNavigation fragment = new MyEventsNavigation();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_EVENT_ID, eventId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,8 +65,7 @@ public class MyEventsNavigation extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            eventId = getArguments().getString(ARG_EVENT_ID);
         }
     }
 
@@ -62,5 +74,101 @@ public class MyEventsNavigation extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_my_events_navigation, container, false);
+    }
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        eventTitle = view.findViewById(R.id.eventTitle);
+        infoButton = view.findViewById(R.id.infoButton);
+        tabWaitlist = view.findViewById(R.id.tabWaitlist);
+        tabInvites = view.findViewById(R.id.tabInvites);
+        tabRegistered = view.findViewById(R.id.tabRegistered);
+        tabHistory = view.findViewById(R.id.tabHistory);
+        indicatorWaitlist = view.findViewById(R.id.indicatorWaitlist);
+        indicatorInvites = view.findViewById(R.id.indicatorInvites);
+        indicatorRegistered = view.findViewById(R.id.indicatorRegistered);
+        indicatorHistory = view.findViewById(R.id.indicatorHistory);
+        MaterialButton buttonAll = view.findViewById(R.id.buttonAll);
+
+        if (infoButton != null) {
+            infoButton.setOnClickListener(v -> {
+                // placeholder
+            });
+        }
+
+        tabWaitlist.setOnClickListener(v -> showWaitlistTab());
+        tabInvites.setOnClickListener(v -> showInvitesTab());
+        tabRegistered.setOnClickListener(v -> showRegisteredTab());
+        tabHistory.setOnClickListener(v -> showHistoryTab());
+
+
+        showWaitlistTab();
+
+        if (buttonAll != null) {
+            buttonAll.setOnClickListener(v -> {
+                EventListFragment fragment = new EventListFragment();
+
+                requireActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            });
+        }
+
+        //NOTIFICATIONS!
+        ProfileManager manager = ProfileManager.getInstance();
+        view.findViewById(R.id.NotificationButton).setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("userId", manager.getUserID());
+
+            NotificationFragment notificationFragment = new NotificationFragment();
+            notificationFragment.setArguments(args);
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, notificationFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+    }
+
+    private void showWaitlistTab() {
+        indicatorWaitlist.setVisibility(View.VISIBLE);
+        indicatorInvites.setVisibility(View.INVISIBLE);
+        indicatorRegistered.setVisibility(View.INVISIBLE);
+        indicatorHistory.setVisibility(View.INVISIBLE);
+
+        ViewWaitListFragment fragment = new ViewWaitListFragment();
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+    }
+    private void showInvitesTab() {
+        indicatorWaitlist.setVisibility(View.INVISIBLE);
+        indicatorInvites.setVisibility(View.VISIBLE);
+        indicatorRegistered.setVisibility(View.INVISIBLE);
+        indicatorHistory.setVisibility(View.INVISIBLE);
+
+        AcceptEventInviteFragment fragment = new AcceptEventInviteFragment();
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+    }
+    private void showRegisteredTab(){
+        indicatorWaitlist.setVisibility(View.INVISIBLE);
+        indicatorInvites.setVisibility(View.INVISIBLE);
+        indicatorRegistered.setVisibility(View.VISIBLE);
+        indicatorHistory.setVisibility(View.INVISIBLE);
+
+        ViewRegisteredListFragment fragment = new ViewRegisteredListFragment();
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+    }
+    private void showHistoryTab(){
+        indicatorWaitlist.setVisibility(View.INVISIBLE);
+        indicatorInvites.setVisibility(View.INVISIBLE);
+        indicatorRegistered.setVisibility(View.INVISIBLE);
+        indicatorHistory.setVisibility(View.VISIBLE);
+
+        ViewHistoryListFragment fragment = new ViewHistoryListFragment();
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
     }
 }

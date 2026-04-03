@@ -1,28 +1,40 @@
 package com.example.eventlotterysystem.model;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Event implements Serializable {
     private String eventId;
-    private String title;           // was eventName
-    private String description;     // was eventDescription
+    private String title;
+    private String description;
     private int capacity;
     private long registrationStartDate;   // timestamp (milliseconds)
     private long registrationEndDate;     // timestamp
     private int waitingListCount;         // number of users on waiting list
+    private long date;
+    private String place;
+    private String privacy;              // For public/private
     // TODO: poster image URL
-    private String category;              // event category (e.g., Swimming, Dance)
+    private String category;
 
-    // Required no-arg constructor for Firestore
-    public Event() {}
+    // ✅ FIX: support multiple organizers
+    private String organizerId;
+    private List<String> co_organizerIds;
+
+    // Required no-arg constructor
+    public Event() {
+        this.co_organizerIds = new ArrayList<>();
+    }
 
     public Event(String eventId, String title, String description) {
         this.eventId = eventId;
         this.title = title;
         this.description = description;
+        this.co_organizerIds = new ArrayList<>();
     }
 
-    // Getters and setters
+    // Getters & setters
     public String getEventId() { return eventId; }
     public void setEventId(String eventId) { this.eventId = eventId; }
 
@@ -44,6 +56,47 @@ public class Event implements Serializable {
     public int getWaitingListCount() { return waitingListCount; }
     public void setWaitingListCount(int waitingListCount) { this.waitingListCount = waitingListCount; }
 
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public void setPrivacy(String privacy) {
+        this.privacy = privacy;
+    }
+
+    public String getPrivacy() {
+        return privacy;
+    }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    // ✅ NEW METHODS
+    public String getOrganizerId() { return organizerId; }
+
+    public void setOrganizerId(String Id) {
+        this.organizerId = Id;
+    }
+
+    public List<String> getCoOrganizerIds() { return co_organizerIds; }
+    public void setCoOrganizerIds(List<String> ids) { this.co_organizerIds = ids; }
+    
+    // Optional helper (clean filtering)
+    public boolean isOrganizer(String userId) {
+        if (userId == null) return false;
+        if (userId.equals(organizerId)) return true;
+        return co_organizerIds != null && co_organizerIds.contains(userId);
+    }
 }

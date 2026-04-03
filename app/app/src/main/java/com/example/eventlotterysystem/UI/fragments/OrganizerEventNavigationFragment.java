@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.model.Event;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +35,8 @@ public class OrganizerEventNavigationFragment extends Fragment {
     private View indicatorDetails;
     private View indicatorEntrants;
     private View indicatorMap;
+    private View commentsTab;
+    private View commentsIndicator;
 
     public OrganizerEventNavigationFragment() {
         // Required empty public constructor
@@ -45,7 +49,6 @@ public class OrganizerEventNavigationFragment extends Fragment {
      * @param eventId The unique identifier for the event.
      * @return A new instance of fragment OrganizerEventNavigationFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static OrganizerEventNavigationFragment newInstance(String eventId) {
         OrganizerEventNavigationFragment fragment = new OrganizerEventNavigationFragment();
         Bundle args = new Bundle();
@@ -71,6 +74,21 @@ public class OrganizerEventNavigationFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // For title of the event.
+        EventRepository eventRepository = new EventRepository();
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+            @Override
+            public void onEventLoaded(Event event) {
+                if (!isAdded()) return;
+                eventTitle.setText(event.getTitle());
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (!isAdded()) return;
+                eventTitle.setText("Unknown Event");
+            }
+        });
 
         eventTitle = view.findViewById(R.id.eventTitle);
         infoButton = view.findViewById(R.id.infoButton);
@@ -80,6 +98,10 @@ public class OrganizerEventNavigationFragment extends Fragment {
         indicatorDetails = view.findViewById(R.id.indicatorDetails);
         indicatorEntrants = view.findViewById(R.id.indicatorEntrants);
         indicatorMap = view.findViewById(R.id.indicatorMap);
+        // comments
+        commentsTab = view.findViewById(R.id.commentsTab);
+        commentsIndicator = view.findViewById(R.id.commentsIndicator);
+
         if (infoButton != null) {
             infoButton.setOnClickListener(v -> {
                 // placeholder
@@ -88,23 +110,17 @@ public class OrganizerEventNavigationFragment extends Fragment {
 
         tabDetails.setOnClickListener(v -> showDetailsTab());
         tabEntrants.setOnClickListener(v -> showEntrantsTab());
+        tabMap.setOnClickListener(v -> showMapsTab());
+        commentsTab.setOnClickListener(v -> showCommentsTab());
 
-        tabMap.setOnClickListener(v -> {
-            indicatorDetails.setVisibility(View.INVISIBLE);
-            indicatorEntrants.setVisibility(View.INVISIBLE);
-            indicatorMap.setVisibility(View.VISIBLE);
-
-            // Placeholder until map fragment is ready
-        });
-        if (savedInstanceState == null && eventId != null && !eventId.isEmpty()) {
-            showDetailsTab();
-        }
+        showDetailsTab();
     }
 
     private void showEntrantsTab() {
         indicatorDetails.setVisibility(View.INVISIBLE);
         indicatorEntrants.setVisibility(View.VISIBLE);
         indicatorMap.setVisibility(View.INVISIBLE);
+        commentsIndicator.setVisibility(View.INVISIBLE);
 
         OrganizerEventEntrantsFragment fragment = OrganizerEventEntrantsFragment.newInstance(eventId);
         getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
@@ -113,8 +129,30 @@ public class OrganizerEventNavigationFragment extends Fragment {
         indicatorDetails.setVisibility(View.VISIBLE);
         indicatorEntrants.setVisibility(View.INVISIBLE);
         indicatorMap.setVisibility(View.INVISIBLE);
+        commentsIndicator.setVisibility(View.INVISIBLE);
 
         OrganizerEventDetailsFragment fragment = OrganizerEventDetailsFragment.newInstance(eventId);
         getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+    }
+    private void showMapsTab(){
+        indicatorDetails.setVisibility(View.INVISIBLE);
+        indicatorEntrants.setVisibility(View.INVISIBLE);
+        indicatorMap.setVisibility(View.VISIBLE);
+        commentsIndicator.setVisibility(View.INVISIBLE);
+
+        OrganizerEventMapFragment fragment = OrganizerEventMapFragment.newInstance(eventId);
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+    }
+
+    public void showCommentsTab(){
+        // set the indicators visibility
+        commentsIndicator.setVisibility(View.VISIBLE);
+        indicatorDetails.setVisibility(View.INVISIBLE);
+        indicatorEntrants.setVisibility(View.INVISIBLE);
+        indicatorMap.setVisibility(View.INVISIBLE);
+        // navigate to the comments fragment
+        OrganizerCommentsFragment fragment = OrganizerCommentsFragment.newInstance(eventId);
+        getChildFragmentManager().beginTransaction().replace(R.id.eventInfoChildContainer, fragment).commit();
+
     }
 }

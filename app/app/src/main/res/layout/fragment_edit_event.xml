@@ -24,6 +24,14 @@
             android:textAlignment="center"
             android:textSize="20dp"></TextView>
 
+        <Switch
+            android:id="@+id/privacySwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/nav_blue"
+            android:text="Public"
+            android:checked="false"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,12 +53,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Place" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="(Date Format: dd/MM/yyyy HH:mm)"
-            android:textSize="20dp"></TextView>
 
         <TextView
             android:layout_width="wrap_content"

@@ -20,6 +20,7 @@ import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,6 +52,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
     //Firestore data for these variables
     private Button editEventButton;
     //Firestore data for these variables
+    private Button inviteCo_OrgButton;
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
@@ -126,6 +128,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
         valueStarttime = view.findViewById(R.id.valueStartTime);
         valueLocation = view.findViewById(R.id.valueLocation);
         eventPoster = view.findViewById(R.id.eventposter);
+        inviteCo_OrgButton = view.findViewById(R.id.inviteCoOrganizerButton);
         //infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         editEventButton = view.findViewById(R.id.editEventButton);
@@ -144,6 +147,15 @@ public class OrganizerEventDetailsFragment extends Fragment{
             entrantId = user.getUid();
         }
 
+        inviteCo_OrgButton.setOnClickListener(v -> {
+            Fragment fragment = InviteCoOrganizerFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
         editEventButton.setOnClickListener(v -> {
             Fragment fragment = EditEventFragment.newInstance(eventId);
             requireActivity()
@@ -161,27 +173,37 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             }
         });
-        // add a comment when the add button is pressed
-        addCommentButton.setOnClickListener(v -> {
-            String comment = writeCommentBox.getText().toString();
-            // input validation
-            boolean isValid = true;
-            if (comment.isEmpty()){
-                isValid = false;
-            }
-            // add the comment to firebase
-            if (isValid){
-                UserCommentManager commentManager = UserCommentManager.getInstance();
-                commentManager.addCommentToEvent(eventId, comment);
-                // clear the text box
-                writeCommentBox.setText("");
-                // send a comment posted message
-                Toast.makeText(getContext(), "Comment posted!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
-            }
-
-        });
+//        // add a comment when the add button is pressed
+//        addCommentButton.setOnClickListener(v -> {
+//            String comment = writeCommentBox.getText().toString();
+//            // input validation
+//            boolean isValid = true;
+//            if (comment.isEmpty()){
+//                isValid = false;
+//            }
+//            // add the comment to firebase
+//            if (isValid){
+//                UserCommentManager commentManager = UserCommentManager.getInstance();
+//                commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
+//                    @Override
+//                    public void onSuccess(DocumentReference docRef) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Exception e) {
+//
+//                    }
+//                });
+//                // clear the text box
+//                writeCommentBox.setText("");
+//                // send a comment posted message
+//                Toast.makeText(getContext(), "Comment posted!", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
+//            }
+//
+//        });
         /**
         // the lottery system info pop up (future implementation)
         infoButton.setOnClickListener(new View.OnClickListener() {
@@ -227,8 +249,10 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 valueRegistration.setText(regPeriod);
 
                 // These fields are not yet in the Event model
-                valueStarttime.setText("Not available");
-                valueLocation.setText("Not available");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String datetStr = sdf.format(new Date(event.getDate()));
+                valueStarttime.setText(datetStr);
+                valueLocation.setText(event.getPlace());
 
                 // Waitlist count is handled by refreshWaitlistCount()
             }

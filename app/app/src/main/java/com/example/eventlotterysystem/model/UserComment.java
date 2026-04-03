@@ -1,7 +1,7 @@
 package com.example.eventlotterysystem.model;
 
 
-import java.security.Timestamp;
+import com.google.firebase.Timestamp;
 
 public class UserComment {
     /**
@@ -11,20 +11,28 @@ public class UserComment {
     private Timestamp timestamp;
     private String userID;
     private String userName;
+    private String commentID;
+    private boolean isOrganizer;
 
     // empty constructor for firebase
     public UserComment() {
 
     }
 
-    public UserComment(String text) {
+    public UserComment(String text, String userID, String userName) {
         this.text = text;
-        this.timestamp = null;
-        this.userID = null;
-        this.userName = null;
+        this.userID = userID;
+        this.userName = userName;
     }
 
     // getters
+    public boolean getIsOrganizer(){
+        return isOrganizer;
+    }
+    public String getCommentID() {
+        return commentID;
+    }
+
     public String getText() {
         return text;
     }
@@ -42,8 +50,11 @@ public class UserComment {
     }
 
     // setters
+    public void setIsOrganizer(boolean isOrganizer){
+        this.isOrganizer = isOrganizer;
+    }
     public void setText(String text) {
-        this.text = this.text;
+        this.text = text;
     }
 
     public void setTimestamp(Timestamp timestamp) {
@@ -51,10 +62,14 @@ public class UserComment {
     }
 
     public void setUserID(String userID) {
-        this.userID= this.userID;
+        this.userID = userID;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setCommentID(String commentID) {
+        this.commentID = commentID;
     }
 }

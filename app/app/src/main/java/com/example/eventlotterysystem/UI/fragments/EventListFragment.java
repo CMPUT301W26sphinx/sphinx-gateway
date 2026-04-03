@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.EventAdapter;
 import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.Event;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -70,9 +71,6 @@ public class EventListFragment extends Fragment {
     /** Repository for event data */
     EventRepository repository;
 
-    /** Button to access create Event */
-    private Button createEventButton;
-
     /**
      * Inflates the fragment layout.
      *
@@ -114,16 +112,18 @@ public class EventListFragment extends Fragment {
         // Initialize repository
         repository = new EventRepository();
 
-        // Retrieve all events from Firestore
+        // Retrieve all events from Firestore 
         repository.getEvents(new EventRepository.EventCallback() {
             @Override
             public void onEventsLoaded(List<Event> events) {
                 allEvents.clear();
                 allCategories.clear();
                 for (Event event : events) {
-                    allEvents.add(event);
-                    if (event.getCategory() != null && !event.getCategory().isEmpty()) {
-                        allCategories.add(event.getCategory());
+                    if (!"Private".equals(event.getPrivacy())){
+                        allEvents.add(event);
+                        if (event.getCategory() != null && !event.getCategory().isEmpty()) {
+                            allCategories.add(event.getCategory());
+                        }
                     }
                 }
                 filteredEvents.clear();
@@ -145,25 +145,11 @@ public class EventListFragment extends Fragment {
         MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.toggleGroup);
         toggleGroup.check(R.id.buttonAll);
 
-        /**
-         * For creating new event
-         */
-        createEventButton = view.findViewById(R.id.createEventButton);
-        createEventButton.setOnClickListener(v -> {
-            Fragment fragment = CreateEventFragment.newInstance();
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit();
-        });
-
         // transition to the invited events fragment
         Button myEventsButton = view.findViewById(R.id.buttonMyEvents);
         myEventsButton.setOnClickListener(v -> {
             // Replace the current fragment with AcceptEventInviteFragment
-            AcceptEventInviteFragment fragment = new AcceptEventInviteFragment();
+            MyEventsNavigation fragment = new MyEventsNavigation();
 
             requireActivity()
                     .getSupportFragmentManager()
@@ -190,6 +176,22 @@ public class EventListFragment extends Fragment {
             }
         });
         toggleGroup.check(R.id.buttonAll);
+
+        //NOTIFICATIONS!
+        ProfileManager manager = ProfileManager.getInstance();
+        view.findViewById(R.id.NotificationButton).setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("userId", manager.getUserID());
+
+            NotificationFragment notificationFragment = new NotificationFragment();
+            notificationFragment.setArguments(args);
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, notificationFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
 
     /**

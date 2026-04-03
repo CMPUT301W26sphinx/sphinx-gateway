@@ -1,6 +1,10 @@
 package com.example.eventlotterysystem.UI.fragments;
 
+import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.Event;
+
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -12,16 +16,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.Switch;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.model.Event;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 public class CreateEventFragment extends Fragment {
@@ -31,6 +37,7 @@ public class CreateEventFragment extends Fragment {
 
     private Button saveButton;
     private Button backButton;
+    private Switch privacySwitch;
 
     public static CreateEventFragment newInstance() {
         CreateEventFragment fragment = new CreateEventFragment();
@@ -59,6 +66,9 @@ public class CreateEventFragment extends Fragment {
         db = FirebaseFirestore.getInstance(); // will replaced by the database of Event
 
         // Edit text
+        privacySwitch = view.findViewById(R.id.privacySwitch);
+        privacySwitch.setChecked(false);
+        privacySwitch.setText("Public");
         nameInput = view.findViewById(R.id.eventName);
         descInput = view.findViewById(R.id.eventDescription);
         timeInput = view.findViewById(R.id.eventTime);
@@ -68,6 +78,28 @@ public class CreateEventFragment extends Fragment {
         maxInput = view.findViewById(R.id.maxEntrants);
         saveButton = view.findViewById(R.id.saveEventButton);
         backButton = view.findViewById(R.id.backButton);
+
+        timeInput.setFocusable(false);
+        startRegInput.setFocusable(false);
+        endRegInput.setFocusable(false);
+
+        privacySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                privacySwitch.setText("Private");
+            } else {
+                privacySwitch.setText("Public");
+            }
+        });
+
+        timeInput.setOnClickListener(v ->
+                showDateTimePicker(timeInput)
+        );
+        startRegInput.setOnClickListener(v ->
+                showDateTimePicker(startRegInput)
+        );
+        endRegInput.setOnClickListener(v ->
+                showDateTimePicker(endRegInput)
+        );
 
         backButton.setOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
@@ -89,7 +121,40 @@ public class CreateEventFragment extends Fragment {
         return view;
     }
 
+    private void showDateTimePicker(EditText targetInput) {
+        final Calendar calendar = Calendar.getInstance();
 
+        DatePickerDialog datePicker = new DatePickerDialog(
+                getContext(),
+                (view, year, month, dayOfMonth) -> {
+
+                    calendar.set(Calendar.YEAR, year);
+                    calendar.set(Calendar.MONTH, month);
+                    calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                    TimePickerDialog timePicker = new TimePickerDialog(
+                            getContext(),
+                            (view1, hourOfDay, minute) -> {
+                                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                calendar.set(Calendar.MINUTE, minute);
+
+                                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                targetInput.setText(format.format(calendar.getTime()));
+                            },
+                            calendar.get(Calendar.HOUR_OF_DAY),
+                            calendar.get(Calendar.MINUTE),
+                            true
+                    );
+
+                    timePicker.show();
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        datePicker.show();
+    }
     /**
      * Checking all the information if they are good to upload to the database
      * @return  true if the formats are all correct and non-optional infomation are all filled
@@ -178,8 +243,11 @@ public class CreateEventFragment extends Fragment {
      * upload it to the database
      */
     private void createEvent() {
+        String privacy = privacySwitch.getText().toString().trim();
         String name = nameInput.getText().toString().trim();
         String description = descInput.getText().toString().trim();
+        String place = placeInput.getText().toString().trim();
+        String time = timeInput.getText().toString().trim();
         String start = startRegInput.getText().toString().trim();
         String end = endRegInput.getText().toString().trim();
 
@@ -189,15 +257,24 @@ public class CreateEventFragment extends Fragment {
         }
 
         Event event = new Event();
+        ProfileManager manager = ProfileManager.getInstance();
+        event.setOrganizerId(manager.getUserID());
+        event.setPrivacy(privacy);
         final String uuid = UUID.randomUUID().toString().replace("-", "");
         event.setEventId(uuid);
         event.setTitle(name);
         event.setDescription(description);
+        event.setPlace(place);
         event.setCapacity(maxEntrants);
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         try {
+            if (!time.isEmpty()) {
+                Date timeDate = formatter.parse(time);
+                event.setDate(timeDate.getTime());
+            }
+
             if (!start.isEmpty()) {
                 Date startDate = formatter.parse(start);
                 event.setRegistrationStartDate(startDate.getTime());
@@ -221,7 +298,8 @@ public class CreateEventFragment extends Fragment {
                     Toast.makeText(getContext(), "New Event: " + name + " is created", Toast.LENGTH_SHORT).show();
 
                     // direct to EventDetailsFragment after it is created
-                    EventDetailsFragment fragment = EventDetailsFragment.newInstance(documentReference.getId());
+                    OrganizerEventNavigationFragment fragment = OrganizerEventNavigationFragment.newInstance(documentReference.getId());
+
                     getParentFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, fragment)

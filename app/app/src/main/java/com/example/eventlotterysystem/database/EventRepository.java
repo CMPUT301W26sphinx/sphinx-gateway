@@ -84,18 +84,28 @@ public class EventRepository {
         String id = doc.getId();
         String title = doc.getString("title");
         String description = doc.getString("description");
+        String place = doc.getString("place");
+        Long date = doc.getLong("date");
         Long capacity = doc.getLong("capacity");
         Long registrationStartDate = doc.getLong("registrationStartDate");
         Long registrationEndDate = doc.getLong("registrationEndDate");
         Long waitingListCount = doc.getLong("waitingListCount");
         String category = doc.getString("category");   // new field
+        String privacy = doc.getString("privacy");
+        String organizerId = doc.getString("organizerId");
+        List<String> co_organizerIds = (List<String>) doc.get("co_organizerIds");
 
         Event event = new Event(id, title, description);
+        event.setPlace(place);
+        event.setOrganizerId(organizerId);
+        event.setPrivacy(privacy);
+        if (date != null) event.setDate(date);
         if (capacity != null) event.setCapacity(capacity.intValue());
         if (registrationStartDate != null) event.setRegistrationStartDate(registrationStartDate);
         if (registrationEndDate != null) event.setRegistrationEndDate(registrationEndDate);
         if (waitingListCount != null) event.setWaitingListCount(waitingListCount.intValue());
         if (category != null) event.setCategory(category);
+        if (co_organizerIds != null) event.setCoOrganizerIds(co_organizerIds);
         return event;
     }
 

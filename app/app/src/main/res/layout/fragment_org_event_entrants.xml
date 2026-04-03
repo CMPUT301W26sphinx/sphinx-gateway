@@ -29,6 +29,36 @@
                 android:layout_marginTop="8dp"
                 android:background="#CCCCCC" />
 
+            <!-- Lottery section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:weightSum="2">
+
+                <Button
+                    android:id="@+id/startLotteryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="Start Lottery"
+                    android:backgroundTint="@color/accept_green"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/endEventButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="End Event"
+                    android:backgroundTint="@color/decline_red"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
             <!-- Invite section -->
             <TextView
                 android:id="@+id/inviteTitle"
@@ -38,6 +68,14 @@
                 android:text="Invite new Entrants:"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+            <Button
+                android:id="@+id/inviteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Invite"
+                android:backgroundTint="@color/nav_blue"
+                android:textColor="@color/white"
+                />
 
             <TextView
                 android:id="@+id/sampleAmountLabel"
