@@ -3,6 +3,7 @@ package com.example.eventlotterysystem.UI.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.model.EntrantDisplay;
+import com.example.eventlotterysystem.model.EntrantListEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +53,13 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.ViewHold
         holder.emailText.setText(
                 entrant.getEmail() != null ? entrant.getEmail() : "No email"
         );
+        // Show cancel button only for invited entrants
+        if (entrant.getStatus() == EntrantListEntry.STATUS_INVITED) {
+            holder.cancelButton.setVisibility(View.VISIBLE);
+        } else {
+            holder.cancelButton.setVisibility(View.GONE);
+            holder.cancelButton.setOnClickListener(null);
+        }
     }
 
     @Override
@@ -65,12 +74,14 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.ViewHold
 
         TextView nameText;
         TextView emailText;
+        Button cancelButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             nameText = itemView.findViewById(R.id.profile_name);
             emailText = itemView.findViewById(R.id.profile_email);
+            cancelButton = itemView.findViewById(R.id.cancelEntrantButton);
         }
     }
 }
