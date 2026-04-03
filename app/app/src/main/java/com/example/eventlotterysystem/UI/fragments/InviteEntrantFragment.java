@@ -53,25 +53,7 @@
             InviteEntrantFragment fragment = new InviteEntrantFragment();
             Bundle args = new Bundle();
             args.putString(EVENT_ID, eventId);
-            //Privacy checker, really intensive but if it works :shrug:
-            EventRepository eventRepository = new EventRepository();
-            eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
-                @Override
-                public void onEventLoaded(Event event) {
-                    Bundle args = new Bundle();
-                    args.putString(EVENT_ID, eventId);
-                    args.putString("privacy", event.getPrivacy());
-                    fragment.setArguments(args);
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Bundle args = new Bundle();
-                    args.putString(EVENT_ID, eventId);
-                    args.putString("privacy", "public");
-                    fragment.setArguments(args);
-                }
-            });
+            fragment.setArguments(args);
             return fragment;
         }
 
@@ -87,8 +69,21 @@
             Bundle args = getArguments();
             if (args != null) {
                 eventId = args.getString(EVENT_ID);
-                privacy = args.getString("privacy", "public");
             }
+
+            // fetch privacy from event
+            EventRepository eventRepository = new EventRepository();
+            eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+                @Override
+                public void onEventLoaded(Event event) {
+                    privacy = event.getPrivacy() != null ? event.getPrivacy() : "Public";
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    privacy = "Public";
+                }
+            });
             profileManager = ProfileManager.getInstance();
             recyclerView = view.findViewById(R.id.entrantsRecyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
