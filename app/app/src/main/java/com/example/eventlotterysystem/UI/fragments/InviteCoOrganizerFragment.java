@@ -17,11 +17,20 @@ import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.fragments.admin.ProfileAdapter;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
+import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.ProfileManager;
+import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.model.Notification;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,6 +50,12 @@ public class InviteCoOrganizerFragment extends Fragment {
     private EditText phoneNum;
     private EditText email;
     private Button searchButton;
+    private Button backButton;
+    private List<String> coOrganizer_List;
+    private String organizer;
+    private final Notification notification = new Notification();
+    private final EventRepository eventRepository = new EventRepository();
+    private final EntrantListFirebase entrantList = new EntrantListFirebase();
 
     public InviteCoOrganizerFragment() {}
 
@@ -74,14 +89,24 @@ public class InviteCoOrganizerFragment extends Fragment {
         phoneNum = view.findViewById(R.id.phoneNum);
         email = view.findViewById(R.id.email);
         searchButton = view.findViewById(R.id.search_button);
+        backButton = view.findViewById(R.id.backButton);
 
         loadProfiles();
+        loadEvent();
+
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
         searchButton.setOnClickListener(v -> {
             searchProfiles.clear();
             search();
         });
 
     }
+    /**
+     * loading all the user porfile from the database
+     */
     private void loadProfiles() {
         profileManager.getAllUsers(new ProfileManager.AllUsersCallback() {
             @Override
@@ -102,6 +127,35 @@ public class InviteCoOrganizerFragment extends Fragment {
         });
     }
 
+    /**
+     * Loading the event from database
+     * Aim to getting the organizer's Id and co-organizers' Id
+     */
+    private void loadEvent() {
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+
+            @Override
+            public void onEventLoaded(Event event) {
+                if (!isAdded()) return;
+                organizer = event.getOrganizerId();
+                coOrganizer_List = event.getCoOrganizerIds();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (!isAdded()) return;
+
+                Toast.makeText(
+                        getContext(),
+                        "Failed to load event: " + e.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+    }
+    /**
+     * Search users base on given name, phone number and email
+     */
     private void search() {
         String target_nameStr = name.getText().toString().trim().toLowerCase();
         String target_phoneNumStr = phoneNum.getText().toString().trim();
@@ -122,9 +176,46 @@ public class InviteCoOrganizerFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    private void inviteCoOrganizer(UserProfile profile){
-        // check if entrants already in any list(wait , cancel, etc)
-        // if no sending notification for invite
-        // if yes, pop message like "already in list"
+    private void inviteCoOrganizer(UserProfile profile) {
+        if (eventId == null) {
+            Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String entrantId = profile.getProfileID();
+        EventRepository eventRepository = new EventRepository();
+        EntrantListFirebase entrantList = new EntrantListFirebase();
+        Notification notification = new Notification();
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+            @Override
+            public void onEventLoaded(Event event) {
+                List<String> coOrganizerIds  = event.getCoOrganizerIds();
+                if (coOrganizerIds != null && coOrganizerIds.contains(entrantId)) {
+                    Toast.makeText(requireContext(),
+                            profile.getFirstName() + " is already a coorganizer ",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    coOrganizerIds.add(entrantId);
+                    entrantList.removeEntrantListEntry(eventId, entrantId);
+
+                    FirebaseFirestore.getInstance()
+                            .collection("events")
+                            .document(eventId)
+                            .update("coOrganizerIds", FieldValue.arrayUnion(entrantId))
+                            .addOnSuccessListener(unused -> {
+                                notification.notifyOrganizerInvite(entrantId, eventId);
+                                Toast.makeText(requireContext(),
+                                        profile.getFirstName() + " has been invited as a co-organizer.",
+                                        Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(requireContext(), "Failed to add co-organizer", Toast.LENGTH_SHORT).show()
+                            );
+                }
+            }
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

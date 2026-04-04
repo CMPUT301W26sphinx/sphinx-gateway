@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.app.AlertDialog;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.NotificationAdapter;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.NotificationSystem;
+import com.example.eventlotterysystem.model.EntrantListEntry;
 
 import java.util.ArrayList;
 /** Notification Fragment.
@@ -29,6 +32,7 @@ public class NotificationFragment extends Fragment {
     private NotificationAdapter adapter;
     private TextView subtitle;
     private NotificationSystem notificationSystem;
+    private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
     private String userId;
 
     @Nullable
@@ -107,20 +111,56 @@ public class NotificationFragment extends Fragment {
         String message  = parts.length > 0 ? parts[0] : raw;
         String eventId  = parts.length > 1 ? parts[1] : null;
         String sender   = parts.length > 2 ? parts[2] : "Notification";
+        boolean isAsk  = parts.length > 3 && parts[3].equals("ask");
 
+        if (isAsk) {
+            showAskDialog(message, eventId, sender);
+        } else {
+            showStandardDialog(message, eventId, sender);
+        }
+    }
+    private void showStandardDialog(String message, String eventId, String sender){
         new AlertDialog.Builder(requireContext())
                 .setTitle(sender)
                 .setMessage(message)
                 .setPositiveButton("See More", (dialog, which) -> {
                     dialog.dismiss();
-                    EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventId);
-                    requireActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, fragment)
-                            .addToBackStack(null)
-                            .commit();
+                    navigateToEvent(eventId);
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
+    private void showAskDialog(String message, String eventId, String sender){
+        new AlertDialog.Builder(requireContext())
+                .setTitle(sender)
+                .setMessage(message)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    dialog.dismiss();
+                    entrantListFirebase.getEntry(eventId, userId).addOnSuccessListener(entry -> {
+                        if (entry == null) {
+                            EntrantListEntry newEntry = new EntrantListEntry(eventId, userId, EntrantListEntry.STATUS_WAITLIST);
+                            entrantListFirebase.upsertEntry(eventId, newEntry).addOnSuccessListener(unused -> {
+                                Toast.makeText(getContext(), "Joined waiting list. Welcome to the private event!", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    });
+                    navigateToEvent(eventId);
+                })
+                .setNeutralButton("See More", (dialog, which) -> {
+                    dialog.dismiss();
+                    navigateToEvent(eventId);
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+    private void navigateToEvent(String eventId) {
+        if (eventId == null) return;
+        EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventId);
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+        }
 }

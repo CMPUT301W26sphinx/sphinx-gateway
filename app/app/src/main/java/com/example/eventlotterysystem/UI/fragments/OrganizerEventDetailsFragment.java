@@ -1,5 +1,7 @@
 package com.example.eventlotterysystem.UI.fragments;
 
+import android.app.AlertDialog;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,8 @@ import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.zxing.BarcodeFormat;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,6 +57,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
     private Button editEventButton;
     //Firestore data for these variables
     private Button inviteCo_OrgButton;
+    private Button qrButton;
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
@@ -134,6 +139,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
         editEventButton = view.findViewById(R.id.editEventButton);
         addCommentButton = view.findViewById(R.id.add_comment_button);
         writeCommentBox = view.findViewById(R.id.write_comment_box);
+        qrButton = view.findViewById(R.id.generateQrButton);
 
         // get the id
         Bundle args = getArguments();
@@ -164,6 +170,27 @@ public class OrganizerEventDetailsFragment extends Fragment{
                     .replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commit();
+        });
+
+        qrButton.setOnClickListener(v -> {
+            try {
+                String url = eventId;
+
+                BarcodeEncoder encoder = new BarcodeEncoder();
+                Bitmap bitmap = encoder.encodeBitmap(url, BarcodeFormat.QR_CODE, 400, 400);
+                ImageView imageView = new ImageView(getContext());
+                imageView.setImageBitmap(bitmap);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("QR Code");
+                builder.setView(imageView);
+                builder.setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+
+                builder.show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         });
 
         backButton.setOnClickListener(new View.OnClickListener() {

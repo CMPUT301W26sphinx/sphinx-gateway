@@ -92,7 +92,9 @@ public class Event implements Serializable {
 
     public List<String> getCoOrganizerIds() { return co_organizerIds; }
     public void setCoOrganizerIds(List<String> ids) { this.co_organizerIds = ids; }
-    
+    public void addCoOrganizer(String Id) {
+        this.co_organizerIds.add(Id);
+    }
     // Optional helper (clean filtering)
     public boolean isOrganizer(String userId) {
         if (userId == null) return false;
