@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.fragments.admin.ProfileAdapter;
+import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.Event;
@@ -182,6 +183,7 @@ public class InviteCoOrganizerFragment extends Fragment {
         }
         String entrantId = profile.getProfileID();
         EventRepository eventRepository = new EventRepository();
+        EntrantListFirebase entrantList = new EntrantListFirebase();
         Notification notification = new Notification();
         eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
             @Override
@@ -193,6 +195,8 @@ public class InviteCoOrganizerFragment extends Fragment {
                             Toast.LENGTH_SHORT).show();
                 } else {
                     coOrganizerIds.add(entrantId);
+                    entrantList.removeEntrantListEntry(eventId, entrantId);
+
                     FirebaseFirestore.getInstance()
                             .collection("events")
                             .document(eventId)
