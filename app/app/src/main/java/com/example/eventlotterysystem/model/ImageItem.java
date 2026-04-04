@@ -3,21 +3,20 @@ package com.example.eventlotterysystem.model;
 import java.io.Serializable;
 
 public class ImageItem implements Serializable {
-    private String id;           // Firestore document ID (event ID or image ID)
-    private String title;         // event name or image title
-    private String description;   // event description or image caption
-    private String imageUrl;      // placeholder URL or actual image URL
-    private String uploaderName;  // e.g., "System" or uploader's name
+    private String id;
+    private String title;
+    private String description;
+    private String imageUrl;
+    private String uploaderName;
+    private String imageData;
 
-    // Required no-arg constructor for Firestore (if used later)
-    public ImageItem() {}
-
-    public ImageItem(String id, String title, String description, String imageUrl, String uploaderName) {
+    public ImageItem(String id, String title, String description, String imageUrl, String uploaderName, String imageData) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.imageUrl = imageUrl;
         this.uploaderName = uploaderName;
+        this.imageData = imageData;
     }
 
     // Getters and setters
@@ -35,4 +34,7 @@ public class ImageItem implements Serializable {
 
     public String getUploaderName() { return uploaderName; }
     public void setUploaderName(String uploaderName) { this.uploaderName = uploaderName; }
+
+    public String getImageData() { return imageData; }
+    public void setImageData(String imageData) { this.imageData = imageData; }
 }
