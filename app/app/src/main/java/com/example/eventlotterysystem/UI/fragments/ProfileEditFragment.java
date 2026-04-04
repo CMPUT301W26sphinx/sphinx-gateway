@@ -85,7 +85,7 @@ public class ProfileEditFragment extends Fragment {
 
             // update fields
             if (email.contains("@") && email.endsWith(".com")){
-                userProfile.setUserEmail(email);
+                userProfile.setEmail(email);
             } else {
                 Toast myToast = Toast.makeText(getActivity(), "Invalid email format",
                         Toast.LENGTH_SHORT);
@@ -94,7 +94,7 @@ public class ProfileEditFragment extends Fragment {
             }
 
             if (phoneNumber.matches("\\d{3}-\\d{3}\\-\\d{4}") || phoneNumber.isEmpty()){
-                userProfile.setUserPhoneNumber(phoneNumber);
+                userProfile.setPhoneNumber(phoneNumber);
             } else {
                 Toast myToast = Toast.makeText(getActivity(), "Invalid phone number format",
                         Toast.LENGTH_SHORT);

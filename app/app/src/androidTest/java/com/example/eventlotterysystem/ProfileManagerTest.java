@@ -75,6 +75,7 @@ public class ProfileManagerTest {
         manager.saveUser(user, new ProfileManager.OnUserAddedCallback() {
             @Override
             public void onSuccess(Void snapshot) {
+
                 // retrieve information
                 manager.getUserProfile(new ProfileManager.UserProfileCallBack() {
                     @Override
@@ -83,13 +84,40 @@ public class ProfileManagerTest {
                         assertEquals("User", user.getLastName());
                         assertEquals("testUser@gmail.com", user.getEmail());
                         assertEquals("123-456-7890", user.getPhoneNumber());
-                        latch.countDown();
+
+                        // delete
+                        final String uid = manager.getUserID();
+                        manager.deleteUser(uid, new ProfileManager.OnDeleteListener() {
+                            @Override
+                            public void onSuccess() {
+                                // verify delete
+                                manager.getUserProfile(new ProfileManager.UserProfileCallBack() {
+                                    @Override
+                                    public void onComplete(UserProfile user) {
+                                        fail("Failed to delete profile");
+                                        latch.countDown();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // expected
+                                        latch.countDown();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                fail("Delete profile: " + e.getMessage());
+                                latch.countDown();
+                            }
+                        });
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        latch.countDown();
                         fail("Failed to get profile: " + e.getMessage());
+                        latch.countDown();
                     }
                 });
 
@@ -97,44 +125,69 @@ public class ProfileManagerTest {
 
             @Override
             public void onFailure(Exception e) {
-                latch.countDown();
                 fail("Failed to add profile: " + e.getMessage());
-            }
-        });
-
-        // delete profile
-        final String uid = manager.getUserID();
-        manager.deleteUser(uid, new ProfileManager.OnDeleteListener() {
-            @Override
-            public void onSuccess() {
-                // verify delete
-                manager.getUserProfile(new ProfileManager.UserProfileCallBack() {
-                    @Override
-                    public void onComplete(UserProfile user) {
-                        latch.countDown();
-                        fail("Failed to delete profile");
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        latch.countDown();
-                    }
-                });
                 latch.countDown();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                latch.countDown();
-                fail("Delete profile: " + e.getMessage());
             }
         });
 
         assertTrue("Timed out waiting for add profile", latch.await(10, TimeUnit.SECONDS));
-
     }
 
-    // TODO: implement test for getUserProfileByID and getAllUsers
+    @Test
+    public void testGetUserProfileByID() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        String uid = "uid" + System.currentTimeMillis();
+        ProfileManager manager = ProfileManager.getInstance();
+
+        UserProfile user = new UserProfile("Test", "User", "testUser@gmail.com", "123-456-7890");
+        user.setUserID(uid);
+
+        manager.saveUser(user, new ProfileManager.OnUserAddedCallback() {
+            @Override
+            public void onSuccess(Void snapshot) {
+
+                // verify user exists
+                manager.getUserProfileById(uid, new ProfileManager.UserProfileCallBack() {
+                    @Override
+                    public void onComplete(UserProfile user) {
+
+                        // delete after confirming save
+                        manager.deleteUser(uid, new ProfileManager.OnDeleteListener() {
+                            @Override
+                            public void onSuccess() {
+
+                                // verify deletion
+                                manager.getUserProfileById(uid, new ProfileManager.UserProfileCallBack() {
+                                    @Override
+                                    public void onComplete(UserProfile user) {
+                                        latch.countDown();
+
+                                        if (user != null) {
+                                            fail("User was not deleted");
+                                        }
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                latch.countDown();
+                                fail("Delete failed: " + e.getMessage());
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                latch.countDown();
+                fail("Could not save user: " + e.getMessage());
+            }
+        });
+
+        assertTrue("Timed out waiting for test", latch.await(10, TimeUnit.SECONDS));
+    }
 
 
 }

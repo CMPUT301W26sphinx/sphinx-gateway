@@ -87,6 +87,8 @@ public class ProfileManager {
             if (document.exists()) {
                 UserProfile userProfile = document.toObject(UserProfile.class);
                 callback.onComplete(userProfile);
+            } else {
+                callback.onFailure(new Exception("User not found"));
             }
         }).addOnFailureListener(callback::onFailure);
     }
