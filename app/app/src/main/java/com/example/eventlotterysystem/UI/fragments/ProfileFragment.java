@@ -23,6 +23,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.util.Objects;
+
 public class ProfileFragment extends Fragment {
     /**
      * Provides a brief overview of available users functions, such as: edit profile, accept invitation, delete account
@@ -135,7 +137,6 @@ public class ProfileFragment extends Fragment {
                     .get()
                     .addOnSuccessListener(allEvents -> {
                         final int[] pendingTasks = {allEvents.size()};
-
                         if (allEvents.isEmpty()) {
                             // No events, commit batch and delete user
                             commitBatchAndDeleteUser(batch, db, userId);
@@ -144,10 +145,10 @@ public class ProfileFragment extends Fragment {
                 for (DocumentSnapshot eventDoc : allEvents) {
                     eventDoc.getReference()
                             .collection("EntrantList")
-                            .whereEqualTo("userId", userId)
+                            .document(userId)
                             .get()
-                            .addOnSuccessListener(entrantDocs -> {
-                                for (DocumentSnapshot entrantDoc : entrantDocs) {
+                            .addOnSuccessListener(entrantDoc -> {
+                                if (entrantDoc.exists()) {
                                     batch.delete(entrantDoc.getReference());
                                 }
                                 pendingTasks[0]--;
@@ -176,7 +177,7 @@ public class ProfileFragment extends Fragment {
         batch.delete(db.collection("users").document(userId));
         batch.commit()
                 .addOnSuccessListener(aVoid -> {
-                    FirebaseAuth.getInstance().getCurrentUser().delete()
+                    Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).delete()
                             .addOnSuccessListener(authVoid -> {
                                 Toast.makeText(getContext(), "Profile deleted.", Toast.LENGTH_SHORT).show();
                                 requireActivity().finishAffinity();
