@@ -27,6 +27,7 @@ public class UserCommentManagerTest {
     private static final String EVENT_ID = "Gh3IHAczlecQ4oMOj8t2";
     private static final String TEST_COMMENT = "TEST_comment_" + System.currentTimeMillis();
 
+
     @Before
     public void setUp() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
@@ -82,6 +83,7 @@ public class UserCommentManagerTest {
 
             @Override
             public void onSuccess(Void unused) {
+                // verify it was added
                 manager.getCommentsFromEvent(EVENT_ID, new UserCommentManager.UserCommentCallback() {
                     @Override
                     public void onCommentLoaded(List<UserComment> comments) {
@@ -109,6 +111,84 @@ public class UserCommentManagerTest {
             }
         });
 
+
         assertTrue("Timed out waiting for comment test", latch.await(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void testDeleteCommentFromEvent() throws InterruptedException {
+        UserCommentManager manager = UserCommentManager.getInstance();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        manager.addCommentToEvent(EVENT_ID, TEST_COMMENT, false, new UserCommentManager.OnCommentAddedListener() {
+            @Override
+            public void onFailure(Exception e) {
+                latch.countDown();
+                fail("Failed to add comment: " + e.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void unused) {
+                manager.getCommentsFromEvent(EVENT_ID, new UserCommentManager.UserCommentCallback() {
+                    @Override
+                    public void onCommentLoaded(List<UserComment> comments) {
+                        String commentId = null;
+
+                        for (UserComment comment : comments) {
+                            if (TEST_COMMENT.equals(comment.getText())) {
+                                commentId = comment.getCommentID();
+                                break;
+                            }
+                        }
+
+                        if (commentId == null) {
+                            latch.countDown();
+                            fail("Comment not found after add");
+                            return;
+                        }
+
+                        manager.deleteComment(EVENT_ID, commentId, new UserCommentManager.OnCommentDeletedListener() {
+                            @Override
+                            public void onFailure(Exception e) {
+                                latch.countDown();
+                                fail("Could not delete comment: " + e.getMessage());
+                            }
+
+                            @Override
+                            public void onSuccess(Void unused) {
+                                manager.getCommentsFromEvent(EVENT_ID, new UserCommentManager.UserCommentCallback() {
+                                    @Override
+                                    public void onCommentLoaded(List<UserComment> commentsAfterDelete) {
+                                        for (UserComment comment : commentsAfterDelete) {
+                                            if (TEST_COMMENT.equals(comment.getText())) {
+                                                latch.countDown();
+                                                fail("Comment was still found after deletion");
+                                                return;
+                                            }
+                                        }
+
+                                        latch.countDown();
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        latch.countDown();
+                                        fail("Fetching comments failed: " + e.getMessage());
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        latch.countDown();
+                        fail("Fetching comments failed: " + e.getMessage());
+                    }
+                });
+            }
+        });
+
+        assertTrue("Timed out waiting for delete test", latch.await(10, TimeUnit.SECONDS));
     }
 }

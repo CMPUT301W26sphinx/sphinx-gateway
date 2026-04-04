@@ -23,9 +23,12 @@ public class UserProfile implements Serializable {
 
     }
 
-//    public UserProfile(String userID) {
-//        this.userID = userID;
-//    }
+    public UserProfile(String firstName, String lastName, String email, String phoneNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
 
     // Setters
 
