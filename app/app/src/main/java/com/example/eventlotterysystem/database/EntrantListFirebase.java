@@ -18,8 +18,16 @@ public class EntrantListFirebase {
     // See https://firebase.google.com/docs/firestore/quickstart#java
     // and https://firebase.google.com/docs/reference/android/com/google/firebase/ml/common/modeldownload/FirebaseModelManager
     // For documentation referenced for this implementation
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db;
 
+    public EntrantListFirebase() {
+        // safer and make testing easier, shouldn't break anything (see test file)
+        this(FirebaseFirestore.getInstance());
+    }
+
+    EntrantListFirebase(FirebaseFirestore db) {
+        this.db = db;
+    }
     /**
      * This method is used to get the reference to the entrantlistRef for an event in the firestore db.
      * @param eventId

@@ -18,7 +18,9 @@ import java.util.List;
 /**
  * Unit tests for EntrantListFirebase using Mockito.
  *
- * Now uses constructor injection instead of reflection.
+ * Generated tests with help from Chatgpt
+ * "How do I use mocks in JUnit tests for Firebase Firestore?"
+ *
  */
 public class EntrantListFirebaseTest {
 
