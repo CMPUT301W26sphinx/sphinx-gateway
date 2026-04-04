@@ -166,17 +166,32 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         startLotteryButton.setOnClickListener(v -> {
             String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
             if (eventId == null) return;
+            boolean isRedraw = startLotteryButton.getText().toString().equalsIgnoreCase("Redraw Lottery");
+            if (isRedraw){
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Redraw Lottery")
+                        .setMessage("This will redraw up to full capacity. Continue?")
+                        .setPositiveButton("Redraw!", (dialog, which) -> {
+                            lotterySystem.redrawLottery(eventId);
+                            Toast.makeText(requireContext(), "Lottery started!", Toast.LENGTH_SHORT).show();
+                            loadEntrants(eventId);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
 
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Start Lottery")
-                    .setMessage("This will run the lottery up to full capacity and notify all losers. Continue?")
-                    .setPositiveButton("Start", (dialog, which) -> {
-                        lotterySystem.firstLottery(eventId);
-                        Toast.makeText(requireContext(), "Lottery started!", Toast.LENGTH_SHORT).show();
-                        loadEntrants(eventId);
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+            }
+            else{
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Start Lottery")
+                        .setMessage("This will run the lottery up to full capacity and notify all losers. Continue?")
+                        .setPositiveButton("Start", (dialog, which) -> {
+                            lotterySystem.firstLottery(eventId);
+                            Toast.makeText(requireContext(), "Lottery started!", Toast.LENGTH_SHORT).show();
+                            loadEntrants(eventId);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
         });
 
         sampleButton.setOnClickListener(v -> {
@@ -341,6 +356,16 @@ public class OrganizerEventEntrantsFragment extends Fragment {
                                 selectedAdapter.setEntrants(selected);
                                 enrolledAdapter.setEntrants(enrolled);
                                 cancelledAdapter.setEntrants(cancelled);
+
+                                //Changes button text based on what the lottery is doing.
+                                //I would like to have it so we had seperate "cancelled" but we didnt have this foresight
+                                //This means that anyone who 'deregisters' from the event will cause start lottery
+                                //- bryan j
+                                if (!cancelled.isEmpty() && !waitlist.isEmpty()) {
+                                    startLotteryButton.setText("Redraw Lottery");
+                                } else {
+                                    startLotteryButton.setText("Start Lottery");
+                                }
                             }
                         });
                     }
