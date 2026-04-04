@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,9 +41,7 @@ public class EventComments extends Fragment {
     private final UserCommentManager commentManager = UserCommentManager.getInstance();
     private ListenerRegistration commentListener;
 
-    public EventComments() {
-
-    }
+    public EventComments() {}
 
     public static EventComments newInstance(String eventId) {
         EventComments fragment = new EventComments();
@@ -76,9 +73,7 @@ public class EventComments extends Fragment {
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
 
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(commentList, false, listener -> {
-            // do nothing
-        });
+        commentAdapter = new CommentAdapter(commentList, false, listener -> { /* no delete for entrants */ });
 
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentRecyclerView.setAdapter(commentAdapter);
@@ -94,11 +89,7 @@ public class EventComments extends Fragment {
         addComment();
 
         Button backButton = view.findViewById(R.id.comment_back_button);
-
-        backButton.setOnClickListener(v -> {
-            requireActivity().getOnBackPressedDispatcher().onBackPressed();
-        });
-
+        backButton.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
     }
 
     private void initializeCommentList() {
@@ -106,7 +97,6 @@ public class EventComments extends Fragment {
             @Override
             public void onCommentLoaded(List<UserComment> comments) {
                 if (!isAdded()) return;
-
                 commentList.clear();
                 commentList.addAll(comments);
                 commentAdapter.notifyDataSetChanged();
@@ -125,7 +115,6 @@ public class EventComments extends Fragment {
             @Override
             public void onCommentLoaded(List<UserComment> comments) {
                 if (!isAdded()) return;
-
                 commentList.clear();
                 commentList.addAll(comments);
                 commentAdapter.notifyDataSetChanged();
@@ -142,25 +131,23 @@ public class EventComments extends Fragment {
     private void addComment() {
         addCommentButton.setOnClickListener(v -> {
             String comment = writeCommentBox.getText().toString().trim();
-
             if (TextUtils.isEmpty(comment)) {
                 Toast.makeText(getContext(), "Enter a comment", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            commentManager.addCommentToEvent(eventId, comment, false ,new UserCommentManager.OnCommentAddedListener() {
-
+            commentManager.addCommentToEvent(eventId, comment, false, new UserCommentManager.OnCommentAddedListener() {
+                @Override
+                public void onSuccess(DocumentReference docRef) {
+                    if (!isAdded()) return;
+                    writeCommentBox.setText("");
+                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
+                }
 
                 @Override
                 public void onFailure(Exception e) {
                     if (!isAdded()) return;
                     Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onSuccess(Void unused) {
-                    writeCommentBox.setText("");
-                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
                 }
             });
         });

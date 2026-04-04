@@ -31,26 +31,12 @@ public class OrganizerCommentsFragment extends Fragment {
     private String eventId;
     private Button addCommentButton;
     private RecyclerView commentRecyclerView;
-    private ArrayList commentList;
+    private ArrayList<UserComment> commentList;
     private CommentAdapter commentAdapter;
     private final UserCommentManager commentManager = UserCommentManager.getInstance();
     private ListenerRegistration commentListener;
 
-
-    /**
-     * Create Event Details fragment for specific event with eventId
-     *
-     * @param eventId The unique identifier for the event
-     * @return fragment
-     * A new instance of EventDetailsFragment
-     */
     public static OrganizerCommentsFragment newInstance(String eventId) {
-        /*
-         Author: RobinHood https://stackoverflow.com/users/646806/robinhood
-         Title: "How can I transfer data from one fragment to another fragment android"
-         Answer: https://stackoverflow.com/a/19333288
-         Date: Oct 12, 2013
-         */
         OrganizerCommentsFragment fragment = new OrganizerCommentsFragment();
         Bundle args = new Bundle();
         args.putString(EVENT_ID, eventId);
@@ -73,7 +59,6 @@ public class OrganizerCommentsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.view_user_comments, container, false);
     }
 
@@ -81,7 +66,6 @@ public class OrganizerCommentsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // initialize recycler view
         writeCommentBox = view.findViewById(R.id.write_comment_box);
         addCommentButton = view.findViewById(R.id.add_comment_button);
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
@@ -90,13 +74,17 @@ public class OrganizerCommentsFragment extends Fragment {
         commentAdapter = new CommentAdapter(commentList, true, commentID -> {
             commentManager.deleteComment(eventId, commentID, new UserCommentManager.OnCommentDeletedListener() {
                 @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getContext(), "Comment could not be deleted", Toast.LENGTH_SHORT).show();
+                public void onSuccess() {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override
-                public void onSuccess(Void unused) {
-                    Toast.makeText(getContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
+                public void onFailure(Exception e) {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Comment could not be deleted", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         });
@@ -104,21 +92,16 @@ public class OrganizerCommentsFragment extends Fragment {
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentRecyclerView.setAdapter(commentAdapter);
 
-        // populate recycler
         initializeCommentList();
         updateComments();
         addComment();
-
-
     }
-
 
     private void initializeCommentList() {
         commentManager.getCommentsFromEvent(eventId, new UserCommentManager.UserCommentCallback() {
             @Override
             public void onCommentLoaded(List<UserComment> comments) {
                 if (!isAdded()) return;
-
                 commentList.clear();
                 commentList.addAll(comments);
                 commentAdapter.notifyDataSetChanged();
@@ -137,7 +120,6 @@ public class OrganizerCommentsFragment extends Fragment {
             @Override
             public void onCommentLoaded(List<UserComment> comments) {
                 if (!isAdded()) return;
-
                 commentList.clear();
                 commentList.addAll(comments);
                 commentAdapter.notifyDataSetChanged();
@@ -154,27 +136,33 @@ public class OrganizerCommentsFragment extends Fragment {
     private void addComment() {
         addCommentButton.setOnClickListener(v -> {
             String comment = writeCommentBox.getText().toString().trim();
-
             if (TextUtils.isEmpty(comment)) {
                 Toast.makeText(getContext(), "Enter a comment", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             commentManager.addCommentToEvent(eventId, comment, true, new UserCommentManager.OnCommentAddedListener() {
-
+                @Override
+                public void onSuccess(DocumentReference docRef) {
+                    if (!isAdded()) return;
+                    writeCommentBox.setText("");
+                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
+                }
 
                 @Override
                 public void onFailure(Exception e) {
                     if (!isAdded()) return;
                     Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-
-                @Override
-                public void onSuccess(Void unused) {
-                    writeCommentBox.setText("");
-                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
-                }
             });
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (commentListener != null) {
+            commentListener.remove();
+        }
     }
 }
