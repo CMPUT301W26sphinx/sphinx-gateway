@@ -298,7 +298,8 @@ public class CreateEventFragment extends Fragment {
                     Toast.makeText(getContext(), "New Event: " + name + " is created", Toast.LENGTH_SHORT).show();
 
                     // direct to EventDetailsFragment after it is created
-                    EventDetailsFragment fragment = EventDetailsFragment.newInstance(documentReference.getId());
+                    OrganizerEventNavigationFragment fragment = OrganizerEventNavigationFragment.newInstance(documentReference.getId());
+
                     getParentFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, fragment)

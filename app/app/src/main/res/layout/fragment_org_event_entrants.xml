@@ -68,6 +68,14 @@
                 android:text="Invite new Entrants:"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+            <Button
+                android:id="@+id/inviteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Invite"
+                android:backgroundTint="@color/nav_blue"
+                android:textColor="@color/white"
+                />
 
             <TextView
                 android:id="@+id/sampleAmountLabel"

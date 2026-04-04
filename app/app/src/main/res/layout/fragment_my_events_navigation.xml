@@ -26,6 +26,21 @@
 
         android:layout_marginTop="32dp"/>
 
+    <!-- Notification -->
+    <ImageButton
+        android:id="@+id/NotificationButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="2dp"
+        android:layout_marginEnd="50dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/notification_circle"
+        app:layout_constraintBottom_toBottomOf="@+id/text_heading"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_heading" />
+
     <!-- Subtitle -->
 
     <TextView
