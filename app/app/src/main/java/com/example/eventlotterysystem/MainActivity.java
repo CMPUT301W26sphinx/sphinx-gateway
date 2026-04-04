@@ -57,6 +57,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        userSignIn();
+
+    }
+
+    /**
+     * Signs the user in and creates their profile in firebase
+     */
+    public void userSignIn(){
         // loads database and auth for firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -95,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     /**
      * Creates the bottom navigation
      */
