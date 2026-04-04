@@ -2,10 +2,10 @@ package com.example.eventlotterysystem.UI.activities.admin;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.widget.Toast;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -82,7 +82,7 @@ public class AdminEventCommentsActivity extends AppCompatActivity {
         Button deleteButton = dialogView.findViewById(R.id.dialog_delete);
 
         userView.setText(comment.getUserName() != null ? comment.getUserName() : "Unknown");
-        organizerView.setText(comment.isOrganizer() ? "Yes" : "No");
+        organizerView.setText(comment.getIsOrganizer() ? "Yes" : "No");  // ✅ fixed
         commentView.setText(comment.getText() != null ? comment.getText() : "");
 
         if (comment.getTimestamp() != null) {
@@ -95,7 +95,6 @@ public class AdminEventCommentsActivity extends AppCompatActivity {
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(dialogView)
                 .create();
-
 
         cancelButton.setOnClickListener(v -> dialog.dismiss());
 
@@ -112,7 +111,7 @@ public class AdminEventCommentsActivity extends AppCompatActivity {
     }
 
     private void deleteComment(UserComment comment) {
-        commentManager.deleteComment(eventId, comment.getCommentId(), new UserCommentManager.OnCommentDeletedListener() {
+        commentManager.deleteComment(eventId, comment.getCommentID(), new UserCommentManager.OnCommentDeletedListener() {  // ✅ fixed
             @Override
             public void onSuccess() {
                 Toast.makeText(AdminEventCommentsActivity.this, "Comment deleted", Toast.LENGTH_SHORT).show();

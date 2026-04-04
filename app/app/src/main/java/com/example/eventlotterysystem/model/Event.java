@@ -22,7 +22,7 @@ public class Event implements Serializable {
     private String organizerId;
     private List<String> co_organizerIds;
 
-    // New field for Base64 image
+    // New field for Base64 image (admin branch)
     private String imageData;
 
     // Required no-arg constructor
@@ -95,6 +95,9 @@ public class Event implements Serializable {
 
     public List<String> getCoOrganizerIds() { return co_organizerIds; }
     public void setCoOrganizerIds(List<String> ids) { this.co_organizerIds = ids; }
+    public void addCoOrganizer(String Id) {
+        this.co_organizerIds.add(Id);
+    }
 
     // Optional helper (clean filtering)
     public boolean isOrganizer(String userId) {
@@ -103,7 +106,7 @@ public class Event implements Serializable {
         return co_organizerIds != null && co_organizerIds.contains(userId);
     }
 
-    // Image data
+    // Image data (admin branch)
     public String getImageData() { return imageData; }
     public void setImageData(String imageData) { this.imageData = imageData; }
 }

@@ -39,35 +39,41 @@ public class UserCommentManager {
         void onFailure(Exception e);
     }
 
-    public void addCommentToEvent(String eventID, String comment, OnCommentAddedListener listener) {
+    // Main branch version (with isOrganizer)
+    public void addCommentToEvent(String eventID, String comment, boolean isOrganizer, OnCommentAddedListener listener) {
         ProfileManager manager = ProfileManager.getInstance();
         String uid = manager.getUserID();
         manager.getUserProfile(user -> {
             String firstName = user.getFirstName();
+            DocumentReference docRef = eventRef.document(eventID).collection("comments").document();
+            String commentID = docRef.getId();
             Map<String, Object> data = new HashMap<>();
             data.put("text", comment);
             data.put("userID", uid);
+            data.put("isOrganizer", isOrganizer);
             data.put("userName", firstName);
             data.put("timestamp", FieldValue.serverTimestamp());
-            eventRef.document(eventID).collection("comments")
-                    .add(data)
-                    .addOnSuccessListener(listener::onSuccess)
+            data.put("commentID", commentID);
+            docRef.set(data)
+                    .addOnSuccessListener(aVoid -> listener.onSuccess(docRef))
                     .addOnFailureListener(listener::onFailure);
         });
     }
 
+    // Optional: convenience overload without isOrganizer (default false)
+    public void addCommentToEvent(String eventID, String comment, OnCommentAddedListener listener) {
+        addCommentToEvent(eventID, comment, false, listener);
+    }
+
     // ------------------------------------------------------------------------
-    // Get comments (with or without document IDs)
+    // Get comments
     // ------------------------------------------------------------------------
     public interface UserCommentCallback {
         void onCommentLoaded(List<UserComment> comments);
         void onError(Exception e);
     }
 
-    /**
-     * Gets comments WITHOUT document IDs (simple toObject).
-     * Useful for realtime listeners.
-     */
+    // Main branch method: uses automatic mapping (commentID field is present)
     public void getCommentsFromEvent(String eventID, UserCommentCallback callback) {
         eventRef.document(eventID).collection("comments")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -79,10 +85,7 @@ public class UserCommentManager {
                 .addOnFailureListener(callback::onError);
     }
 
-    /**
-     * Gets comments WITH Firestore document IDs (populates commentId field).
-     * Needed for deletion.
-     */
+    // Admin branch method: also sets the document ID as commentId (redundant but safe)
     public void getCommentsFromEventWithIds(String eventID, UserCommentCallback callback) {
         eventRef.document(eventID).collection("comments")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -91,7 +94,7 @@ public class UserCommentManager {
                     List<UserComment> comments = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : snapshot) {
                         UserComment comment = doc.toObject(UserComment.class);
-                        comment.setCommentId(doc.getId());
+                        comment.setCommentID(doc.getId()); // ensure ID is set (already in Firestore but safe)
                         comments.add(comment);
                     }
                     callback.onCommentLoaded(comments);
@@ -100,7 +103,7 @@ public class UserCommentManager {
     }
 
     // ------------------------------------------------------------------------
-    // Realtime listener (optional)
+    // Realtime listener
     // ------------------------------------------------------------------------
     public ListenerRegistration listenToComments(String eventID, UserCommentCallback callback) {
         return eventRef.document(eventID).collection("comments")
@@ -125,8 +128,8 @@ public class UserCommentManager {
         void onFailure(Exception e);
     }
 
-    public void deleteComment(String eventID, String commentId, OnCommentDeletedListener listener) {
-        eventRef.document(eventID).collection("comments").document(commentId)
+    public void deleteComment(String eventID, String commentID, OnCommentDeletedListener listener) {
+        eventRef.document(eventID).collection("comments").document(commentID)
                 .delete()
                 .addOnSuccessListener(aVoid -> listener.onSuccess())
                 .addOnFailureListener(listener::onFailure);

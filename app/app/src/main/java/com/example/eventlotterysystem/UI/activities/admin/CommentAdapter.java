@@ -41,7 +41,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         UserComment comment = comments.get(position);
         String displayName = comment.getUserName() != null ? comment.getUserName() : "Unknown";
-        if (comment.isOrganizer()) displayName += " (Organizer)";
+        if (comment.getIsOrganizer()) displayName += " (Organizer)";  // ✅ fixed
         holder.userView.setText(displayName);
         holder.textView.setText(comment.getText());
         if (comment.getTimestamp() != null) {
