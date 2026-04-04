@@ -128,5 +128,18 @@ public class EntrantListFirebaseTest {
 
         assertFalse(result.isSuccessful());
         assertEquals(ex, result.getException());
+        verify(mockEntrantDoc).update("status", 3);
+    }
+    /**
+     * Test update status with negative status
+     */
+    @Test
+    public void testUpdateStatus_withNegativeStatus_stillPassesValueToFirestore() {
+        when(mockEntrantDoc.update("status", -1)).thenReturn(Tasks.forResult(null));
+
+        Task<Void> result = firebase.updateStatus("event1", "entrant1", -1);
+
+        assertTrue(result.isSuccessful());
+        verify(mockEntrantDoc).update("status", -1); //should still be allowed
     }
 }
