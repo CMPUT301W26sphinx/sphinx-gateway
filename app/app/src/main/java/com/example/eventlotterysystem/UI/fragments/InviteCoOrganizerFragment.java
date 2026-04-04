@@ -17,12 +17,13 @@ import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.fragments.admin.ProfileAdapter;
-import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.Event;
 import com.example.eventlotterysystem.model.Notification;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -174,36 +175,43 @@ public class InviteCoOrganizerFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    /**
-     * Invite an user to be a co-organizer
-     * kick the user out if he/she is in any list of the event
-     * @param profile
-     * the one who is invited to be the co-organizer
-     */
-    private void inviteCoOrganizer(UserProfile profile){
-        // check if entrants already in any list(wait , cancel, etc)
-        // if no sending notification for invite
-        // if yes, pop message like "already in list"
-        if (organizer.equals(profile.getProfileID()) ||
-                coOrganizer_List.contains(profile.getProfileID())) {
-            Toast.makeText(
-                    getContext(),
-                    "User is already organizer or co-organizer ",
-                    Toast.LENGTH_SHORT
-            ).show();
+    private void inviteCoOrganizer(UserProfile profile) {
+        if (eventId == null) {
+            Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
             return;
         }
-        else {
-            coOrganizer_List.add(profile.getProfileID());
-            entrantList.removeEntrantListEntry(eventId, profile.getProfileID());
-            String fulll_name = profile.getFirstName() + " " + profile.getLastName();
-            Toast.makeText(
-                    getContext(),
-                    fulll_name +" is now a co-organizer",
-                    Toast.LENGTH_SHORT
-            ).show();
-            notification.notifyOrganizerInvite(profile.getProfileID(), eventId);
-            
-        }
+        String entrantId = profile.getProfileID();
+        EventRepository eventRepository = new EventRepository();
+        Notification notification = new Notification();
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+            @Override
+            public void onEventLoaded(Event event) {
+                List<String> coOrganizerIds  = event.getCoOrganizerIds();
+                if (coOrganizerIds != null && coOrganizerIds.contains(entrantId)) {
+                    Toast.makeText(requireContext(),
+                            profile.getFirstName() + " is already a coorganizer ",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    coOrganizerIds.add(entrantId);
+                    FirebaseFirestore.getInstance()
+                            .collection("events")
+                            .document(eventId)
+                            .update("coOrganizerIds", FieldValue.arrayUnion(entrantId))
+                            .addOnSuccessListener(unused -> {
+                                notification.notifyOrganizerInvite(entrantId, eventId);
+                                Toast.makeText(requireContext(),
+                                        profile.getFirstName() + " has been invited as a co-organizer.",
+                                        Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(requireContext(), "Failed to add co-organizer", Toast.LENGTH_SHORT).show()
+                            );
+                }
+            }
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

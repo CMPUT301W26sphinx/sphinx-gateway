@@ -13,18 +13,22 @@ import java.util.List;
  * TODO: loadOrganizerName(); is always repeating.
  */
 public class Notification extends NotificationSystem {
-    private String organizerName;
-    private String eventName;
     private final EventRepository eventRepository = new EventRepository();
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
 
-    private void loadOrganizerName() {
-        ProfileManager manager = ProfileManager.getInstance();
-        manager.getUserProfile(user -> {
-            if (user.getFirstName() != null && user.getLastName() != null) {
-                organizerName = user.getFirstName() + " " + user.getLastName();
-            }
+    //This fixes it being too fast, and sending null.
+    //https://www.geeksforgeeks.org/java/asynchronous-synchronous-callbacks-java/
+    private void loadOrganizerName(OrganizerNameCallback callback) {
+        ProfileManager.getInstance().getUserProfile(user -> {
+            String name = (user.getFirstName() != null)
+                    ? user.getFirstName()
+                    : "An organizer";
+            callback.onLoaded(name);
         });
+    }
+
+    private interface OrganizerNameCallback {
+        void onLoaded(String name);
     }
 
     //Lottery Winner or Loser.
@@ -36,12 +40,14 @@ public class Notification extends NotificationSystem {
                 String eventName = event.getTitle();
                 sendNotification(entrantId, "You have won the lottery for the event " + eventName + "! Please click to see more.", eventId, "System");
             }
+
             @Override
             public void onError(Exception e) {
                 Log.e("Notification", "Failed to fetch event for notifyWinner: " + eventId, e);
             }
         });
     }
+
     public void notifyLoser(String entrantId, String eventId) {
         eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
             @Override
@@ -49,6 +55,7 @@ public class Notification extends NotificationSystem {
                 String eventName = event.getTitle();
                 sendNotification(entrantId, "You have lost the lottery for the event " + eventName + "! Please click to see more.", eventId, "System");
             }
+
             @Override
             public void onError(Exception e) {
                 Log.e("Notification", "Failed to fetch event for notifyLoser: " + eventId, e);
@@ -57,43 +64,62 @@ public class Notification extends NotificationSystem {
     }
 
     public void notifyPrivateInvite(String entrantId, String eventId) {
-        loadOrganizerName();
-        sendNotification(entrantId, "You have been invited to a private event by "+ organizerName, eventId, "System");
+        loadOrganizerName(name ->
+                sendNotificationAsk(entrantId,
+                        "You have been invited to a private event by " + name + ". Would you like to join the private waitlist?",
+                        eventId, "System")
+        );
+    }
+    public void notifyInvite(String entrantId, String eventId) {
+        loadOrganizerName(name ->
+                sendNotificationAsk(entrantId,
+                        "You have been invited to a event by " + name + ". Would you like to join the private waitlist?",
+                        eventId, "System")
+        );
     }
 
     public void notifyOrganizerInvite(String entrantId, String eventId) {
-        loadOrganizerName();
-        sendNotification(entrantId, "You have been invited to become a co-organizer of an event by "+ organizerName, eventId, "System");
+        loadOrganizerName(name ->
+                sendNotification(entrantId,
+                        "You have been invited to become a co-organizer of this event by " + name + ".",
+                        eventId, "System")
+        );
     }
 
     /**
      * Prebased NotificationStatus for the Organizers.
-     * Also logs it for the System.
+     * Also logs it for the Database.
      * * @param message
+     *
      * @param eventId
      * @param status
      */
     private void notifyAllWithStatus(String message, String eventId, int status) {
-        loadOrganizerName();
-        entrantListFirebase.getEntrantsByStatus(eventId, status)
-                .addOnSuccessListener(entrantList -> {
-                    for (EntrantListEntry entrant : entrantList) {
-                        String entrantId = entrant.getEntrantId();
-                        sendNotification(entrantId, message, eventId, "Organizer " + organizerName);
-                        logNotification(eventId, message);
-                    }
-                });
+        loadOrganizerName(name ->
+                entrantListFirebase.getEntrantsByStatus(eventId, status)
+                        .addOnSuccessListener(entrantList -> {
+                            for (EntrantListEntry entrant : entrantList) {
+                                String entrantId = entrant.getEntrantId();
+                                sendNotification(entrantId, message, eventId, "Organizer " + name);
+                                logNotification(eventId, message);
+                            }
+                        })
+        );
     }
+
     // All the premade status. Organizers will call this instead.
     public void notifyAllWaiting(String message, String eventId) {
         notifyAllWithStatus(message, eventId, 1);
     }
+
     public void notifyAllSelected(String message, String eventId) {
         notifyAllWithStatus(message, eventId, 2);
     }
+
     public void notifyAllEnrolled(String message, String eventId) {
         notifyAllWithStatus(message, eventId, 3);
     }
+
     public void notifyAllCancelled(String message, String eventId) {
         notifyAllWithStatus(message, eventId, 4);
     }
@@ -106,13 +132,6 @@ public class Notification extends NotificationSystem {
                         sendNotification(entrant.getEntrantId(), message, eventId, "");
                     }
                 });
-    }
-
-    // Ill probably borrow admin code for the delete user?
-    public void notifySelectEntrants(String message, String eventId, List<EntrantListEntry> selectedList) {
-        for (EntrantListEntry entrant : selectedList) {
-            sendNotification(entrant.getEntrantId(), message, eventId, "");
-        }
     }
 }
 
