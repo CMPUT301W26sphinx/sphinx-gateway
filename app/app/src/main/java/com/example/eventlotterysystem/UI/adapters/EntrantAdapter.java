@@ -22,7 +22,15 @@ import java.util.List;
 public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.ViewHolder> {
 
     private final List<EntrantDisplay> entrants = new ArrayList<>();
+    public interface OnCancelClickListener {
+        void onCancelClick(EntrantDisplay entrant);
+    }
 
+    private OnCancelClickListener cancelClickListener;
+
+    public void setOnCancelClickListener(OnCancelClickListener listener) {
+        this.cancelClickListener = listener;
+    }
     /**
      * Update the data shown in the list
      */
@@ -56,6 +64,11 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.ViewHold
         // Show cancel button only for invited entrants
         if (entrant.getStatus() == EntrantListEntry.STATUS_INVITED) {
             holder.cancelButton.setVisibility(View.VISIBLE);
+            holder.cancelButton.setOnClickListener(v -> {
+                if (cancelClickListener != null) {
+                    cancelClickListener.onCancelClick(entrant);
+                }
+            });
         } else {
             holder.cancelButton.setVisibility(View.GONE);
             holder.cancelButton.setOnClickListener(null);

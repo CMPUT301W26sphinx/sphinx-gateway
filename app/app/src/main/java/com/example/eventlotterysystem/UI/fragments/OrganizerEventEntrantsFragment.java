@@ -263,6 +263,13 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         enrolledAdapter = new EntrantAdapter();
         cancelledAdapter = new EntrantAdapter();
 
+        selectedAdapter.setOnCancelClickListener(entrant -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+
+            showCancelDialog(eventId, entrant);
+        });
+
         // Set up layout managers for each RecyclerView
         waitlistRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         selectedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -283,6 +290,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
      *  No parameters or returns.
      */
     private void loadEntrants(String eventId){
+        enrolledList.clear();//avoid duplicates
         entrantListFirebase.getEntrantList(eventId)
                 .addOnSuccessListener(entries -> {
                     if (!isAdded()) return;
@@ -347,6 +355,10 @@ public class OrganizerEventEntrantsFragment extends Fragment {
                 }).addOnFailureListener(e -> {if (!isAdded()) return;Toast.makeText(requireContext(), "Failed to load entrants", Toast.LENGTH_SHORT).show();});
     }
 
+    /**
+     * This method is used to export the enrolled entrants to a csv file.
+     *  No parameters or returns.
+     */
     private void exportCsv() {
         if (enrolledList == null || enrolledList.isEmpty()) {
             Toast.makeText(requireContext(), "No registered entrants", Toast.LENGTH_SHORT).show();
@@ -354,5 +366,26 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         }
         if (!isAdded()) return;
         createCsvLauncher.launch("registered_entrants.csv");
+    }
+
+    /**
+     * Show confirmation dialog before cancelling an invited entrant.
+     */
+    private void showCancelDialog(String eventId, EntrantDisplay entrant) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Cancel Entrant")
+                .setMessage("Cancel " + entrant.getFullName() + "?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    entrantListFirebase.updateStatus(eventId, entrant.getEntrantId(), EntrantListEntry.STATUS_CANCELLED_OR_REJECTED
+                    ).addOnSuccessListener(unused -> {
+                        if (!isAdded()) return;
+                        Toast.makeText(requireContext(), "Entrant cancelled", Toast.LENGTH_SHORT).show();
+                        loadEntrants(eventId);
+                    }).addOnFailureListener(e -> {
+                        if (!isAdded()) return;
+                        Toast.makeText(requireContext(), "Failed to cancel entrant", Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .setNegativeButton("No", null).show();
     }
 }
