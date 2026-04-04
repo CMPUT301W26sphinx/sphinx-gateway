@@ -129,11 +129,21 @@ public class ProfileEditFragment extends Fragment {
             }
             // update user information in firebase
             if (isValid){
-                manager.saveUser(userProfile);
-                // display information saved message
-                Toast myToast = Toast.makeText(getActivity(), "Information Saved!",
-                        Toast.LENGTH_SHORT);
-                myToast.show();
+                manager.saveUser(userProfile, new ProfileManager.OnUserAddedCallback() {
+                    @Override
+                    public void onSuccess(Void snapshot) {
+                        // display information saved message
+                        Toast myToast = Toast.makeText(getActivity(), "Information Saved!",
+                                Toast.LENGTH_SHORT);
+                        myToast.show();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+
+                    }
+                });
+
             }
 
 

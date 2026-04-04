@@ -88,7 +88,17 @@ public class MainActivity extends AppCompatActivity {
                             UserProfile userProfile = new UserProfile();
 
                             // save to Firestore
-                            profileManager.saveUser(userProfile);
+                            profileManager.saveUser(userProfile, new ProfileManager.OnUserAddedCallback() {
+                                @Override
+                                public void onSuccess(Void snapshot) {
+
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+
+                                }
+                            });
 
                         }
                     });

@@ -1,5 +1,6 @@
 package com.example.eventlotterysystem;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -62,11 +63,76 @@ public class ProfileManagerTest {
         assertTrue("Timed out during setup", latch.await(30, TimeUnit.SECONDS));
     }
 
-    ProfileManager manager = ProfileManager.getInstance();
 
-    UserProfile user = new UserProfile("John", "Smith", "test@gmail.com", "123-456-7890");
+    @Test
+    public void testAddProfile() throws InterruptedException {
+        ProfileManager manager = ProfileManager.getInstance();
+        CountDownLatch latch = new CountDownLatch(1);
 
-    
+        UserProfile user = new UserProfile("Test", "User", "testUser@gmail.com", "123-456-7890");
+
+        // save user
+        manager.saveUser(user, new ProfileManager.OnUserAddedCallback() {
+            @Override
+            public void onSuccess(Void snapshot) {
+                // retrieve information
+                manager.getUserProfile(new ProfileManager.UserProfileCallBack() {
+                    @Override
+                    public void onComplete(UserProfile user) {
+                        assertEquals("Test", user.getFirstName());
+                        assertEquals("User", user.getLastName());
+                        assertEquals("testUser@gmail.com", user.getEmail());
+                        assertEquals("123-456-7890", user.getPhoneNumber());
+                        latch.countDown();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        latch.countDown();
+                        fail("Failed to get profile: " + e.getMessage());
+                    }
+                });
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                latch.countDown();
+                fail("Failed to add profile: " + e.getMessage());
+            }
+        });
+
+        // delete profile
+        final String uid = manager.getUserID();
+        manager.deleteUser(uid, new ProfileManager.OnDeleteListener() {
+            @Override
+            public void onSuccess() {
+                // verify delete
+                manager.getUserProfile(new ProfileManager.UserProfileCallBack() {
+                    @Override
+                    public void onComplete(UserProfile user) {
+                        latch.countDown();
+                        fail("Failed to delete profile");
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        latch.countDown();
+                    }
+                });
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                latch.countDown();
+                fail("Delete profile: " + e.getMessage());
+            }
+        });
+
+        assertTrue("Timed out waiting for add profile", latch.await(10, TimeUnit.SECONDS));
+
+    }
 
 
 }
