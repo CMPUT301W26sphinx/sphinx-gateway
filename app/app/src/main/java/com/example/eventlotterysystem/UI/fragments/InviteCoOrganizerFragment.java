@@ -25,8 +25,11 @@ import com.example.eventlotterysystem.model.profiles.UserProfile;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,6 +49,12 @@ public class InviteCoOrganizerFragment extends Fragment {
     private EditText phoneNum;
     private EditText email;
     private Button searchButton;
+    private Button backButton;
+    private List<String> coOrganizer_List;
+    private String organizer;
+    private final Notification notification = new Notification();
+    private final EventRepository eventRepository = new EventRepository();
+    private final EntrantListFirebase entrantList = new EntrantListFirebase();
 
     public InviteCoOrganizerFragment() {}
 
@@ -79,14 +88,24 @@ public class InviteCoOrganizerFragment extends Fragment {
         phoneNum = view.findViewById(R.id.phoneNum);
         email = view.findViewById(R.id.email);
         searchButton = view.findViewById(R.id.search_button);
+        backButton = view.findViewById(R.id.backButton);
 
         loadProfiles();
+        loadEvent();
+
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
         searchButton.setOnClickListener(v -> {
             searchProfiles.clear();
             search();
         });
 
     }
+    /**
+     * loading all the user porfile from the database
+     */
     private void loadProfiles() {
         profileManager.getAllUsers(new ProfileManager.AllUsersCallback() {
             @Override
@@ -107,6 +126,35 @@ public class InviteCoOrganizerFragment extends Fragment {
         });
     }
 
+    /**
+     * Loading the event from database
+     * Aim to getting the organizer's Id and co-organizers' Id
+     */
+    private void loadEvent() {
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+
+            @Override
+            public void onEventLoaded(Event event) {
+                if (!isAdded()) return;
+                organizer = event.getOrganizerId();
+                coOrganizer_List = event.getCoOrganizerIds();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (!isAdded()) return;
+
+                Toast.makeText(
+                        getContext(),
+                        "Failed to load event: " + e.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+    }
+    /**
+     * Search users base on given name, phone number and email
+     */
     private void search() {
         String target_nameStr = name.getText().toString().trim().toLowerCase();
         String target_phoneNumStr = phoneNum.getText().toString().trim();
