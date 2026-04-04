@@ -36,6 +36,22 @@ public class NotificationSystem {
                     .update("notification", FieldValue.arrayUnion(structMessage));
         });
     }
+    //Special use case, basically has it make sure that it opens dialog when there's that Ask option.
+    //Used for private and notify selected entrants.
+    public void sendNotificationAsk(String entrantId, String message, String eventId, String sender){
+        profileManager.getUserProfileById(entrantId, user -> {
+            if (user == null) return;
+            if (!user.getNotificationPreference()) return;
+
+            String structMessage = message + "|" + eventId + "|" + sender + "|ask";
+
+            FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(entrantId)
+                    .update("notification", FieldValue.arrayUnion(structMessage));
+        });
+    }
+
     /** Called with the user's notifications (newest first), or an empty list on none/error. */
     public interface NotificationsCallback {
         void onResult(List<String> notifications);

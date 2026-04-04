@@ -17,8 +17,13 @@ import android.widget.Toast;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.fragments.admin.ProfileAdapter;
+import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.database.ProfileManager;
+import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.model.Notification;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,9 +127,43 @@ public class InviteCoOrganizerFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    private void inviteCoOrganizer(UserProfile profile){
-        // check if entrants already in any list(wait , cancel, etc)
-        // if no sending notification for invite
-        // if yes, pop message like "already in list"
+    private void inviteCoOrganizer(UserProfile profile) {
+        if (eventId == null) {
+            Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String entrantId = profile.getProfileID();
+        EventRepository eventRepository = new EventRepository();
+        Notification notification = new Notification();
+        eventRepository.getEvent(eventId, new EventRepository.SingleEventCallback() {
+            @Override
+            public void onEventLoaded(Event event) {
+                List<String> coOrganizerIds  = event.getCoOrganizerIds();
+                if (coOrganizerIds != null && coOrganizerIds.contains(entrantId)) {
+                    Toast.makeText(requireContext(),
+                            profile.getFirstName() + " is already a coorganizer ",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    coOrganizerIds.add(entrantId);
+                    FirebaseFirestore.getInstance()
+                            .collection("events")
+                            .document(eventId)
+                            .update("coOrganizerIds", FieldValue.arrayUnion(entrantId))
+                            .addOnSuccessListener(unused -> {
+                                notification.notifyOrganizerInvite(entrantId, eventId);
+                                Toast.makeText(requireContext(),
+                                        profile.getFirstName() + " has been invited as a co-organizer.",
+                                        Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(requireContext(), "Failed to add co-organizer", Toast.LENGTH_SHORT).show()
+                            );
+                }
+            }
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
