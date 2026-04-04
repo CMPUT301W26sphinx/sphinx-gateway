@@ -63,6 +63,23 @@ public class EntrantListFirebaseTest {
         verify(mockEntrantDoc).set(entry);
     }
 
+    /**
+     * Test insert/update failure
+     */
+    @Test
+    public void testUpsertEntry_failure() {
+        EntrantListEntry entry = mock(EntrantListEntry.class);
+        when(entry.getEntrantId()).thenReturn("entrant1");
+
+        Exception ex = new RuntimeException("write failed");
+        when(mockEntrantDoc.set(entry)).thenReturn(Tasks.forException(ex));
+
+        Task<Void> result = firebase.upsertEntry("event1", entry);
+
+
+        assertFalse(result.isSuccessful());
+        assertEquals(ex, result.getException());
+    }
     /** Test delete */
     @Test
     public void testRemoveEntry() {
@@ -72,6 +89,20 @@ public class EntrantListFirebaseTest {
 
         assertTrue(result.isSuccessful());
         verify(mockEntrantDoc).delete();
+    }
+
+    /**
+     * Test delete failure
+     */
+    @Test
+    public void testRemoveEntry_failure() {
+        Exception ex = new RuntimeException("delete failed");
+        when(mockEntrantDoc.delete()).thenReturn(Tasks.forException(ex));
+
+        Task<Void> result = firebase.removeEntrantListEntry("event1", "entrant1");
+
+        assertFalse(result.isSuccessful());
+        assertEquals(ex, result.getException());
     }
 
     /** Test update status */
@@ -85,5 +116,17 @@ public class EntrantListFirebaseTest {
         verify(mockEntrantDoc).update("status", 3);
     }
 
+    /**
+     * Test update status failure
+     */
+    @Test
+    public void testUpdateStatus_failure() {
+        Exception ex = new RuntimeException("update failed");
+        when(mockEntrantDoc.update("status", 3)).thenReturn(Tasks.forException(ex));
 
+        Task<Void> result = firebase.updateStatus("event1", "entrant1", 3);
+
+        assertFalse(result.isSuccessful());
+        assertEquals(ex, result.getException());
+    }
 }
