@@ -134,5 +134,7 @@ public class ProfileManagerTest {
 
     }
 
+    // TODO: implement test for getUserProfileByID and getAllUsers
+
 
 }

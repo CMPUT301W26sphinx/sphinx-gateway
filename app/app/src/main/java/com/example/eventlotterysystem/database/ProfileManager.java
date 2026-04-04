@@ -116,6 +116,11 @@ public class ProfileManager {
         void onError(Exception e);
     }
 
+    /**
+     * Delete the user profile from firebase
+     * @param userId
+     * @param listener
+     */
     public void deleteUser(String userId, OnDeleteListener listener) {
         usersRef.document(userId).delete().addOnSuccessListener(aVoid -> listener.onSuccess()).addOnFailureListener(listener::onError);
     }
