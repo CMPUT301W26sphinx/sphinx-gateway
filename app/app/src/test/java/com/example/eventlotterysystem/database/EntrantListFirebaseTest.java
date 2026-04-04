@@ -18,6 +18,14 @@ import org.junit.Test;
  * Generated tests with help from Chatgpt
  * "How do I use mocks in JUnit tests for Firebase Firestore?"
  * and for debugging issues with mock calls
+ * covers:
+ * - upsertEntry
+ * - upsert failure
+ * - removeEntrantListEntry
+ * - remove failure
+ * - update status
+ * - update status failure
+ * - update status with negative status
  */
 public class EntrantListFirebaseTest {
 
