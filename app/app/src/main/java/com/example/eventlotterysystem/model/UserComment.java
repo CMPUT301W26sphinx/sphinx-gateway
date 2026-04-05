@@ -2,6 +2,9 @@ package com.example.eventlotterysystem.model;
 
 import com.google.firebase.Timestamp;
 
+/**
+ * Represents a comment made by a user on an event.
+ */
 public class UserComment {
     private String text;
     private Timestamp timestamp;
@@ -10,34 +13,44 @@ public class UserComment {
     private String commentID;
     private boolean isOrganizer;
 
-    // empty constructor for firebase
+    /**
+     * Empty constructor required for Firebase deserialization.
+     */
     public UserComment() {}
 
-    // constructor used by main branch
+    /**
+     * Creates a user comment with text, user ID, and user name.
+     *
+     * @param text the comment text
+     * @param userID the ID of the user who made the comment
+     * @param userName the name of the user who made the comment
+     */
     public UserComment(String text, String userID, String userName) {
-        /**
-         * This defines the structure of a comment to be stored in an event
-         */
         this.text = text;
         this.userID = userID;
         this.userName = userName;
     }
 
-    // additional constructor for admin branch (with isOrganizer)
+    /**
+     * Creates a user comment and records whether the commenter is an organizer.
+     *
+     * @param text the comment text
+     * @param userID the ID of the user who made the comment
+     * @param userName the name of the user who made the comment
+     * @param isOrganizer whether the commenter is an organizer
+     */
     public UserComment(String text, String userID, String userName, boolean isOrganizer) {
         this(text, userID, userName);
         this.isOrganizer = isOrganizer;
     }
 
-    // Getters
-    public boolean getIsOrganizer() { return isOrganizer; }
+    public boolean isOrganizer() { return isOrganizer; }
     public String getCommentID() { return commentID; }
     public String getText() { return text; }
     public Timestamp getTimestamp() { return timestamp; }
     public String getUserID() { return userID; }
     public String getUserName() { return userName; }
 
-    // Setters
     public void setIsOrganizer(boolean isOrganizer) { this.isOrganizer = isOrganizer; }
     public void setCommentID(String commentID) { this.commentID = commentID; }
     public void setText(String text) { this.text = text; }
