@@ -3,6 +3,7 @@ package com.example.eventlotterysystem.UI.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.model.EntrantDisplay;
+import com.example.eventlotterysystem.model.EntrantListEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,15 @@ import java.util.List;
 public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.ViewHolder> {
 
     private final List<EntrantDisplay> entrants = new ArrayList<>();
+    public interface OnCancelClickListener {
+        void onCancelClick(EntrantDisplay entrant);
+    }
 
+    private OnCancelClickListener cancelClickListener;
+
+    public void setOnCancelClickListener(OnCancelClickListener listener) {
+        this.cancelClickListener = listener;
+    }
     /**
      * Update the data shown in the list
      */
@@ -51,6 +61,18 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.ViewHold
         holder.emailText.setText(
                 entrant.getEmail() != null ? entrant.getEmail() : "No email"
         );
+        // Show cancel button only for invited entrants
+        if (entrant.getStatus() == EntrantListEntry.STATUS_INVITED) {
+            holder.cancelButton.setVisibility(View.VISIBLE);
+            holder.cancelButton.setOnClickListener(v -> {
+                if (cancelClickListener != null) {
+                    cancelClickListener.onCancelClick(entrant);
+                }
+            });
+        } else {
+            holder.cancelButton.setVisibility(View.GONE);
+            holder.cancelButton.setOnClickListener(null);
+        }
     }
 
     @Override
@@ -61,16 +83,18 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.ViewHold
     /**
      * ViewHolder for each row
      */
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView nameText;
-        TextView emailText;
+        public TextView nameText;
+        public TextView emailText;
+        public Button cancelButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             nameText = itemView.findViewById(R.id.profile_name);
             emailText = itemView.findViewById(R.id.profile_email);
+            cancelButton = itemView.findViewById(R.id.cancelEntrantButton);
         }
     }
 }
