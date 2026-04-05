@@ -26,6 +26,7 @@ import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.model.UserComment;
+import com.example.eventlotterysystem.utils.ImageHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -325,6 +326,11 @@ public class EventDetailsFragment extends Fragment {
                 valueLocation.setText("Not available");
 
                 // Waitlist count is handled by refreshWaitlistCount()
+
+                // ADDED: load event poster if available, otherwise keep placeholder
+                if (event.getImageData() != null && !event.getImageData().isEmpty()) {
+                    ImageHelper.loadEventImage(eventPoster, event);
+                }
             }
 
             @Override

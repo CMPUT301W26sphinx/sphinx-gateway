@@ -6,11 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class ImageUploadHelper {
         void onError(String error);
     }
 
-    private final AppCompatActivity activity;
+    private final Fragment fragment;
     private final ActivityResultLauncher<Intent> pickImageLauncher;
     private ImageUploadCallback callback;
 
@@ -37,9 +36,9 @@ public class ImageUploadHelper {
     private int maxTargetKB = 290;        // final Base64 size target (kilobytes)
     private int maxAttempts = 5;          // number of compression attempts
 
-    public ImageUploadHelper(AppCompatActivity activity) {
-        this.activity = activity;
-        pickImageLauncher = activity.registerForActivityResult(
+    public ImageUploadHelper(Fragment fragment) {
+        this.fragment = fragment;
+        pickImageLauncher = fragment.registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -74,7 +73,7 @@ public class ImageUploadHelper {
     private void processImage(Uri imageUri) {
         try {
             // First, load just the bounds to determine original dimensions
-            InputStream inputStream = activity.getContentResolver().openInputStream(imageUri);
+            InputStream inputStream = fragment.requireActivity().getContentResolver().openInputStream(imageUri);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(inputStream, null, options);
@@ -90,7 +89,7 @@ public class ImageUploadHelper {
             options.inJustDecodeBounds = false;
 
             // Decode with sampling
-            inputStream = activity.getContentResolver().openInputStream(imageUri);
+            inputStream = fragment.requireActivity().getContentResolver().openInputStream(imageUri);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
             inputStream.close();
 

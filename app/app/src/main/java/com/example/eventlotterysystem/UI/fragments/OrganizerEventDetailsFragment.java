@@ -20,6 +20,7 @@ import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.utils.ImageHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -232,14 +233,14 @@ public class OrganizerEventDetailsFragment extends Fragment{
 //
 //        });
         /**
-        // the lottery system info pop up (future implementation)
-        infoButton.setOnClickListener(new View.OnClickListener() {
-            // TODO: add the pop up
-            @Override
-            public void onClick(View v) {
-                //TODO
-            }
-        });*/
+         // the lottery system info pop up (future implementation)
+         infoButton.setOnClickListener(new View.OnClickListener() {
+         // TODO: add the pop up
+         @Override
+         public void onClick(View v) {
+         //TODO
+         }
+         });*/
         initializeUI(); // button update and get event details
     }
 
@@ -282,6 +283,11 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 valueLocation.setText(event.getPlace());
 
                 // Waitlist count is handled by refreshWaitlistCount()
+
+                // ADDED: load event poster if available, otherwise keep placeholder
+                if (event.getImageData() != null && !event.getImageData().isEmpty()) {
+                    ImageHelper.loadEventImage(eventPoster, event);
+                }
             }
 
             @Override
