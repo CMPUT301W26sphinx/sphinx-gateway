@@ -15,7 +15,10 @@ import org.junit.Test;
 /**
  * Unit tests for EntrantListFirebase using Mockito.
  *
- * Generated tests with help from Chatgpt
+ *Resources:
+ * https://developer.android.com/training/testing/local-tests
+ * https://medium.com/@chetanshingare2991/mastering-android-unit-testing-with-mockito-mocking-for-reliability-and-flexibility-93d42078d2ca
+ * also generated setup/example test with help from Chatgpt
  * "How do I use mocks in JUnit tests for Firebase Firestore?"
  * and for debugging issues with mock calls
  * covers:
