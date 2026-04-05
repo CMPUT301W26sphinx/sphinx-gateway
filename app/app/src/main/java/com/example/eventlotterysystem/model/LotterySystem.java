@@ -15,6 +15,13 @@ public class LotterySystem {
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
     private final EventRepository eventRepository = new EventRepository();
     private final Notification notification = new Notification();
+    protected void notifyWinner(String entrantId, String eventId) {
+        notification.notifyWinner(entrantId, eventId);
+    }
+
+    protected void notifyLoser(String entrantId, String eventId) {
+        notification.notifyLoser(entrantId, eventId);
+    }
 
     /** Starts the lottery system, looks at eventid, then chooses based on lottery.
      * Checksum is built in. It is remainingSpots = capacity - invited - registered
@@ -66,7 +73,7 @@ public class LotterySystem {
                         entrantListFirebase.updateStatus(eventId, chosen.getEntrantId(), EntrantListEntry.STATUS_INVITED)
                                 .addOnSuccessListener(unused -> {
                                     Log.d("LotterySystem", "Invited: " + chosen.getEntrantId());
-                                    notification.notifyWinner(chosen.getEntrantId(), eventId);
+                                    notifyWinner(chosen.getEntrantId(), eventId);
                                 })
                                 .addOnFailureListener(e -> Log.e("LotterySystem", "Failed to invite", e));
                     }
@@ -101,7 +108,7 @@ public class LotterySystem {
             entrantListFirebase.getEntrantsByStatus(eventId, EntrantListEntry.STATUS_WAITLIST)
                     .addOnSuccessListener(waitlistEntrants -> {
                         for (EntrantListEntry entrant : waitlistEntrants) {
-                            notification.notifyLoser(entrant.getEntrantId(), eventId);
+                            notifyLoser(entrant.getEntrantId(), eventId);
                         }
                     });
         });

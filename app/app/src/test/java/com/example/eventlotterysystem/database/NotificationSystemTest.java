@@ -62,7 +62,6 @@ public class NotificationSystemTest {
         when(mockDocument.update(anyString(), any())).thenReturn(null);
         when(mockLogsCollection.add(any())).thenReturn(null);
 
-        // Construct NotificationSystem with ProfileManager.getInstance() mocked
         try (MockedStatic<ProfileManager> pmStatic = mockStatic(ProfileManager.class)) {
             pmStatic.when(ProfileManager::getInstance).thenReturn(mockProfileManager);
             notificationSystem = new NotificationSystem();

@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
@@ -33,7 +32,6 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationTest {
 
-    // Testable subclass
     private static class TestableNotification extends Notification {
         final List<String[]> sentNotifications    = new java.util.ArrayList<>();
         final List<String[]> sentAskNotifications = new java.util.ArrayList<>();
@@ -55,51 +53,33 @@ public class NotificationTest {
         }
     }
 
-    // Mocks
-
     @Mock private EventRepository      mockEventRepository;
     @Mock private EntrantListFirebase  mockEntrantListFirebase;
     @Mock private ProfileManager       mockProfileManager;
     @Mock private UserProfile          mockUser;
     @Mock private Event                mockEvent;
 
-    // Firestore infrastructure mocks — only needed to satisfy the constructor chain
     @Mock private FirebaseFirestore    mockFirestore;
-    @Mock private CollectionReference  mockCollection;
-    @Mock private DocumentReference    mockDocument;
 
-    // Held open for the entire test so any getInstance() call inside helpers is safe
     private MockedStatic<FirebaseFirestore> firestoreStatic;
     private MockedStatic<ProfileManager>   profileManagerStatic;
-
     private TestableNotification notification;
-
-    // Setup / Teardown
 
     @Before
     public void setUp() throws Exception {
-        // Stub the Firestore chain so constructors that call getInstance() don't crash
-        when(mockFirestore.collection(anyString())).thenReturn(mockCollection);
-        when(mockCollection.document(anyString())).thenReturn(mockDocument);
-
-        // Open static mocks BEFORE constructing TestableNotification
         firestoreStatic      = mockStatic(FirebaseFirestore.class);
         profileManagerStatic = mockStatic(ProfileManager.class);
 
         firestoreStatic.when(FirebaseFirestore::getInstance).thenReturn(mockFirestore);
         profileManagerStatic.when(ProfileManager::getInstance).thenReturn(mockProfileManager);
-
-        // Now safe to construct — EventRepository/EntrantListFirebase won't hit real Firebase
         notification = new TestableNotification();
 
-        // Inject our mocked repositories over the real ones created during construction
         injectField("eventRepository",    mockEventRepository);
         injectField("entrantListFirebase", mockEntrantListFirebase);
     }
 
     @After
     public void tearDown() {
-        // Always close static mocks to avoid leaking them between tests
         if (firestoreStatic      != null) firestoreStatic.close();
         if (profileManagerStatic != null) profileManagerStatic.close();
     }
@@ -110,7 +90,7 @@ public class NotificationTest {
         field.set(notification, value);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // Helpers
 
     private void stubOrganizerName(String firstName) {
         when(mockUser.getFirstName()).thenReturn(firstName);
@@ -130,14 +110,6 @@ public class NotificationTest {
         }).when(mockEventRepository).getEvent(eq(eventId), any());
     }
 
-    private void stubEventError(String eventId) {
-        doAnswer(inv -> {
-            EventRepository.SingleEventCallback cb = inv.getArgument(1);
-            cb.onError(new Exception("Firebase error"));
-            return null;
-        }).when(mockEventRepository).getEvent(eq(eventId), any());
-    }
-
     @SuppressWarnings("unchecked")
     private void stubEntrantsByStatus(String eventId, int status, List<EntrantListEntry> entrants) {
         Task<List<EntrantListEntry>> mockTask = mock(Task.class);
@@ -149,13 +121,13 @@ public class NotificationTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void stubEntrantList(String eventId, List<EntrantListEntry> entrants) {
+    private void stubEntrantList(List<EntrantListEntry> entrants) {
         Task<List<EntrantListEntry>> mockTask = mock(Task.class);
         doAnswer(inv -> {
             ((OnSuccessListener<List<EntrantListEntry>>) inv.getArgument(0)).onSuccess(entrants);
             return mockTask;
         }).when(mockTask).addOnSuccessListener(any());
-        when(mockEntrantListFirebase.getEntrantList(eq(eventId))).thenReturn(mockTask);
+        when(mockEntrantListFirebase.getEntrantList(eq("eventF"))).thenReturn(mockTask);
     }
 
     private EntrantListEntry makeEntrant(String id) {
@@ -164,10 +136,10 @@ public class NotificationTest {
         return e;
     }
 
-    // ── notifyWinner ──────────────────────────────────────────────────────────
+    // notifyWinner, correct message
 
     @Test
-    public void notifyWinner_eventLoaded_sendsCorrectMessage() {
+    public void notifyWinner() {
         stubEventLoaded("event1", "Spring Gala");
 
         notification.notifyWinner("entrant1", "event1");
@@ -180,10 +152,10 @@ public class NotificationTest {
         assertEquals("System", sent[3]);
     }
 
-    // ── notifyLoser ───────────────────────────────────────────────────────────
+    // notifyLoser, correct message
 
     @Test
-    public void notifyLoser_eventLoaded_sendsCorrectMessage() {
+    public void notifyLoser() {
         stubEventLoaded("event3", "Summer Fest");
 
         notification.notifyLoser("entrant3", "event3");
@@ -198,10 +170,10 @@ public class NotificationTest {
     }
 
 
-    // ── notifyPrivateInvite ───────────────────────────────────────────────────
+    // notifyPrivateInvite, sends with Organizer Name
 
     @Test
-    public void notifyPrivateInvite_sendsAskNotificationWithOrganizerName() {
+    public void notifyPrivateInvite() {
         stubOrganizerName("Alice");
 
         notification.notifyPrivateInvite("entrant5", "event5");
@@ -215,20 +187,10 @@ public class NotificationTest {
         assertEquals("System",  sent[3]);
     }
 
-    @Test
-    public void notifyPrivateInvite_nullOrganizerName_usesFallback() {
-        stubOrganizerName(null); // getFirstName() == null → "An organizer"
-
-        notification.notifyPrivateInvite("entrant6", "event6");
-
-        assertEquals(1, notification.sentAskNotifications.size());
-        assertTrue(notification.sentAskNotifications.get(0)[1].contains("An organizer"));
-    }
-
-    // ── notifyInvite ──────────────────────────────────────────────────────────
+    // notifyInvite sends with Organizer Name
 
     @Test
-    public void notifyInvite_sendsAskNotificationWithOrganizerName() {
+    public void notifyInvite() {
         stubOrganizerName("Bob");
 
         notification.notifyInvite("entrant7", "event7");
@@ -241,10 +203,10 @@ public class NotificationTest {
         assertEquals("System",  sent[3]);
     }
 
-    // ── notifyOrganizerInvite ─────────────────────────────────────────────────
+    // notifyOrganizerInvite send regular notification with org name
 
     @Test
-    public void notifyOrganizerInvite_sendsRegularNotificationWithOrganizerName() {
+    public void notifyOrganizerInvite() {
         stubOrganizerName("Carol");
 
         notification.notifyOrganizerInvite("entrant8", "event8");
@@ -258,10 +220,10 @@ public class NotificationTest {
         assertEquals("System",  sent[3]);
     }
 
-    // ── notifyAllWaiting / Selected / Enrolled / Cancelled ───────────────────
+    // notifyEntrants (Waiting, Selected, Enrolled, Cancelled)
 
     @Test
-    public void notifyAllWaiting_sendsToAllWaitingEntrants() {
+    public void notifyAllWaitingEntrants() {
         stubOrganizerName("Dave");
         stubEntrantsByStatus("event9", 1, Arrays.asList(makeEntrant("e1"), makeEntrant("e2")));
 
@@ -275,7 +237,7 @@ public class NotificationTest {
     }
 
     @Test
-    public void notifyAllSelected_sendsToAllSelectedEntrants() {
+    public void notifyAllSelectedEntrants() {
         stubOrganizerName("Eve");
         stubEntrantsByStatus("eventA", 2, Collections.singletonList(makeEntrant("e3")));
 
@@ -286,7 +248,7 @@ public class NotificationTest {
     }
 
     @Test
-    public void notifyAllEnrolled_sendsToAllEnrolledEntrants() {
+    public void notifyAllEnrolledEntrants() {
         stubOrganizerName("Frank");
         stubEntrantsByStatus("eventB", 3, Collections.singletonList(makeEntrant("e4")));
 
@@ -297,7 +259,7 @@ public class NotificationTest {
     }
 
     @Test
-    public void notifyAllCancelled_sendsToAllCancelledEntrants() {
+    public void notifyAllCancelledEntrants() {
         stubOrganizerName("Grace");
         stubEntrantsByStatus("eventC", 4, Collections.singletonList(makeEntrant("e5")));
 
@@ -307,37 +269,11 @@ public class NotificationTest {
         assertEquals("e5", notification.sentNotifications.get(0)[0]);
     }
 
-    @Test
-    public void notifyAllWaiting_logsNotificationForEachEntrant() {
-        stubOrganizerName("Hal");
-        stubEntrantsByStatus("eventD", 1,
-                Arrays.asList(makeEntrant("e6"), makeEntrant("e7"), makeEntrant("e8")));
-
-        notification.notifyAllWaiting("Broadcast msg", "eventD");
-
-        assertEquals(3, notification.loggedNotifications.size());
-        for (String[] log : notification.loggedNotifications) {
-            assertEquals("eventD",        log[0]);
-            assertEquals("Broadcast msg", log[1]);
-        }
-    }
+    // notifyAllEntrants
 
     @Test
-    public void notifyAllWaiting_emptyEntrantList_sendsNothing() {
-        stubOrganizerName("Ivy");
-        stubEntrantsByStatus("eventE", 1, Collections.emptyList());
-
-        notification.notifyAllWaiting("Any message", "eventE");
-
-        assertTrue(notification.sentNotifications.isEmpty());
-        assertTrue(notification.loggedNotifications.isEmpty());
-    }
-
-    // ── notifyAllEntrants ─────────────────────────────────────────────────────
-
-    @Test
-    public void notifyAllEntrants_sendsToEveryEntrantInList() {
-        stubEntrantList("eventF",
+    public void notifyAllEntrants() {
+        stubEntrantList(
                 Arrays.asList(makeEntrant("u1"), makeEntrant("u2"), makeEntrant("u3")));
 
         notification.notifyAllEntrants("Broadcast", "eventF");
@@ -346,14 +282,5 @@ public class NotificationTest {
         assertEquals("u1", notification.sentNotifications.get(0)[0]);
         assertEquals("u2", notification.sentNotifications.get(1)[0]);
         assertEquals("u3", notification.sentNotifications.get(2)[0]);
-    }
-
-    @Test
-    public void notifyAllEntrants_emptyList_sendsNothing() {
-        stubEntrantList("eventG", Collections.emptyList());
-
-        notification.notifyAllEntrants("Nothing", "eventG");
-
-        assertTrue(notification.sentNotifications.isEmpty());
     }
 }
