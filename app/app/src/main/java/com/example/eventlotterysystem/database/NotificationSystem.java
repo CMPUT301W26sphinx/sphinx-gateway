@@ -1,5 +1,6 @@
 package com.example.eventlotterysystem.database;
 
+import com.google.firebase.Firebase;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -19,7 +20,7 @@ public class NotificationSystem {
 
     /**
      * Sends a STRUCTURED notification to a user if their notification preference is enabled.
-     * "message|eventId|sender"
+     * "message|eventId|sender||"
      * Appends to the user's Notifications list in Firestore.
      *
      * @param entrantId The ID of the user to notify.
@@ -32,7 +33,7 @@ public class NotificationSystem {
             if (user == null) return;
             if (!user.getNotificationPreference()) return;
 
-            String structMessage = message + "|" + eventId + "|" + sender;
+            String structMessage = message + "|" + eventId + "|" + sender +"|"; //Empty "|" so that it does not intrude the 'ask' feature.
 
             FirebaseFirestore.getInstance()
                     .collection("users")
@@ -40,8 +41,18 @@ public class NotificationSystem {
                     .update("notification", FieldValue.arrayUnion(structMessage));
         });
     }
-    //Special use case, basically has it make sure that it opens dialog when there's that Ask option.
-    //Used for private and notify selected entrants.
+    /**
+     * Sends a Specialized STRUCTURED notification to a user if their notification preference is enabled.
+     * "message|eventId|sender|ask|"
+     * the |aSK| is used as a feature so that the notification fragment knows that it needs to ask the
+     * waitlist thingy. New feature yada.
+     * Appends to the user's Notifications list in Firestore.
+     *
+     * @param entrantId The ID of the user to notify.
+     * @param sender  Who sent the message - for now it will be organizer from lottery.
+     * @param eventId The notification message to append.
+     * @author Bryan Jonathan
+     */
     public void sendNotificationAsk(String entrantId, String message, String eventId, String sender){
         profileManager.getUserProfileById(entrantId, user -> {
             if (user == null) return;
@@ -119,5 +130,24 @@ public class NotificationSystem {
         FirebaseFirestore.getInstance()
                 .collection("logs_notification")
                 .add(logData);
+    }
+
+    /**
+     * Used for Mark As Read.
+     * @param userId
+     * @param oldRaw
+     * @param newRaw
+     */
+    public void replaceNotification(String userId, String oldRaw, String newRaw){
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .update("notification", FieldValue.arrayRemove(oldRaw))
+                .addOnSuccessListener(unused ->
+                    FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(userId)
+                            .update("notification", FieldValue.arrayUnion(newRaw))
+                );
     }
 }
