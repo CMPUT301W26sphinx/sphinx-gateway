@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/** NotificationSystem, this should NOT be used directly but yk
+ * if someone needs it, yeah, sure.
+ * this basically touches it to the DB.
+ */
 public class NotificationSystem {
     private final ProfileManager profileManager;
     public NotificationSystem() {
@@ -62,6 +66,7 @@ public class NotificationSystem {
      *
      * @param userId   The Firestore document ID of the user.
      * @param callback Receives the notification list (never null; empty on error/none).
+     * @author Bryan Jonathan
      */
     public void getNotifications(String userId, NotificationsCallback callback) {
         profileManager.getUserProfileById(userId, user -> {
@@ -81,12 +86,27 @@ public class NotificationSystem {
             callback.onResult(reversed);
         });
     }
+
+    /**
+     * Deletes notification from the stack
+     * @param userId The Firestore document ID of the user.
+     * @param message the message that was supposed to be deleted
+     *                PS: there might be error when same message.
+     * @author Bryan Jonathan
+     */
     public void deleteNotification(String userId, String message) {
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(userId)
                 .update("notification", FieldValue.arrayRemove(message));
     }
+
+    /**
+     * logs it to a system. Uses entrantId as organizer who notified.
+     * @param eventId
+     * @param message
+     * @author Bryan Jonathan
+     */
     public void logNotification(String eventId, String message) {
         java.util.Map<String, Object> logData = new java.util.HashMap<>();
         String organizerId = ProfileManager.getInstance().getUserID();

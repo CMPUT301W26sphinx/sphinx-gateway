@@ -7,8 +7,7 @@ import com.example.eventlotterysystem.database.EventRepository;
 
 import java.util.Random;
 /** Basic Lottery System
- * TL;DR, When lottery is triggered, it passes capacity.
- * When someone cancels, it should triggers this again, but only 1 person.
+ * TL;DR, When lottery is triggered, it passes the amount.
  * Auto notifies the user who wins with predetermined notification.
  * @author Bryan Jonathan
  */
