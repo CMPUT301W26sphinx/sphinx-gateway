@@ -68,14 +68,18 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         repository.getEvent(eventId, new EventRepository.SingleEventCallback() {
             @Override
             public void onEventLoaded(Event event) {
+                // Populate basic info
                 titleView.setText(event.getTitle());
                 descView.setText(event.getDescription());
 
+                // Format registration period
                 String regPeriod = formatRegistrationPeriod(
                         event.getRegistrationStartDate(),
                         event.getRegistrationEndDate());
                 regPeriodView.setText(regPeriod);
 
+
+                // Waiting list
                 waitingListView.setText("Waiting List: " + event.getWaitingListCount() + " users");
 
                 if (event.getImageData() != null) {

@@ -36,7 +36,21 @@ public class OrganizerCommentsFragment extends Fragment {
     private final UserCommentManager commentManager = UserCommentManager.getInstance();
     private ListenerRegistration commentListener;
 
+
+    /**
+     * Create Event Details fragment for specific event with eventId
+     *
+     * @param eventId The unique identifier for the event
+     * @return fragment
+     * A new instance of EventDetailsFragment
+     */
     public static OrganizerCommentsFragment newInstance(String eventId) {
+        /*
+         Author: RobinHood https://stackoverflow.com/users/646806/robinhood
+         Title: "How can I transfer data from one fragment to another fragment android"
+         Answer: https://stackoverflow.com/a/19333288
+         Date: Oct 12, 2013
+         */
         OrganizerCommentsFragment fragment = new OrganizerCommentsFragment();
         Bundle args = new Bundle();
         args.putString(EVENT_ID, eventId);
@@ -59,6 +73,7 @@ public class OrganizerCommentsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.view_user_comments, container, false);
     }
 
@@ -66,6 +81,7 @@ public class OrganizerCommentsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // initialize recycler view
         writeCommentBox = view.findViewById(R.id.write_comment_box);
         addCommentButton = view.findViewById(R.id.add_comment_button);
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
@@ -92,6 +108,7 @@ public class OrganizerCommentsFragment extends Fragment {
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentRecyclerView.setAdapter(commentAdapter);
 
+        // populate recycler
         initializeCommentList();
         updateComments();
         addComment();

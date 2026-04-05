@@ -14,8 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class manages stored event comments
+ *
+ */
 public class UserCommentManager {
-
+    // https://firebase.google.com/docs/firestore/query-data/listen
+    // See for reference for the implementation of this class
     private final CollectionReference eventRef;
 
     private UserCommentManager() {
@@ -39,14 +44,23 @@ public class UserCommentManager {
         void onFailure(Exception e);
     }
 
+    /**
+     * Adds the comment to the comments subcollection of an event
+     *
+     * @param eventID
+     * @param comment
+     */
     // Main branch version (with isOrganizer)
     public void addCommentToEvent(String eventID, String comment, boolean isOrganizer, OnCommentAddedListener listener) {
         ProfileManager manager = ProfileManager.getInstance();
+        // get userID
         String uid = manager.getUserID();
+        // get the user
         manager.getUserProfile(user -> {
             String firstName = user.getFirstName();
             DocumentReference docRef = eventRef.document(eventID).collection("comments").document();
             String commentID = docRef.getId();
+            // set fields
             Map<String, Object> data = new HashMap<>();
             data.put("text", comment);
             data.put("userID", uid);
@@ -54,6 +68,7 @@ public class UserCommentManager {
             data.put("userName", firstName);
             data.put("timestamp", FieldValue.serverTimestamp());
             data.put("commentID", commentID);
+            // save document to firestore
             docRef.set(data)
                     .addOnSuccessListener(aVoid -> listener.onSuccess(docRef))
                     .addOnFailureListener(listener::onFailure);
@@ -72,6 +87,13 @@ public class UserCommentManager {
         void onCommentLoaded(List<UserComment> comments);
         void onError(Exception e);
     }
+
+    /**
+     * Get the comments from an event, sorted by descending date
+     *
+     * @param eventID
+     * @param callback
+     */
 
     // Main branch method: uses automatic mapping (commentID field is present)
     public void getCommentsFromEvent(String eventID, UserCommentCallback callback) {
@@ -102,6 +124,13 @@ public class UserCommentManager {
                 .addOnFailureListener(callback::onError);
     }
 
+    /**
+     * Listens to the comments subcollection and sends the updated list when changed
+     *
+     * @param eventID
+     * @param callback
+     * @return
+     */
     // ------------------------------------------------------------------------
     // Realtime listener
     // ------------------------------------------------------------------------

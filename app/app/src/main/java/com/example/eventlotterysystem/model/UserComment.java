@@ -15,6 +15,9 @@ public class UserComment {
 
     // constructor used by main branch
     public UserComment(String text, String userID, String userName) {
+        /**
+         * This defines the structure of a comment to be stored in an event
+         */
         this.text = text;
         this.userID = userID;
         this.userName = userName;

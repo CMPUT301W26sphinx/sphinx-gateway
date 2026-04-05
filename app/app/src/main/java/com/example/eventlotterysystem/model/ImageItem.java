@@ -3,11 +3,11 @@ package com.example.eventlotterysystem.model;
 import java.io.Serializable;
 
 public class ImageItem implements Serializable {
-    private String id;
-    private String title;
-    private String description;
-    private String imageUrl;
-    private String uploaderName;
+    private String id;   // Firestore document ID (event ID or image ID)
+    private String title;   // event name or image title
+    private String description;   // event description or image caption
+    private String imageUrl;   // placeholder URL or actual image URL
+    private String uploaderName;   // e.g., "System" or uploader's name
     private String imageData;
 
     public ImageItem(String id, String title, String description, String imageUrl, String uploaderName, String imageData) {
