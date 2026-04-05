@@ -44,7 +44,7 @@ public class UserComment {
         this.isOrganizer = isOrganizer;
     }
 
-    public boolean isOrganizer() { return isOrganizer; }
+    public boolean getIsOrganizer() { return isOrganizer; }
     public String getCommentID() { return commentID; }
     public String getText() { return text; }
     public Timestamp getTimestamp() { return timestamp; }
