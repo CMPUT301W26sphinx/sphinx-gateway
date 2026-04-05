@@ -14,6 +14,8 @@ public class EntrantListEntry {
     private String entrantId;
 
     private int status; // for invited, etc before going to registered status
+    private Double latitude;
+    private Double longitude;
 
     /**
      * empty consructor used by firestore
@@ -48,6 +50,14 @@ public class EntrantListEntry {
         this.status = status;
     }
 
+    public EntrantListEntry(String eventId, String entrantId, int status, Double latitude, Double longitude) {
+        this.eventId = eventId;
+        this.entrantId = entrantId;
+        this.status = status;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     // getters
     /**
      * This gets the id of the entrant to add to the waitlist.
@@ -76,6 +86,14 @@ public class EntrantListEntry {
         return status;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
     // setters
     /**
      * This sets the status of the waitlist entry.(WAITLIST, INVITED, etc.)
@@ -102,6 +120,14 @@ public class EntrantListEntry {
      */
     public void setEntrantId(String entrantId) {
         this.entrantId = entrantId;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
 }

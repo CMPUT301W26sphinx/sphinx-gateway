@@ -14,10 +14,11 @@ public class UserProfile implements Serializable {
     private String email;
     private String phoneNumber;
     private boolean notificationPreference; // was receiveNotifications
-    private List<String> notification;      // was Notifications
+    private List<String> notification;// was Notifications
+    private Double longitude;
+    private Double latitude;
 
     // private role userRole; //need role class, entrant, organizer, or whatever
-
     // Construct
     public UserProfile() {
 
@@ -70,6 +71,10 @@ public class UserProfile implements Serializable {
     public void setUserID(String userID) {
         this.userID = userID;
     }
+
+    public void setLatitude(Double latitude){this.latitude = latitude;}
+
+    public void setLongitude(Double longitude){this.longitude = longitude;}
 
     // Getters
     /**
@@ -130,5 +135,10 @@ public class UserProfile implements Serializable {
     public String getLastName() {
         return lastName;
     }
+
+    public Double getLatitude(){return latitude;}
+
+    public Double getLongitude(){return longitude;}
+
 
 }

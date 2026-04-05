@@ -159,19 +159,8 @@
         android:text="See Comments"
         app:layout_constraintBottom_toTopOf="@id/buttonRow"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.875"
+        app:layout_constraintHorizontal_bias="0.449"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_details_scroll_view" />
-
-    <Button
-        android:id="@+id/mapButton"
-        android:layout_width="181dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="8dp"
-        android:backgroundTint="@color/nav_blue"
-        android:text="View Entrants Map"
-        app:layout_constraintBottom_toTopOf="@+id/buttonRow"
-        app:layout_constraintEnd_toStartOf="@+id/seeCommentsButton"
         app:layout_constraintTop_toBottomOf="@+id/event_details_scroll_view" />
 
     <LinearLayout
