@@ -15,12 +15,6 @@ import org.junit.Test;
 /**
  * Unit tests for EntrantListFirebase using Mockito.
  *
- *Resources:
- * https://developer.android.com/training/testing/local-tests
- * https://medium.com/@chetanshingare2991/mastering-android-unit-testing-with-mockito-mocking-for-reliability-and-flexibility-93d42078d2ca
- * also generated setup/example test with help from Chatgpt
- * "How do I use mocks in JUnit tests for Firebase Firestore?"
- * and for debugging issues with mock calls
  * covers:
  * - upsertEntry
  * - upsert failure
@@ -31,11 +25,16 @@ import org.junit.Test;
  * - update status with negative status
  *
  * coverage for other methods in EntrantListFirebaseTest under Android tests due to difficulty with
- * use of continue functions? (error where task not completing etc)
+ * use of continue functions? Need android runtime (error where task not completing etc)
  *
  */
 public class EntrantListFirebaseTest {
-
+    //Resources:
+    // https://developer.android.com/training/testing/local-tests
+    // https://medium.com/@chetanshingare2991/mastering-android-unit-testing-with-mockito-mocking-for-reliability-and-flexibility-93d42078d2ca
+    // also generated setup/example test with help from Chatgpt
+    // "How do I use mocks in JUnit tests for Firebase Firestore?"
+    // and for debugging issues with mock calls
     private FirebaseFirestore mockDb;
     private CollectionReference mockEvents;
     private DocumentReference mockEventDoc;

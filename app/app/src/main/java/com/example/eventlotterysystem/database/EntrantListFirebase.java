@@ -25,7 +25,7 @@ public class EntrantListFirebase {
         this(FirebaseFirestore.getInstance());
     }
 
-    EntrantListFirebase(FirebaseFirestore db) {
+    public EntrantListFirebase(FirebaseFirestore db) {
         this.db = db;
     }
     /**
