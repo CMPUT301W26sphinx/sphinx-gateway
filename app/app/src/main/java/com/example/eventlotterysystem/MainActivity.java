@@ -179,7 +179,17 @@ public class MainActivity extends AppCompatActivity {
                         ProfileManager profileManager = ProfileManager.getInstance();
                         UserProfile userProfile = new UserProfile();
 
-                        profileManager.saveUser(userProfile);
+                        profileManager.saveUser(userProfile, new ProfileManager.OnUserAddedCallback() {
+                            @Override
+                            public void onSuccess(Void snapshot) {
+                                Log.d(TAG, "User created successfully");
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Log.e(TAG, "Error creating user", e);
+                            }
+                        });
                     }
 
                     // ✅ FIX: request location AFTER user exists
