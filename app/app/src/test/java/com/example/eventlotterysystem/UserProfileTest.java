@@ -14,7 +14,7 @@ public class UserProfileTest {
         // set id
         userProfile.setUserID("qwerty");
         // test ID retrieval
-        assertEquals("qwerty", userProfile.getProfileID());
+        assertEquals("qwerty", userProfile.getUserID());
     }
     @Test
     public void testGetUserName(){
@@ -28,7 +28,7 @@ public class UserProfileTest {
     public void testGetEmail(){
         UserProfile userProfile = new UserProfile();
         // set email
-        userProfile.setUserEmail("test@gmail.com");
+        userProfile.setEmail("test@gmail.com");
         // test retrieval
         assertEquals("test@gmail.com", userProfile.getEmail());
     }
@@ -36,7 +36,7 @@ public class UserProfileTest {
     public void testGetPhoneNumber(){
         UserProfile userProfile = new UserProfile();
         // set phone number
-        userProfile.setUserPhoneNumber("780-777-3576");
+        userProfile.setPhoneNumber("780-777-3576");
         // test retrieval
         assertEquals("780-777-3576", userProfile.getPhoneNumber());
     }
@@ -44,7 +44,7 @@ public class UserProfileTest {
     public void testSetNotificationPreference(){
         UserProfile userProfile = new UserProfile();
         // set preference
-        userProfile.setReceiveNotifications(true);
+        userProfile.setNotificationPreference(true);
         // test retrieval
         assertTrue(userProfile.getNotificationPreference());
     }

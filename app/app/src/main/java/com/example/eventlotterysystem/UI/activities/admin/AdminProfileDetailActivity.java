@@ -49,7 +49,7 @@ public class AdminProfileDetailActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         removeButton.setOnClickListener(v -> {
-            profileManager.deleteUser(profile.getProfileID(), new ProfileManager.OnDeleteListener() {
+            profileManager.deleteUser(profile.getUserID(), new ProfileManager.OnDeleteListener() {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(AdminProfileDetailActivity.this, "Profile removed", Toast.LENGTH_SHORT).show();

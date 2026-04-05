@@ -85,7 +85,7 @@ public class ProfileEditFragment extends Fragment {
 
             // update fields
             if (email.contains("@") && email.endsWith(".com")){
-                userProfile.setUserEmail(email);
+                userProfile.setEmail(email);
             } else {
                 Toast myToast = Toast.makeText(getActivity(), "Invalid email format",
                         Toast.LENGTH_SHORT);
@@ -94,7 +94,7 @@ public class ProfileEditFragment extends Fragment {
             }
 
             if (phoneNumber.matches("\\d{3}-\\d{3}\\-\\d{4}") || phoneNumber.isEmpty()){
-                userProfile.setUserPhoneNumber(phoneNumber);
+                userProfile.setPhoneNumber(phoneNumber);
             } else {
                 Toast myToast = Toast.makeText(getActivity(), "Invalid phone number format",
                         Toast.LENGTH_SHORT);
@@ -121,13 +121,29 @@ public class ProfileEditFragment extends Fragment {
 
             }
 
-            // update user information in firebase
-            if (isValid){
-                manager.saveUser(userProfile);
-                // display information saved message
-                Toast myToast = Toast.makeText(getActivity(), "Information Saved!",
+            if (email.length() > 50){
+                isValid = false;
+                Toast myToast = Toast.makeText(getActivity(), "Email is too long",
                         Toast.LENGTH_SHORT);
                 myToast.show();
+            }
+            // update user information in firebase
+            if (isValid){
+                manager.saveUser(userProfile, new ProfileManager.OnUserAddedCallback() {
+                    @Override
+                    public void onSuccess(Void snapshot) {
+                        // display information saved message
+                        Toast myToast = Toast.makeText(getActivity(), "Information Saved!",
+                                Toast.LENGTH_SHORT);
+                        myToast.show();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+
+                    }
+                });
+
             }
 
 

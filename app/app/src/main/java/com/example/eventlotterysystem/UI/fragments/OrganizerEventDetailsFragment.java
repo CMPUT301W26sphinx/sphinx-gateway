@@ -1,5 +1,7 @@
 package com.example.eventlotterysystem.UI.fragments;
 
+import android.app.AlertDialog;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,8 @@ import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.zxing.BarcodeFormat;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,6 +56,8 @@ public class OrganizerEventDetailsFragment extends Fragment{
     //Firestore data for these variables
     private Button editEventButton;
     //Firestore data for these variables
+    private Button inviteCo_OrgButton;
+    private Button qrButton;
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
@@ -127,11 +133,13 @@ public class OrganizerEventDetailsFragment extends Fragment{
         valueStarttime = view.findViewById(R.id.valueStartTime);
         valueLocation = view.findViewById(R.id.valueLocation);
         eventPoster = view.findViewById(R.id.eventposter);
+        inviteCo_OrgButton = view.findViewById(R.id.inviteCoOrganizerButton);
         //infoButton = view.findViewById(R.id.infoButton);
         backButton = view.findViewById(R.id.backbutton);
         editEventButton = view.findViewById(R.id.editEventButton);
         addCommentButton = view.findViewById(R.id.add_comment_button);
         writeCommentBox = view.findViewById(R.id.write_comment_box);
+        qrButton = view.findViewById(R.id.generateQrButton);
 
         // get the id
         Bundle args = getArguments();
@@ -145,6 +153,15 @@ public class OrganizerEventDetailsFragment extends Fragment{
             entrantId = user.getUid();
         }
 
+        inviteCo_OrgButton.setOnClickListener(v -> {
+            Fragment fragment = InviteCoOrganizerFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
         editEventButton.setOnClickListener(v -> {
             Fragment fragment = EditEventFragment.newInstance(eventId);
             requireActivity()
@@ -153,6 +170,27 @@ public class OrganizerEventDetailsFragment extends Fragment{
                     .replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commit();
+        });
+
+        qrButton.setOnClickListener(v -> {
+            try {
+                String url = eventId;
+
+                BarcodeEncoder encoder = new BarcodeEncoder();
+                Bitmap bitmap = encoder.encodeBitmap(url, BarcodeFormat.QR_CODE, 400, 400);
+                ImageView imageView = new ImageView(getContext());
+                imageView.setImageBitmap(bitmap);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("QR Code");
+                builder.setView(imageView);
+                builder.setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+
+                builder.show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         });
 
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -238,8 +276,10 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 valueRegistration.setText(regPeriod);
 
                 // These fields are not yet in the Event model
-                valueStarttime.setText("Not available");
-                valueLocation.setText("Not available");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String datetStr = sdf.format(new Date(event.getDate()));
+                valueStarttime.setText(datetStr);
+                valueLocation.setText(event.getPlace());
 
                 // Waitlist count is handled by refreshWaitlistCount()
             }

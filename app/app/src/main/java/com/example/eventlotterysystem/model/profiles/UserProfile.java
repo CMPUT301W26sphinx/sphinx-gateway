@@ -19,57 +19,24 @@ public class UserProfile implements Serializable {
     private Double latitude;
 
     // private role userRole; //need role class, entrant, organizer, or whatever
+
     // Construct
     public UserProfile() {
 
     }
 
-//    public UserProfile(String userID) {
-//        this.userID = userID;
-//    }
-
-    // Setters
-
-    /**
-     * Update the users first name
-     *
-     * @param firstName
-     */
-    public void setFirstName(String firstName) {
+    public UserProfile(String firstName, String lastName, String email, String phoneNumber) {
         this.firstName = firstName;
-    }
-
-    /**
-     * Update the users email
-     *
-     * @param userEmail
-     */
-    public void setUserEmail(String userEmail) {
-        this.email = userEmail;
-    }
-
-    /**
-     * Update the users phone number
-     *
-     * @param userPhone
-     */
-    public void setUserPhoneNumber(String userPhone) {
-        this.phoneNumber = userPhone;
-    }
-
-    /**
-     * Set the users last name
-     */
-    public void setLastName(String lastName) {
         this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 
-    /**
-     * Set user ID
-     * @param userID
-     */
-    public void setUserID(String userID) {
-        this.userID = userID;
+    // getters
+
+
+    public String getUserID() {
+        return userID;
     }
 
     public void setLatitude(Double latitude){this.latitude = latitude;}
@@ -86,56 +53,55 @@ public class UserProfile implements Serializable {
         return firstName;
     }
 
-    /**
-     * Get the users userID (UID)
-     *
-     * @return
-     */
-    public String getProfileID() {
-        return userID;
-    }
-
-    /**
-     * Update the users stored phone number
-     *
-     * @return
-     */
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    /**
-     * Update the users stored email address
-     *
-     * @return
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * Returns notification preference
-     * @return
-     */
-    public boolean getNotificationPreference() {return notificationPreference;}
-
-    /**
-     * Sets notification preference
-     * @param choice yes or no
-     */
-    public void setReceiveNotifications(boolean choice) {this.notificationPreference = choice;}
-    /**
-     * Gets notifications
-     * @return notification
-     */
-    public List<String> getNotification() {return notification;}
-    /**
-     * Get the users last name.
-     */
     public String getLastName() {
         return lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public boolean getNotificationPreference() {
+        return notificationPreference;
+    }
+
+    public List<String> getNotification() {
+        return notification;
+    }
+
+    // setters
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setNotificationPreference(boolean notificationPreference) {
+        this.notificationPreference = notificationPreference;
+    }
+
+    public void setNotification(List<String> notification) {
+        this.notification = notification;
+    }
     public Double getLatitude(){return latitude;}
 
     public Double getLongitude(){return longitude;}

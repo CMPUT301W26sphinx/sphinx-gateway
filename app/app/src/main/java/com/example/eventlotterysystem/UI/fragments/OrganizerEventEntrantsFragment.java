@@ -2,6 +2,8 @@ package com.example.eventlotterysystem.UI.fragments;
 
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.eventlotterysystem.model.CsvExporter;
 import com.example.eventlotterysystem.model.LotterySystem;
 import com.example.eventlotterysystem.model.Notification;
 
@@ -26,6 +29,7 @@ import com.example.eventlotterysystem.model.EntrantDisplay;
 import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.database.ProfileManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -54,7 +58,13 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     private Button notifySelectedButton;
     private Button notifyCancelledButton;
     private Button exportCsvButton;
+    private Button inviteButton;
+    // To figure out how to create a csv, I looked at these sources:
+    // https://medium.com/@sanjayajosep/offline-first-challenge-making-csv-pdf-reports-right-on-android-faf2ee7946dc
+  
     private List<EntrantDisplay> enrolledList = new ArrayList<>();
+    private ActivityResultLauncher<String> createCsvLauncher;
+    private CsvExporter entrantCsvExporter;
 
     private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
     private final ProfileManager profileManager = ProfileManager.getInstance();
@@ -72,6 +82,25 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    //https://medium.com/@sanjayajosep/offline-first-challenge-making-csv-pdf-reports-right-on-android-faf2ee7946dc
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        createCsvLauncher = registerForActivityResult(
+                new ActivityResultContracts.CreateDocument("text/csv"),
+                uri -> {
+                    if (uri == null || !isAdded()) { // uri is where to put the file
+                        return;
+                    }
+                    try {
+                        entrantCsvExporter.writeCsv(uri, enrolledList);
+                        Toast.makeText(requireContext(), "CSV exported", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        Toast.makeText(requireContext(), "Export failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+    }
 
 
     @Override
@@ -84,7 +113,8 @@ public class OrganizerEventEntrantsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        // initialize the csv
+        entrantCsvExporter = new CsvExporter(requireContext());
         waitlistRecyclerView = view.findViewById(R.id.waitlistRecyclerView);
         selectedRecyclerView = view.findViewById(R.id.selectedRecyclerView);
         enrolledRecyclerView = view.findViewById(R.id.enrolledRecyclerView);
@@ -98,6 +128,19 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         notifySelectedButton = view.findViewById(R.id.notifySelectedButton);
         notifyCancelledButton = view.findViewById(R.id.notifyCancelledButton);
         exportCsvButton = view.findViewById(R.id.exportCsvButton);
+        inviteButton = view.findViewById(R.id.inviteButton);
+
+        inviteButton.setOnClickListener(v -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+            Fragment fragment = InviteEntrantFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         notifyWaitlistButton.setOnClickListener(v -> {
             String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
@@ -123,17 +166,32 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         startLotteryButton.setOnClickListener(v -> {
             String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
             if (eventId == null) return;
+            boolean isRedraw = startLotteryButton.getText().toString().equalsIgnoreCase("Redraw Lottery");
+            if (isRedraw){
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Redraw Lottery")
+                        .setMessage("This will redraw up to full capacity. Continue?")
+                        .setPositiveButton("Redraw!", (dialog, which) -> {
+                            lotterySystem.redrawLottery(eventId);
+                            Toast.makeText(requireContext(), "Lottery started!", Toast.LENGTH_SHORT).show();
+                            loadEntrants(eventId);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
 
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Start Lottery")
-                    .setMessage("This will run the lottery up to full capacity and notify all losers. Continue?")
-                    .setPositiveButton("Start", (dialog, which) -> {
-                        lotterySystem.firstLottery(eventId);
-                        Toast.makeText(requireContext(), "Lottery started!", Toast.LENGTH_SHORT).show();
-                        loadEntrants(eventId);
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+            }
+            else{
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Start Lottery")
+                        .setMessage("This will run the lottery up to full capacity and notify all losers. Continue?")
+                        .setPositiveButton("Start", (dialog, which) -> {
+                            lotterySystem.firstLottery(eventId);
+                            Toast.makeText(requireContext(), "Lottery started!", Toast.LENGTH_SHORT).show();
+                            loadEntrants(eventId);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
         });
 
         sampleButton.setOnClickListener(v -> {
@@ -220,6 +278,13 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         enrolledAdapter = new EntrantAdapter();
         cancelledAdapter = new EntrantAdapter();
 
+        selectedAdapter.setOnCancelClickListener(entrant -> {
+            String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+            if (eventId == null) return;
+
+            showCancelDialog(eventId, entrant);
+        });
+
         // Set up layout managers for each RecyclerView
         waitlistRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         selectedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -231,7 +296,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
         enrolledRecyclerView.setAdapter(enrolledAdapter);
         cancelledRecyclerView.setAdapter(cancelledAdapter);
 
-            }
+    }
 
     /**
      * This method is used to load the entrants for the event.
@@ -240,6 +305,7 @@ public class OrganizerEventEntrantsFragment extends Fragment {
      *  No parameters or returns.
      */
     private void loadEntrants(String eventId){
+        enrolledList.clear();//avoid duplicates
         entrantListFirebase.getEntrantList(eventId)
                 .addOnSuccessListener(entries -> {
                     if (!isAdded()) return;
@@ -282,6 +348,8 @@ public class OrganizerEventEntrantsFragment extends Fragment {
 
                                 case EntrantListEntry.STATUS_REGISTERED:
                                     enrolled.add(display);
+                                    // add entry to list for csv
+                                    enrolledList.add(display);
                                     break;
 
                                 case EntrantListEntry.STATUS_CANCELLED_OR_REJECTED:
@@ -296,17 +364,53 @@ public class OrganizerEventEntrantsFragment extends Fragment {
                                 selectedAdapter.setEntrants(selected);
                                 enrolledAdapter.setEntrants(enrolled);
                                 cancelledAdapter.setEntrants(cancelled);
+
+                                //Changes button text based on what the lottery is doing.
+                                //I would like to have it so we had seperate "cancelled" but we didnt have this foresight
+                                //This means that anyone who 'deregisters' from the event will cause start lottery
+                                //- bryan j
+                                if (!cancelled.isEmpty() && !waitlist.isEmpty()) {
+                                    startLotteryButton.setText("Redraw Lottery");
+                                } else {
+                                    startLotteryButton.setText("Start Lottery");
+                                }
                             }
                         });
                     }
                 }).addOnFailureListener(e -> {if (!isAdded()) return;Toast.makeText(requireContext(), "Failed to load entrants", Toast.LENGTH_SHORT).show();});
     }
 
+    /**
+     * This method is used to export the enrolled entrants to a csv file.
+     *  No parameters or returns.
+     */
     private void exportCsv() {
         if (enrolledList == null || enrolledList.isEmpty()) {
             Toast.makeText(requireContext(), "No registered entrants", Toast.LENGTH_SHORT).show();
             return;
         }
-        // TODO: fill
+        if (!isAdded()) return;
+        createCsvLauncher.launch("registered_entrants.csv");
+    }
+
+    /**
+     * Show confirmation dialog before cancelling an invited entrant.
+     */
+    private void showCancelDialog(String eventId, EntrantDisplay entrant) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Cancel Entrant")
+                .setMessage("Cancel " + entrant.getFullName() + "?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    entrantListFirebase.updateStatus(eventId, entrant.getEntrantId(), EntrantListEntry.STATUS_CANCELLED_OR_REJECTED
+                    ).addOnSuccessListener(unused -> {
+                        if (!isAdded()) return;
+                        Toast.makeText(requireContext(), "Entrant cancelled", Toast.LENGTH_SHORT).show();
+                        loadEntrants(eventId);
+                    }).addOnFailureListener(e -> {
+                        if (!isAdded()) return;
+                        Toast.makeText(requireContext(), "Failed to cancel entrant", Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .setNegativeButton("No", null).show();
     }
 }

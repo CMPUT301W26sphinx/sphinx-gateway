@@ -191,8 +191,9 @@ public class EditEventFragment extends Fragment {
                 }
 
                 // Max Entrant
-                maxInput.setText(String.valueOf(event.getCapacity()));
-
+                if (event.getCapacity() != 0){
+                    maxInput.setText(String.valueOf(event.getCapacity()));
+                }
                 // Waitlist count is handled by refreshWaitlistCount()
             }
 
@@ -372,7 +373,7 @@ public class EditEventFragment extends Fragment {
                 .addOnSuccessListener(unused -> {
                             Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
                             // direct back to EventDetailsFragment after updating
-                            EventDetailsFragment fragment = EventDetailsFragment.newInstance(eventId);
+                            OrganizerEventNavigationFragment fragment = OrganizerEventNavigationFragment.newInstance(eventId);
                             getParentFragmentManager()
                                     .beginTransaction()
                                     .replace(R.id.fragment_container, fragment)

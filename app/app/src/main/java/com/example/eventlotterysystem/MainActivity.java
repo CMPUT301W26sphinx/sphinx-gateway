@@ -47,6 +47,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+    /**
+     * Creates a new instance that goes to the Events, without login.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +68,67 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+
+        userSignIn();
+
+    }
+
+    /**
+     * Signs the user in and creates their profile in firebase
+     */
+    public void userSignIn(){
+        // loads database and auth for firebase
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Sign in anonymously
+        mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "signInAnonymously:success");
+
+                    String uid = mAuth.getCurrentUser().getUid();
+                    DocumentReference docRef = db.collection("users").document(uid);
+
+                    docRef.get().addOnSuccessListener(document -> {
+                        if (!document.exists()) {
+
+                            ProfileManager profileManager = ProfileManager.getInstance();
+
+                            // create profile
+                            UserProfile userProfile = new UserProfile();
+
+                            // save to Firestore
+                            profileManager.saveUser(userProfile, new ProfileManager.OnUserAddedCallback() {
+                                @Override
+                                public void onSuccess(Void snapshot) {
+
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+
+                                }
+                            });
+
+                        }
+                    });
+
+                    // setup bottom nav
+                    initializeBottomNavigation();
+
+                    // Stay on entrant UI (no redirect)
+                } else {
+                    Log.w(TAG, "signInAnonymously:failure", task.getException());
+                }
+            }
+        });
+    }
+    /**
+     * Creates the bottom navigation
+     */
+    private void initializeBottomNavigation() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         EventListFragment eventListFragment = new EventListFragment();
@@ -67,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         ProfileFragment profileFragment = new ProfileFragment();
         OrganizerFragment organizerFragment = new OrganizerFragment();
 
+        // Set default fragment (Events)
         setCurrentFragment(eventListFragment);
 
         boolean showTermsPopup = getIntent().getBooleanExtra("show_terms_popup", false);
@@ -74,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
             showTermsDialog();
         }
 
+        // No Login!!
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.events) {
@@ -121,6 +192,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Shows the terms and conditions pop-up
+     */
     private void showTermsDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.activity_terms, null);
 
@@ -196,6 +270,11 @@ public class MainActivity extends AppCompatActivity {
                 .set(location, SetOptions.merge());
     }
 
+    /**
+     * Replaces current fragment with the specified fragment
+     *
+     * @param fragment the fragment to display next
+     */
     private void setCurrentFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
@@ -225,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_switch_account) {
-
+            // Navigate to AccountTypeActivity and clear back stack
             Intent intent = new Intent(this, AccountTypeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
