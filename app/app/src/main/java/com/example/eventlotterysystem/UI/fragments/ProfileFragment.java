@@ -108,71 +108,80 @@ public class ProfileFragment extends Fragment {
             });
         });
 
-
-        //DELETE PROFILE BUTTON
-        //Made it so that it writes null to all organizerId (because it may crash?)
-        //Firebase SDK documentation is used yes yes
-        //https://firebase.google.com/docs/firestore/manage-data/delete-data#java
         view.findViewById(R.id.deleteProfileButton).setOnClickListener(v -> {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Delete Profile")
-                    .setMessage("Are you sure you want to delete your profile? This cannot be undone.")
-                    .setPositiveButton("Delete", (dialog, which) -> {
-            String userId = manager.getUserID();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            deleteAccount(manager);
+        });
+    }
 
-            //change organizer to null
-            //set event to private (since it's over)
-            db.collection("events")
-                    .whereEqualTo("organizerId", userId)
-                    .get()
-                    .addOnSuccessListener(organizerEvents -> {
-                        WriteBatch batch = db.batch();
-                        for (DocumentSnapshot doc : organizerEvents) {
-                            batch.update(doc.getReference(), "privacy","Private");
-                            batch.update(doc.getReference(), "organizerId", null);
-                        }
-            //Find all events where user is in EntrantList subcollection
-            db.collection("events")
-                    .get()
-                    .addOnSuccessListener(allEvents -> {
-                        final int[] pendingTasks = {allEvents.size()};
-                        if (allEvents.isEmpty()) {
-                            // No events, commit batch and delete user
-                            commitBatchAndDeleteUser(batch, db, userId);
-                            return;
-                        }
-                for (DocumentSnapshot eventDoc : allEvents) {
-                    eventDoc.getReference()
-                            .collection("EntrantList")
-                            .document(userId)
+    /** DELETE PROFILE BUTTON
+     *  Made it so that it writes null to all organizerId (because it may crash?)
+     *  Firebase SDK documentation is used yes yes
+     *  https://firebase.google.com/docs/firestore/manage-data/delete-data#java
+     * @param manager rather use the one that is initialized before.
+     * @Author Bryan Jonathan
+     */
+    private void deleteAccount(ProfileManager manager){
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Profile")
+                .setMessage("Are you sure you want to delete your profile? This cannot be undone.")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    String userId = manager.getUserID();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    //change organizer to null
+                    //set event to private (since it's over)
+                    db.collection("events")
+                            .whereEqualTo("organizerId", userId)
                             .get()
-                            .addOnSuccessListener(entrantDoc -> {
-                                if (entrantDoc.exists()) {
-                                    batch.delete(entrantDoc.getReference());
+                            .addOnSuccessListener(organizerEvents -> {
+                                WriteBatch batch = db.batch();
+                                for (DocumentSnapshot doc : organizerEvents) {
+                                    batch.update(doc.getReference(), "privacy","Private");
+                                    batch.update(doc.getReference(), "organizerId", null);
                                 }
-                                pendingTasks[0]--;
-                                if (pendingTasks[0] == 0) {
+                    //Find all events where user is in EntrantList subcollection
+                    db.collection("events")
+                            .get()
+                            .addOnSuccessListener(allEvents -> {
+                                final int[] pendingTasks = {allEvents.size()};
+                                if (allEvents.isEmpty()) {
+                                    // No events, commit batch and delete user
                                     commitBatchAndDeleteUser(batch, db, userId);
+                                    return;
                                 }
-                            })
-                            .addOnFailureListener(e -> {
-                                pendingTasks[0]--;
-                                if (pendingTasks[0] == 0) {
-                                    commitBatchAndDeleteUser(batch, db, userId);
+                    for (DocumentSnapshot eventDoc : allEvents) {
+                        eventDoc.getReference()
+                                .collection("EntrantList")
+                                .document(userId)
+                                .get()
+                                .addOnSuccessListener(entrantDoc -> {
+                                    if (entrantDoc.exists()) {
+                                        batch.delete(entrantDoc.getReference());
+                                    }
+                                    pendingTasks[0]--;
+                                    if (pendingTasks[0] == 0) {
+                                        commitBatchAndDeleteUser(batch, db, userId);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    pendingTasks[0]--;
+                                    if (pendingTasks[0] == 0) {
+                                        commitBatchAndDeleteUser(batch, db, userId);
                                 }
                             });
                         }
                     });
-                });
-                })
+                    });
+            })
             .setNegativeButton("Cancel", null)
             .show();
-        });
     }
 
-    //Bye bye account
-    //https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
+    /** Bye bye account
+     * https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
+     * @param batch
+     * @param db
+     * @param userId
+     */
     private void commitBatchAndDeleteUser(WriteBatch batch, FirebaseFirestore db, String userId) {
         batch.delete(db.collection("users").document(userId));
         batch.commit()

@@ -176,6 +176,11 @@ public class InviteCoOrganizerFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+    /** adds Coorganizer to the event, and notifies them.
+     * Uses the searchbar implemented by Ivan
+     * @param profile
+     * @author Bryan Jonathan
+     */
     private void inviteCoOrganizer(UserProfile profile) {
         if (eventId == null) {
             Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
