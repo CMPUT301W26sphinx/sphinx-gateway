@@ -140,7 +140,11 @@
             }
             adapter.notifyDataSetChanged();
         }
-
+        /** Invites Entrant, and notifies them (using the ask feature)
+         * Uses the searchbar implemented by Ivan
+         * @param profile
+         * @author Bryan Jonathan
+         */
         private void inviteEntrant(UserProfile profile) {
             if (eventId == null) {
                 Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();

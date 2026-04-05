@@ -1,14 +1,11 @@
 package com.example.eventlotterysystem.database;
 
 import com.example.eventlotterysystem.model.profiles.UserProfile;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +48,10 @@ public class ProfileManager {
         return user.getUid();
     }
 
+    public interface OnUserAddedCallback{
+        void onSuccess(Void snapshot);
+        void onFailure(Exception e);
+    }
     /**
      * Saves the desired user into firebase if they do no exist already. If they
      * already exist, updates the information.
@@ -58,17 +59,19 @@ public class ProfileManager {
      *
      * @param user the user profile that you want to save
      */
-    public void saveUser(UserProfile user) {
+    public void saveUser(UserProfile user, OnUserAddedCallback callback) {
         // get the UID
         String uid = getUserID();
         // set the ID for the profile
         user.setUserID(uid);
         // update in firebase
-        usersRef.document(uid).set(user);
+        usersRef.document(uid).set(user).addOnSuccessListener(callback::onSuccess).addOnFailureListener(callback::onFailure);
     }
 
+    @FunctionalInterface
     public interface UserProfileCallBack {
         void onComplete(UserProfile user);
+        default void onFailure(Exception e) {}
     }
 
     /**
@@ -84,8 +87,10 @@ public class ProfileManager {
             if (document.exists()) {
                 UserProfile userProfile = document.toObject(UserProfile.class);
                 callback.onComplete(userProfile);
+            } else {
+                callback.onFailure(new Exception("User not found"));
             }
-        });
+        }).addOnFailureListener(callback::onFailure);
     }
 
     public interface AllUsersCallback {
@@ -113,6 +118,11 @@ public class ProfileManager {
         void onError(Exception e);
     }
 
+    /**
+     * Delete the user profile from firebase
+     * @param userId
+     * @param listener
+     */
     public void deleteUser(String userId, OnDeleteListener listener) {
         usersRef.document(userId).delete().addOnSuccessListener(aVoid -> listener.onSuccess()).addOnFailureListener(listener::onError);
     }
@@ -132,7 +142,7 @@ public class ProfileManager {
             } else {
                 callback.onComplete(null);
             }
-        });
+        }).addOnFailureListener(callback::onFailure);
     }
 
 
