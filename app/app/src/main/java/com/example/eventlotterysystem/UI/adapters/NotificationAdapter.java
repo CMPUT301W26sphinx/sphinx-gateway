@@ -1,5 +1,6 @@
 package com.example.eventlotterysystem.UI.adapters;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return new ViewHolder(v);
     }
 
+    // Used for Read notification
+    // https://stackoverflow.com/questions/29468423/changing-the-color-of-the-settextcolor-when-the-checkbox-is-using-setenabletru
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String raw     = items.get(position);
@@ -47,7 +50,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         holder.sender.setText(parts.length > 2 ? parts[2] : "System");
         holder.message.setText(parts.length > 0 ? parts[0] : raw);
+        boolean isRead = parts.length > 4 && parts[4].equals("read");
 
+        if (isRead){
+            holder.sender.setTextColor(Color.GRAY);
+            holder.message.setTextColor(Color.GRAY);
+        }
+        else{
+            holder.sender.setTextColor(Color.DKGRAY);
+            holder.message.setTextColor(Color.DKGRAY);
+        }
         holder.itemView.setOnClickListener(v -> listener.onClick(raw));
     }
 
