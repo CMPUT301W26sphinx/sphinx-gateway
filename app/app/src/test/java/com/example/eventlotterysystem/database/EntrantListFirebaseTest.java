@@ -26,6 +26,10 @@ import org.junit.Test;
  * - update status
  * - update status failure
  * - update status with negative status
+ *
+ * coverage for other methods in EntrantListFirebaseTest under Android tests due to difficulty with
+ * use of continue functions? (error where task not completing etc)
+ *
  */
 public class EntrantListFirebaseTest {
 
