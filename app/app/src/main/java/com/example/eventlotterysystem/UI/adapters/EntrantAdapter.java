@@ -83,11 +83,11 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.ViewHold
     /**
      * ViewHolder for each row
      */
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView nameText;
-        TextView emailText;
-        Button cancelButton;
+        public TextView nameText;
+        public TextView emailText;
+        public Button cancelButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
