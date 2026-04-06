@@ -5,8 +5,7 @@
         android:id="@+id/nav_events"
         android:icon="@drawable/ic_events"
         android:title="Events"
-        android:background="@color/admin_nav_blue"
-        />
+        android:background="@color/admin_nav_blue" />
 
     <item
         android:id="@+id/nav_images"
@@ -19,8 +18,15 @@
         android:title="Profiles" />
 
     <item
+        android:id="@+id/nav_calendar"
+        android:icon="@drawable/ic_calendar"
+        android:title="Calendar" />
+
+    <item
         android:id="@+id/nav_logs"
         android:icon="@drawable/ic_logs"
         android:title="Logs" />
+
+
 
 </menu>

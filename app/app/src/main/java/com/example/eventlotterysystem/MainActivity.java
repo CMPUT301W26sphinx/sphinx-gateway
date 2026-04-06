@@ -25,6 +25,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventlotterysystem.UI.activities.AccountTypeActivity;
+import com.example.eventlotterysystem.UI.fragments.CalendarFragment;
 import com.example.eventlotterysystem.UI.fragments.EventListFragment;
 import com.example.eventlotterysystem.UI.fragments.OrganizerFragment;
 import com.example.eventlotterysystem.UI.fragments.ProfileFragment;
@@ -148,7 +149,9 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(qrCodeFragment);
             } else if (id == R.id.organizer) {
                 setCurrentFragment(organizerFragment);
-            }
+            } else if (id == R.id.calendar) { // ADDED
+                setCurrentFragment(CalendarFragment.newInstance()); // ADDED
+            } // ADDED
             return true;
         });
     }

@@ -4,6 +4,11 @@
         android:id="@+id/events"
         android:title="Events"
         android:icon="@drawable/ic_events"/>
+    <!-- ADDED -->
+    <item
+        android:id="@+id/calendar"
+        android:title="Calendar"
+        android:icon="@drawable/ic_calendar"/>
     <item
         android:id="@+id/QRScan"
         android:title="QR Scan"
@@ -16,4 +21,5 @@
         android:id="@+id/profile"
         android:title="Profile"
         android:icon="@drawable/ic_profiles"/>
+
 </menu>
