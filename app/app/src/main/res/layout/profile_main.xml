@@ -44,6 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:text="@string/default_name"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -55,6 +56,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
+            android:layout_marginEnd="10dp"
             android:text="@string/default_email"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -66,6 +68,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
+            android:layout_marginEnd="10dp"
             android:text="@string/default_phone"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -169,20 +172,20 @@
             android:id="@+id/checkBoxforNotification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
             android:text="Receive Notifications from Organizers and Admin"
             android:textSize="14sp"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/NotificationsSettings" />
 
         <TextView
             android:id="@+id/Notificationsettingtext"
             android:layout_width="362dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="24dp"
-            android:text="Notifications include selection to register, calcellations, and more. The settings will only be affected with future notifications."
+            android:layout_height="wrap_content"
+            android:text="Notifications include lottery, cancellations, invites from private events, and more. The settings will only be affected with future notifications."
             android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/checkBoxforNotification" />
 
