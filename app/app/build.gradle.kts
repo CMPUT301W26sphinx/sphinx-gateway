@@ -33,6 +33,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true  // ADDED
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
@@ -40,6 +41,8 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4") // ADDED
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -58,7 +61,7 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-    
+
     // QR Code dependancies - google based dependancies
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
@@ -70,7 +73,6 @@ dependencies {
     implementation("androidx.camera:camera-view:1.0.0-alpha30")
     implementation("androidx.camera:camera-mlkit-vision:1.3.4")
 
-
     // Camera dependencies
     implementation("androidx.camera:camera-core:1.3.4")
     implementation("androidx.camera:camera-camera2:1.3.4")
@@ -80,6 +82,8 @@ dependencies {
 
     implementation("org.osmdroid:osmdroid-android:6.1.17")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    implementation("com.kizitonwose.calendar:view:2.5.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
