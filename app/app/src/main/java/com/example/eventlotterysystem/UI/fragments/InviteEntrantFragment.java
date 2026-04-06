@@ -150,7 +150,7 @@
                 Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
                 return;
             }
-            String entrantId = profile.getUserID()  ;
+            String entrantId = profile.getUserID();
             entrantListFirebase.getEntry(eventId, entrantId)
                     .addOnSuccessListener(entry -> {
                         if (entry != null) {

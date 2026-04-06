@@ -44,6 +44,8 @@
         <activity android:name=".UI.activities.admin.AdminLoginActivity" />
         <activity android:name=".UI.activities.admin.AdminProfileDetailActivity" />
         <activity android:name=".UI.activities.admin.AdminImageDetailActivity" />
+        <activity android:name=".UI.activities.admin.AdminEventCommentsActivity" />
+
         <activity android:name=".MainActivity" />
 
     </application>

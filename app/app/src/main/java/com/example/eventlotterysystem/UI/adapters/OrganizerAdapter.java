@@ -38,7 +38,6 @@ public class OrganizerAdapter extends RecyclerView.Adapter<OrganizerAdapter.View
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             eventName = itemView.findViewById(R.id.eventName);
             eventDescription = itemView.findViewById(R.id.eventDescription);
         }
@@ -46,25 +45,27 @@ public class OrganizerAdapter extends RecyclerView.Adapter<OrganizerAdapter.View
 
     @NonNull
     @Override
-    public OrganizerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.event_item, parent, false); // reuse same layout
-
+                .inflate(R.layout.event_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull OrganizerAdapter.ViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = eventList.get(position);
-
         holder.eventName.setText(event.getTitle());
         holder.eventDescription.setText(event.getDescription());
+        holder.itemView.setOnClickListener(v -> listener.onEventClick(event));
+    }
 
-        holder.itemView.setOnClickListener(v -> {
-            listener.onEventClick(event);
-        });
+    /**
+     * Updates the adapter's data set.
+     * @param newEvents the new list of events to display
+     */
+    public void updateEvents(List<Event> newEvents) {
+        this.eventList = newEvents;
+        notifyDataSetChanged();
     }
 
     @Override

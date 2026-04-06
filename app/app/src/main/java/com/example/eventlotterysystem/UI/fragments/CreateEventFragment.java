@@ -5,9 +5,12 @@ import com.example.eventlotterysystem.model.Event;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -17,15 +20,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.Switch;
+import android.widget.ImageView;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.model.Event;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.eventlotterysystem.utils.ImageHelper;
+import com.example.eventlotterysystem.utils.ImageUploadHelper;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -39,12 +43,25 @@ public class CreateEventFragment extends Fragment {
     private Button backButton;
     private Switch privacySwitch;
 
+    // ADDED: image upload fields
+    private ImageView previewImage;
+    private ImageUploadHelper imageUploadHelper;
+    private String uploadedImageBase64 = null;
+
     public static CreateEventFragment newInstance() {
         CreateEventFragment fragment = new CreateEventFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Register the launcher in onCreate, before the fragment is STARTED
+        imageUploadHelper = new ImageUploadHelper(this);
+    }
+
     @Nullable
     @Override
     /**
@@ -79,6 +96,11 @@ public class CreateEventFragment extends Fragment {
         saveButton = view.findViewById(R.id.saveEventButton);
         backButton = view.findViewById(R.id.backButton);
 
+        // ADDED: find image upload UI elements
+        Button uploadImageButton = view.findViewById(R.id.uploadImageButton);
+        previewImage = view.findViewById(R.id.previewImage);
+        // imageUploadHelper is already initialized in onCreate
+
         timeInput.setFocusable(false);
         startRegInput.setFocusable(false);
         endRegInput.setFocusable(false);
@@ -105,6 +127,27 @@ public class CreateEventFragment extends Fragment {
             getParentFragmentManager().popBackStack();
         });
 
+        // ADDED: image upload button listener
+        uploadImageButton.setOnClickListener(v -> {
+            imageUploadHelper.pickImage(new ImageUploadHelper.ImageUploadCallback() {
+                @Override
+                public void onImageLoaded(String base64Image) {
+                    uploadedImageBase64 = base64Image;
+                    // Preview the image using a dummy event
+                    Event dummyEvent = new Event();
+                    dummyEvent.setEventId("preview");
+                    dummyEvent.setImageData(base64Image);
+                    ImageHelper.loadEventImage(previewImage, dummyEvent);
+                    previewImage.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(getContext(), "Image upload failed: " + error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
         saveButton.setOnClickListener(v -> {
             // check if all the inputs are valid
             if (checkInfo()){
@@ -116,7 +159,6 @@ public class CreateEventFragment extends Fragment {
                 Toast.makeText(getContext(), "Required info is not provided, event create fail", Toast.LENGTH_SHORT).show();
             }
         });
-
 
         return view;
     }
@@ -155,6 +197,7 @@ public class CreateEventFragment extends Fragment {
 
         datePicker.show();
     }
+
     /**
      * Checking all the information if they are good to upload to the database
      * @return  true if the formats are all correct and non-optional infomation are all filled
@@ -266,6 +309,11 @@ public class CreateEventFragment extends Fragment {
         event.setDescription(description);
         event.setPlace(place);
         event.setCapacity(maxEntrants);
+
+        // ADDED: set image data if uploaded
+        if (uploadedImageBase64 != null) {
+            event.setImageData(uploadedImageBase64);
+        }
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 

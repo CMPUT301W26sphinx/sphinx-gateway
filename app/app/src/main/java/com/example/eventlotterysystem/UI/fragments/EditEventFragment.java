@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +21,8 @@ import androidx.fragment.app.Fragment;
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.utils.ImageHelper;
+import com.example.eventlotterysystem.utils.ImageUploadHelper;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
@@ -44,6 +47,11 @@ public class EditEventFragment extends Fragment {
     private Switch privacy_Switch;
     private final EventRepository eventRepository = new EventRepository();
 
+    // ADDED: image upload fields
+    private ImageView previewImage;
+    private ImageUploadHelper imageUploadHelper;
+    private String uploadedImageBase64 = null;
+
     private String eventId;
     private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
 
@@ -58,6 +66,13 @@ public class EditEventFragment extends Fragment {
         args.putString(EVENT_ID, eventId);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Register the launcher in onCreate, before the fragment is STARTED
+        imageUploadHelper = new ImageUploadHelper(this);
     }
 
     @Override
@@ -77,6 +92,7 @@ public class EditEventFragment extends Fragment {
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_edit_event, container, false);
     }
+
     @Override
     /**
      * Allows the user to edit an existed event
@@ -110,6 +126,10 @@ public class EditEventFragment extends Fragment {
         saveButton = view.findViewById(R.id.saveEventButton);
         backButton = view.findViewById(R.id.backButton);
 
+        // ADDED: find image upload UI elements
+        Button uploadImageButton = view.findViewById(R.id.uploadImageButton);
+        previewImage = view.findViewById(R.id.previewImage);
+
         timeInput.setFocusable(false);
         startRegInput.setFocusable(false);
         endRegInput.setFocusable(false);
@@ -137,6 +157,27 @@ public class EditEventFragment extends Fragment {
 
         backButton.setOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
+        });
+
+        // ADDED: image upload button listener
+        uploadImageButton.setOnClickListener(v -> {
+            imageUploadHelper.pickImage(new ImageUploadHelper.ImageUploadCallback() {
+                @Override
+                public void onImageLoaded(String base64Image) {
+                    uploadedImageBase64 = base64Image;
+                    // Preview the newly picked image using a dummy event
+                    Event dummyEvent = new Event();
+                    dummyEvent.setEventId("preview");
+                    dummyEvent.setImageData(base64Image);
+                    ImageHelper.loadEventImage(previewImage, dummyEvent);
+                    previewImage.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(getContext(), "Image upload failed: " + error, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         saveButton.setOnClickListener(v -> {
@@ -195,6 +236,13 @@ public class EditEventFragment extends Fragment {
                     maxInput.setText(String.valueOf(event.getCapacity()));
                 }
                 // Waitlist count is handled by refreshWaitlistCount()
+
+                // ADDED: show existing image if the event has one, and store it so save preserves it if no new image is picked
+                if (event.getImageData() != null && !event.getImageData().isEmpty()) {
+                    uploadedImageBase64 = event.getImageData();
+                    ImageHelper.loadEventImage(previewImage, event);
+                    previewImage.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -245,6 +293,7 @@ public class EditEventFragment extends Fragment {
 
         datePicker.show();
     }
+
     /**
      * Checking all the info if they are good to upload to the database
      * (new info)
@@ -368,7 +417,9 @@ public class EditEventFragment extends Fragment {
                         "time", timeMills,
                         "capacity", capacity,
                         "registrationStartDate", registrationStartMillis == null ? 0L : registrationStartMillis,
-                        "registrationEndDate", registrationEndMillis == null ? 0L : registrationEndMillis
+                        "registrationEndDate", registrationEndMillis == null ? 0L : registrationEndMillis,
+                        // ADDED: save image data, preserves existing if no new image was picked
+                        "imageData", uploadedImageBase64
                 )
                 .addOnSuccessListener(unused -> {
                             Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();

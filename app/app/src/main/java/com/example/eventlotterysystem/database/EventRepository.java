@@ -90,10 +90,11 @@ public class EventRepository {
         Long registrationStartDate = doc.getLong("registrationStartDate");
         Long registrationEndDate = doc.getLong("registrationEndDate");
         Long waitingListCount = doc.getLong("waitingListCount");
-        String category = doc.getString("category");   // new field
+        String category = doc.getString("category");
         String privacy = doc.getString("privacy");
         String organizerId = doc.getString("organizerId");
         List<String> co_organizerIds = (List<String>) doc.get("co_organizerIds");
+        String imageData = doc.getString("imageData");   // <-- ADD THIS
 
         Event event = new Event(id, title, description);
         event.setPlace(place);
@@ -106,8 +107,11 @@ public class EventRepository {
         if (waitingListCount != null) event.setWaitingListCount(waitingListCount.intValue());
         if (category != null) event.setCategory(category);
         if (co_organizerIds != null) event.setCoOrganizerIds(co_organizerIds);
+        if (imageData != null) event.setImageData(imageData);   // <-- AND THIS
+
         return event;
     }
+
 
     private Event documentToEvent(QueryDocumentSnapshot doc) {
         return documentToEvent((com.google.firebase.firestore.DocumentSnapshot) doc);

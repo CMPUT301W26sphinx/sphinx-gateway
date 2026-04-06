@@ -25,11 +25,10 @@ public class EventImageRepository implements ImageRepository {
                             String id = doc.getId();
                             String title = doc.getString("title");
                             String description = doc.getString("description");
-                            // Use a placeholder image URL; later replace with actual field
-                            String imageUrl = "placeholder"; // or a constant
-                            String uploaderName = "System"; // since no uploader info
+                            String imageData = doc.getString("imageData");
+                            String uploaderName = "System";
 
-                            ImageItem item = new ImageItem(id, title, description, imageUrl, uploaderName);
+                            ImageItem item = new ImageItem(id, title, description, "placeholder", uploaderName, imageData);
                             images.add(item);
                         } catch (Exception e) {
                             Log.e(TAG, "Error parsing event document", e);
@@ -42,9 +41,19 @@ public class EventImageRepository implements ImageRepository {
 
     @Override
     public void deleteImage(String imageId, DeleteCallback callback) {
-        // For events, deleting an image means deleting the event itself
+        // Delete the entire event document
         db.collection("events").document(imageId)
                 .delete()
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onError);
+    }
+
+    /**
+     * Removes only the imageData field from the event document.
+     */
+    public void removeImageData(String eventId, DeleteCallback callback) {
+        db.collection("events").document(eventId)
+                .update("imageData", null)  // set field to null
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onError);
     }
