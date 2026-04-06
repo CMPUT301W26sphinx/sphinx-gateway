@@ -22,7 +22,7 @@ public class UserProfile implements Serializable {
 
     // Construct
     public UserProfile() {
-
+        this.notificationPreference = true;
     }
 
     public UserProfile(String firstName, String lastName, String email, String phoneNumber) {

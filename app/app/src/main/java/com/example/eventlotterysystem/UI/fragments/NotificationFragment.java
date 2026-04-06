@@ -1,6 +1,8 @@
 package com.example.eventlotterysystem.UI.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +44,6 @@ public class NotificationFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.notification_main, container, false);
     }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -106,12 +107,14 @@ public class NotificationFragment extends Fragment {
     /** Parser of the notifications so that is readable for Notification.
      * @param raw raw as f text that comes from NotificationSystem. Parser goes here.
      */
+
     private void showNotificationDialog(String raw) {
         String[] parts = raw.split("\\|", -1);
         String message  = parts.length > 0 ? parts[0] : raw;
         String eventId  = parts.length > 1 ? parts[1] : null;
         String sender   = parts.length > 2 ? parts[2] : "Notification";
         boolean isAsk  = parts.length > 3 && parts[3].equals("ask");
+        MarkNotificationAsRead(raw);
 
         if (isAsk) {
             showAskDialog(message, eventId, sender);
@@ -119,6 +122,13 @@ public class NotificationFragment extends Fragment {
             showStandardDialog(message, eventId, sender);
         }
     }
+    /**
+     * This will show the normal dialog, for example if the organizer notifies the guys
+     * This does not have the waitlist add feature as, it doesnt make sense?
+     * @param message
+     * @param eventId
+     * @param sender
+     */
     private void showStandardDialog(String message, String eventId, String sender){
         new AlertDialog.Builder(requireContext())
                 .setTitle(sender)
@@ -130,7 +140,12 @@ public class NotificationFragment extends Fragment {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-
+    /**
+     * This will show the the ASK dialog, that includes adding entrant to waitlist
+     * @param message
+     * @param eventId
+     * @param sender
+     */
     private void showAskDialog(String message, String eventId, String sender){
         new AlertDialog.Builder(requireContext())
                 .setTitle(sender)
@@ -141,7 +156,7 @@ public class NotificationFragment extends Fragment {
                         if (entry == null) {
                             EntrantListEntry newEntry = new EntrantListEntry(eventId, userId, EntrantListEntry.STATUS_WAITLIST);
                             entrantListFirebase.upsertEntry(eventId, newEntry).addOnSuccessListener(unused -> {
-                                Toast.makeText(getContext(), "Joined waiting list. Welcome to the private event!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Joined waiting list. Welcome to the event!", Toast.LENGTH_SHORT).show();
                             });
                         }
                     });
@@ -163,4 +178,16 @@ public class NotificationFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
         }
+    private void MarkNotificationAsRead(String raw){
+        String[] parts = raw.split("\\|", -1);
+        boolean alreadyRead = parts.length > 4 && parts[4].equals("read");
+        if (alreadyRead) return;
+
+        String readRaw = parts[0]
+                + "|" + (parts.length > 1 ? parts[1] : "")
+                + "|" + (parts.length > 2 ? parts[2] : "")
+                + "|" + (parts.length > 3 ? parts[3] : "")
+                + "|read";
+        notificationSystem.replaceNotification(userId, raw,readRaw);
+    }
 }
