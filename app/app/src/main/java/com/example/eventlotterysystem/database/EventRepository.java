@@ -90,10 +90,10 @@ public class EventRepository {
         Long registrationStartDate = doc.getLong("registrationStartDate");
         Long registrationEndDate = doc.getLong("registrationEndDate");
         Long waitingListCount = doc.getLong("waitingListCount");
-        String category = doc.getString("category");
+        String category = doc.getString("category");   // new field
         String privacy = doc.getString("privacy");
         String organizerId = doc.getString("organizerId");
-        List<String> co_organizerIds = (List<String>) doc.get("co_organizerIds");
+        List<String> co_organizerIds = (List<String>) doc.get("coOrganizerIds");
         String imageData = doc.getString("imageData");   // <-- ADD THIS
         Boolean geoRequirementEnabled = doc.getBoolean("geoRequirementEnabled");
         String geoRequirementMode = doc.getString("geoRequirementMode");
@@ -121,7 +121,6 @@ public class EventRepository {
 
         return event;
     }
-
 
     private Event documentToEvent(QueryDocumentSnapshot doc) {
         return documentToEvent((com.google.firebase.firestore.DocumentSnapshot) doc);

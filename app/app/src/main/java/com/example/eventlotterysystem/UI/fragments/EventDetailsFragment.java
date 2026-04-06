@@ -56,9 +56,6 @@ import java.util.Locale;
  * Details such as poster, description, registration period, and waitlist count are displayed (and are collected from firestore database)
  */
 public class EventDetailsFragment extends Fragment {
-    // TODO: Array adapter for other fragment logic US 01.01.03
-    // TODO: add event details load in once event firebase and class is set up
-    // TODO: Add the popup about event info for US 01.05.05
     private static final String EVENT_ID = "event_id";
 
     // UI elements (buttons, text views, etc.)
@@ -195,7 +192,9 @@ public class EventDetailsFragment extends Fragment {
                     break;
 
                 case EntrantListEntry.STATUS_INVITED:
-                    // TODO: Add logic for moving to inivation screen to respond
+                    Fragment fragment = MyEventsNavigation.newInstance(eventId, "invites");
+
+                    requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
                     break;
 
                 case EntrantListEntry.STATUS_REGISTERED: //if registered, cancel registration button
@@ -381,9 +380,10 @@ public class EventDetailsFragment extends Fragment {
                 String regPeriod = formatRegistrationPeriod(event.getRegistrationStartDate(), event.getRegistrationEndDate());
                 valueRegistration.setText(regPeriod);
 
-                // These fields are not yet in the Event model
-                valueStarttime.setText("Not available");
-                valueLocation.setText("Not available");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String datetStr = sdf.format(new Date(event.getDate()));
+                valueStarttime.setText(datetStr);
+                valueLocation.setText(event.getPlace());
 
                 // Waitlist count is handled by refreshWaitlistCount()
 
@@ -468,6 +468,4 @@ public class EventDetailsFragment extends Fragment {
             commentListener.remove();
         }
     }
-
-
 }

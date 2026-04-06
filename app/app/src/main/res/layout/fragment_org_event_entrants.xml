@@ -47,16 +47,6 @@
                     android:backgroundTint="@color/accept_green"
                     android:textColor="@color/white" />
 
-                <Button
-                    android:id="@+id/endEventButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:text="End Event"
-                    android:backgroundTint="@color/decline_red"
-                    android:textColor="@color/white" />
-
             </LinearLayout>
 
             <!-- Invite section -->
