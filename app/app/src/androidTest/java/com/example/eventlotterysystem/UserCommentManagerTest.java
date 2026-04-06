@@ -11,6 +11,7 @@ import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.model.UserComment;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.Before;
@@ -82,7 +83,7 @@ public class UserCommentManagerTest {
             }
 
             @Override
-            public void onSuccess(Void unused) {
+            public void onSuccess(DocumentReference docRef) {
                 // verify it was added
                 manager.getCommentsFromEvent(EVENT_ID, new UserCommentManager.UserCommentCallback() {
                     @Override
@@ -128,7 +129,7 @@ public class UserCommentManagerTest {
             }
 
             @Override
-            public void onSuccess(Void unused) {
+            public void onSuccess(DocumentReference docRef) {
                 manager.getCommentsFromEvent(EVENT_ID, new UserCommentManager.UserCommentCallback() {
                     @Override
                     public void onCommentLoaded(List<UserComment> comments) {
@@ -155,7 +156,7 @@ public class UserCommentManagerTest {
                             }
 
                             @Override
-                            public void onSuccess(Void unused) {
+                            public void onSuccess() {
                                 manager.getCommentsFromEvent(EVENT_ID, new UserCommentManager.UserCommentCallback() {
                                     @Override
                                     public void onCommentLoaded(List<UserComment> commentsAfterDelete) {

@@ -20,6 +20,7 @@ import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.CalendarEventAdapter;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.EventRepository;
+import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -353,7 +354,7 @@ public class CalendarFragment extends Fragment {
             entrantListFirebase.getEntry(event.getEventId(), currentUserId)
                     .addOnSuccessListener(entry -> {
                         if (!isAdded()) return;
-                        if (entry != null) {
+                        if (entry != null && entry.getStatus() != EntrantListEntry.STATUS_CANCELLED_OR_REJECTED) {
                             myEvents.add(event);
                         }
                         completedChecks[0]++;
