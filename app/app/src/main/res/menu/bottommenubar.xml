@@ -16,4 +16,9 @@
         android:id="@+id/profile"
         android:title="Profile"
         android:icon="@drawable/ic_profiles"/>
+    <!-- ADDED -->
+    <item
+        android:id="@+id/calendar"
+        android:title="Calendar"
+        android:icon="@drawable/ic_calendar"/>
 </menu>

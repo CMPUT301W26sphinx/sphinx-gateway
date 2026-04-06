@@ -10,9 +10,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.activities.AccountTypeActivity;
+import com.example.eventlotterysystem.UI.fragments.CalendarFragment;
 import com.example.eventlotterysystem.UI.fragments.admin.AdminEventsFragment;
 import com.example.eventlotterysystem.UI.fragments.admin.AdminImagesFragment;
 import com.example.eventlotterysystem.UI.fragments.admin.AdminLogsFragment;
@@ -27,6 +29,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class AdminHomeActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,7 @@ public class AdminHomeActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_admin_home);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
@@ -61,9 +64,26 @@ public class AdminHomeActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_logs) {
                 loadFragment(new AdminLogsFragment());
                 return true;
+            } else if (itemId == R.id.nav_calendar) {
+                loadFragment(CalendarFragment.newInstanceAdmin());
+                return true;
             }
 
             return false;
+        });
+
+        // ADDED: listen to back stack changes to show/hide toolbar
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            int backStackCount = getSupportFragmentManager().getBackStackEntryCount();
+            if (backStackCount == 0) {
+                // Back to a main nav fragment, show toolbar and bottom nav
+                toolbar.setVisibility(android.view.View.VISIBLE);
+                bottomNavigationView.setVisibility(android.view.View.VISIBLE);
+            } else {
+                // Inside a detail fragment, hide toolbar and bottom nav
+                toolbar.setVisibility(android.view.View.GONE);
+                bottomNavigationView.setVisibility(android.view.View.GONE);
+            }
         });
     }
 
