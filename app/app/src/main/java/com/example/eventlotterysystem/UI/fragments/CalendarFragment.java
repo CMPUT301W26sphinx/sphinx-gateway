@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.adapters.CalendarEventAdapter;
 import com.example.eventlotterysystem.database.EntrantListFirebase;
@@ -84,14 +83,23 @@ public class CalendarFragment extends Fragment {
     // true = showing all events, false = showing my events
     private boolean showingAll = true;
 
-    public CalendarFragment() {}
-
     private boolean isAdminMode = false;
 
+    public CalendarFragment() {}
+
+    /**
+     * Creates a new instance of CalendarFragment for entrant mode.
+     * @return A new CalendarFragment instance.
+     */
     public static CalendarFragment newInstance() {
         return new CalendarFragment();
     }
 
+    /**
+     * Creates a new instance of CalendarFragment for admin mode.
+     * In admin mode, tapping an event navigates to AdminEventDetailActivity.
+     * @return A new CalendarFragment instance with admin mode enabled.
+     */
     public static CalendarFragment newInstanceAdmin() {
         CalendarFragment fragment = new CalendarFragment();
         Bundle args = new Bundle();
@@ -100,6 +108,13 @@ public class CalendarFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return Return the View for the fragment's UI.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -107,6 +122,12 @@ public class CalendarFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_calendar, container, false);
     }
 
+    /**
+     * Called immediately after onCreateView has returned.
+     * Initializes all UI elements, sets up the calendar, and loads events from Firestore.
+     * @param view The View returned by onCreateView.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -180,6 +201,7 @@ public class CalendarFragment extends Fragment {
 
     /**
      * Sets up the kizitonwose CalendarView with day and month header binders.
+     * Configures the calendar to show 3 months back and 12 months forward from the current month.
      */
     private void setupCalendar() {
         // Day binder — controls how each day cell looks
@@ -256,6 +278,7 @@ public class CalendarFragment extends Fragment {
     /**
      * Rebuilds the set of dates that have events in the active list
      * and refreshes the calendar display.
+     * Uses the device's default timezone to convert event timestamps to local dates.
      */
     private void refreshEventDates() {
         eventDates.clear();
@@ -274,6 +297,9 @@ public class CalendarFragment extends Fragment {
 
     /**
      * Loads all events from Firestore, then loads the user's registered events.
+     * Admin can see all events including private ones.
+     * Entrants can only see public events in the all events view.
+     * Sets the active events list to all events and refreshes the calendar.
      */
     private void loadAllEvents() {
         eventRepository.getEvents(new EventRepository.EventCallback() {
@@ -281,7 +307,17 @@ public class CalendarFragment extends Fragment {
             public void onEventsLoaded(List<Event> events) {
                 if (!isAdded()) return;
                 allEvents.clear();
-                allEvents.addAll(events);
+                for (Event event : events) {
+                    if (isAdminMode) {
+                        // ADDED: admin sees all events including private
+                        allEvents.add(event);
+                    } else {
+                        // ADDED: entrant only sees public events in all events view
+                        if (event.getPrivacy() == null || event.getPrivacy().equalsIgnoreCase("Public")) {
+                            allEvents.add(event);
+                        }
+                    }
+                }
                 activeEvents = allEvents;
                 refreshEventDates();
                 loadMyEvents();
@@ -298,6 +334,7 @@ public class CalendarFragment extends Fragment {
     /**
      * Loads events the current user is on the waitlist or registered for.
      * Since EntrantListFirebase is structured per event, we check each event individually.
+     * Updates the calendar if the user is currently viewing their own events.
      */
     private void loadMyEvents() {
         if (currentUserId == null) return;
@@ -333,6 +370,8 @@ public class CalendarFragment extends Fragment {
     /**
      * Filters the active events list to only those on the selected date
      * and updates the RecyclerView below the calendar.
+     * Uses the device's default timezone to compare dates correctly.
+     * @param date The selected date to filter events for.
      */
     private void showEventsOnDate(LocalDate date) {
         eventsOnSelectedDate.clear();
@@ -364,12 +403,17 @@ public class CalendarFragment extends Fragment {
 
     /**
      * ViewContainer for each day cell in the calendar.
+     * Holds references to the day number text view and the event dot indicator.
      */
     class DayViewContainer extends ViewContainer {
         TextView textView;
         View dotView;
         View view;
 
+        /**
+         * Constructs a DayViewContainer and binds the day text and dot views.
+         * @param view The inflated day cell view.
+         */
         DayViewContainer(@NonNull View view) {
             super(view);
             this.view = view;
@@ -380,13 +424,16 @@ public class CalendarFragment extends Fragment {
 
     /**
      * ViewContainer for the month header.
-     */
-    /**
-     * ViewContainer for the month header.
+     * Holds a reference to the month title text view and wires up
+     * the previous and next month navigation buttons.
      */
     class MonthViewContainer extends ViewContainer {
         TextView textView;
 
+        /**
+         * Constructs a MonthViewContainer and binds the month title and navigation buttons.
+         * @param view The inflated month header view.
+         */
         MonthViewContainer(@NonNull View view) {
             super(view);
             textView = view.findViewById(R.id.calendarMonthText);
