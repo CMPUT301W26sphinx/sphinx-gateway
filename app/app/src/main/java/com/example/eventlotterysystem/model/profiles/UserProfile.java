@@ -14,7 +14,9 @@ public class UserProfile implements Serializable {
     private String email;
     private String phoneNumber;
     private boolean notificationPreference; // was receiveNotifications
-    private List<String> notification;      // was Notifications
+    private List<String> notification;// was Notifications
+    private Double longitude;
+    private Double latitude;
 
     // private role userRole; //need role class, entrant, organizer, or whatever
 
@@ -37,6 +39,16 @@ public class UserProfile implements Serializable {
         return userID;
     }
 
+    public void setLatitude(Double latitude){this.latitude = latitude;}
+
+    public void setLongitude(Double longitude){this.longitude = longitude;}
+
+    // Getters
+    /**
+     * Get the users stored name
+     *
+     * @return
+     */
     public String getFirstName() {
         return firstName;
     }
@@ -90,4 +102,9 @@ public class UserProfile implements Serializable {
     public void setNotification(List<String> notification) {
         this.notification = notification;
     }
+    public Double getLatitude(){return latitude;}
+
+    public Double getLongitude(){return longitude;}
+
+
 }
