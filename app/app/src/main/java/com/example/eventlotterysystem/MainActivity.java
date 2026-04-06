@@ -2,7 +2,9 @@ package com.example.eventlotterysystem;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -28,6 +31,9 @@ import com.example.eventlotterysystem.UI.fragments.ProfileFragment;
 import com.example.eventlotterysystem.UI.fragments.QRCodeFragment;
 import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -35,6 +41,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     /**
@@ -45,11 +55,13 @@ public class MainActivity extends AppCompatActivity {
      *                           recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
      *
      */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -146,6 +158,48 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+
+        // Firebase setup
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Sign in anonymously
+        mAuth.signInAnonymously().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+
+                Log.d(TAG, "signInAnonymously:success");
+
+                String uid = mAuth.getCurrentUser().getUid();
+                DocumentReference docRef = db.collection("users").document(uid);
+
+                docRef.get().addOnSuccessListener(document -> {
+
+                    if (!document.exists()) {
+
+                        ProfileManager profileManager = ProfileManager.getInstance();
+                        UserProfile userProfile = new UserProfile();
+
+                        profileManager.saveUser(userProfile, new ProfileManager.OnUserAddedCallback() {
+                            @Override
+                            public void onSuccess(Void snapshot) {
+                                Log.d(TAG, "User created successfully");
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Log.e(TAG, "Error creating user", e);
+                            }
+                        });
+                    }
+
+                    // ✅ FIX: request location AFTER user exists
+                    requestLocationPermission();
+                });
+
+            } else {
+                Log.w(TAG, "signInAnonymously:failure", task.getException());
+            }
+        });
     }
 
     /**
@@ -169,6 +223,63 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private void requestLocationPermission() {
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    1);
+        } else {
+            fetchAndSaveUserLocation();
+        }
+    }
+
+    private void fetchAndSaveUserLocation() {
+
+        FusedLocationProviderClient fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        saveUserLocation(location.getLatitude(), location.getLongitude());
+                    } else {
+                        fusedLocationClient.getLastLocation()
+                                .addOnSuccessListener(lastLocation -> {
+                                    if (lastLocation != null) {
+                                        saveUserLocation(lastLocation.getLatitude(), lastLocation.getLongitude());
+                                    }
+                                });
+                    }
+                });
+    }
+
+    private void saveUserLocation(double lat, double lng) {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        String userId = FirebaseAuth.getInstance()
+                .getCurrentUser()
+                .getUid();
+
+        Map<String, Object> location = new HashMap<>();
+        location.put("latitude", lat);
+        location.put("longitude", lng);
+
+        db.collection("users")
+                .document(userId)
+                .set(location, SetOptions.merge());
+    }
+
     /**
      * Replaces current fragment with the specified fragment
      *
@@ -179,6 +290,19 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1 && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            fetchAndSaveUserLocation();
+        }
     }
 
     @Override

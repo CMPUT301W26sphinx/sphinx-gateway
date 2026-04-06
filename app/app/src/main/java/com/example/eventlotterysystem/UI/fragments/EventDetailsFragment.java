@@ -1,7 +1,10 @@
 package com.example.eventlotterysystem.UI.fragments;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,12 +29,17 @@ import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.model.EntrantListEntry;
 import com.example.eventlotterysystem.model.UserComment;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.auth.User;
 
@@ -199,28 +207,7 @@ public class EventDetailsFragment extends Fragment {
 
                 case EntrantListEntry.STATUS_CANCELLED_OR_REJECTED: //if cancelled or rejected, register button
                 default: // if not on list or cancelled, option to register
-                    // TODO: add to entrant list of registered events for myevent screen
-                    waitlistDb.getEntry(eventId, entrantId).addOnSuccessListener(entry -> {
-                        if (entry == null) {
-                            EntrantListEntry newEntry = new EntrantListEntry(eventId, entrantId, EntrantListEntry.STATUS_WAITLIST);
-                            waitlistDb.upsertEntry(eventId, newEntry).addOnSuccessListener(unused -> {
-                                currentStatus = EntrantListEntry.STATUS_WAITLIST;
-                                updateActionButton();
-                                refreshWaitlistCount();
-
-                                Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
-                            });
-
-                        } else {
-                            waitlistDb.updateStatus(eventId, entrantId, EntrantListEntry.STATUS_WAITLIST).addOnSuccessListener(unused -> {
-                                currentStatus = EntrantListEntry.STATUS_WAITLIST;
-                                updateActionButton();
-                                refreshWaitlistCount();
-
-                                Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    });
+                    registerWithCurrentLocation();
                     break;
             }
         });
@@ -285,6 +272,79 @@ public class EventDetailsFragment extends Fragment {
      * This method is used to initialize the UI elements for the event details fragment
      * based on if the entrant is on the waitlist or not, as the button text will be changed.
      */
+
+    private void registerWithCurrentLocation() {
+        if (!isAdded()) return;
+
+        FusedLocationProviderClient fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity());
+
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getContext(), "Location permission is required to register", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        completeRegistrationWithLocation(location.getLatitude(), location.getLongitude());
+                    } else {
+                        fusedLocationClient.getLastLocation().addOnSuccessListener(lastLocation -> {
+                            if (lastLocation != null) {
+                                completeRegistrationWithLocation(lastLocation.getLatitude(), lastLocation.getLongitude());
+                            } else {
+                                Toast.makeText(getContext(), "Could not get your location", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Could not get your location", Toast.LENGTH_SHORT).show());
+    }
+
+    private void completeRegistrationWithLocation(double lat, double lng) {
+        if (entrantId == null || eventId == null) return;
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        java.util.Map<String, Object> userLocation = new java.util.HashMap<>();
+        userLocation.put("latitude", lat);
+        userLocation.put("longitude", lng);
+
+        db.collection("users")
+                .document(entrantId)
+                .set(userLocation, SetOptions.merge())
+                .addOnSuccessListener(unused ->
+                        waitlistDb.getEntry(eventId, entrantId).addOnSuccessListener(entry -> {
+                            if (entry == null) {
+                                EntrantListEntry newEntry = new EntrantListEntry(
+                                        eventId,
+                                        entrantId,
+                                        EntrantListEntry.STATUS_WAITLIST,
+                                        lat,
+                                        lng
+                                );
+                                waitlistDb.upsertEntry(eventId, newEntry).addOnSuccessListener(innerUnused -> {
+                                    currentStatus = EntrantListEntry.STATUS_WAITLIST;
+                                    updateActionButton();
+                                    refreshWaitlistCount();
+                                    Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
+                                });
+                            } else {
+                                entry.setStatus(EntrantListEntry.STATUS_WAITLIST);
+                                entry.setLatitude(lat);
+                                entry.setLongitude(lng);
+                                waitlistDb.upsertEntry(eventId, entry).addOnSuccessListener(innerUnused -> {
+                                    currentStatus = EntrantListEntry.STATUS_WAITLIST;
+                                    updateActionButton();
+                                    refreshWaitlistCount();
+                                    Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        }));
+    }
+
     private void initializeUI() {
         waitlistDb.getEntrantStatus(eventId, entrantId).addOnSuccessListener(status -> {
             currentStatus = status;
