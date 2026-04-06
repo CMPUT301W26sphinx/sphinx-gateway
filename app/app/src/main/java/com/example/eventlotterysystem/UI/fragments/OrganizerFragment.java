@@ -141,7 +141,7 @@ public class OrganizerFragment extends Fragment {
                     QuerySnapshot organizerSnap = organizerTask.getResult();
                     // Query events where user is co-organizer
                     return db.collection("events")
-                            .whereArrayContains("co_organizerIds", currentUserId)
+                            .whereArrayContains("coOrganizerIds", currentUserId)
                             .get()
                             .continueWith(coTask -> {
                                 if (!coTask.isSuccessful()) return Tasks.forException(coTask.getException());
