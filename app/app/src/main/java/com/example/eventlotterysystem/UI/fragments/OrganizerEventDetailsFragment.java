@@ -59,6 +59,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
     //Firestore data for these variables
     private Button inviteCo_OrgButton;
     private Button qrButton;
+    private Button geoRequirementButton;
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
@@ -141,6 +142,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
         addCommentButton = view.findViewById(R.id.add_comment_button);
         writeCommentBox = view.findViewById(R.id.write_comment_box);
         qrButton = view.findViewById(R.id.generateQrButton);
+        geoRequirementButton = view.findViewById(R.id.geoRequirementButton);
 
         // get the id
         Bundle args = getArguments();
@@ -165,6 +167,17 @@ public class OrganizerEventDetailsFragment extends Fragment{
         });
         editEventButton.setOnClickListener(v -> {
             Fragment fragment = EditEventFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        // US-02.02.03: Navigate to geolocation requirement settings
+        geoRequirementButton.setOnClickListener(v -> {
+            Fragment fragment = GeoRequirementFragment.newInstance(eventId);
             requireActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
@@ -200,6 +213,16 @@ public class OrganizerEventDetailsFragment extends Fragment{
             public void onClick(View v) {
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             }
+        });
+
+        geoRequirementButton.setOnClickListener(v -> {
+            Fragment fragment = GeoRequirementFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 //        // add a comment when the add button is pressed
 //        addCommentButton.setOnClickListener(v -> {
