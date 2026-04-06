@@ -68,20 +68,16 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-
         userSignIn();
-
     }
 
     /**
      * Signs the user in and creates their profile in firebase
      */
-    public void userSignIn(){
-        // loads database and auth for firebase
+    public void userSignIn() {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Sign in anonymously
         mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -93,38 +89,36 @@ public class MainActivity extends AppCompatActivity {
 
                     docRef.get().addOnSuccessListener(document -> {
                         if (!document.exists()) {
-
                             ProfileManager profileManager = ProfileManager.getInstance();
-
-                            // create profile
                             UserProfile userProfile = new UserProfile();
 
-                            // save to Firestore
                             profileManager.saveUser(userProfile, new ProfileManager.OnUserAddedCallback() {
                                 @Override
                                 public void onSuccess(Void snapshot) {
-
+                                    Log.d(TAG, "User created successfully");
                                 }
 
                                 @Override
                                 public void onFailure(Exception e) {
-
+                                    Log.e(TAG, "Error creating user", e);
                                 }
                             });
-
                         }
+
+                        // Request location after user exists
+                        requestLocationPermission();
                     });
 
-                    // setup bottom nav
+                    // Setup bottom nav
                     initializeBottomNavigation();
 
-                    // Stay on entrant UI (no redirect)
                 } else {
                     Log.w(TAG, "signInAnonymously:failure", task.getException());
                 }
             }
         });
     }
+
     /**
      * Creates the bottom navigation
      */
@@ -144,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
             showTermsDialog();
         }
 
-        // No Login!!
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.events) {
@@ -157,48 +150,6 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(organizerFragment);
             }
             return true;
-        });
-
-        // Firebase setup
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Sign in anonymously
-        mAuth.signInAnonymously().addOnCompleteListener(this, task -> {
-            if (task.isSuccessful()) {
-
-                Log.d(TAG, "signInAnonymously:success");
-
-                String uid = mAuth.getCurrentUser().getUid();
-                DocumentReference docRef = db.collection("users").document(uid);
-
-                docRef.get().addOnSuccessListener(document -> {
-
-                    if (!document.exists()) {
-
-                        ProfileManager profileManager = ProfileManager.getInstance();
-                        UserProfile userProfile = new UserProfile();
-
-                        profileManager.saveUser(userProfile, new ProfileManager.OnUserAddedCallback() {
-                            @Override
-                            public void onSuccess(Void snapshot) {
-                                Log.d(TAG, "User created successfully");
-                            }
-
-                            @Override
-                            public void onFailure(Exception e) {
-                                Log.e(TAG, "Error creating user", e);
-                            }
-                        });
-                    }
-
-                    // ✅ FIX: request location AFTER user exists
-                    requestLocationPermission();
-                });
-
-            } else {
-                Log.w(TAG, "signInAnonymously:failure", task.getException());
-            }
         });
     }
 
@@ -224,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestLocationPermission() {
-
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -238,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchAndSaveUserLocation() {
-
         FusedLocationProviderClient fusedLocationClient =
                 LocationServices.getFusedLocationProviderClient(this);
 
@@ -264,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveUserLocation(double lat, double lng) {
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         String userId = FirebaseAuth.getInstance()
@@ -300,7 +248,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == 1 && grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
             fetchAndSaveUserLocation();
         }
     }
@@ -314,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_switch_account) {
-            // Navigate to AccountTypeActivity and clear back stack
             Intent intent = new Intent(this, AccountTypeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
