@@ -186,7 +186,7 @@ public class InviteCoOrganizerFragment extends Fragment {
             Toast.makeText(requireContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
             return;
         }
-        String entrantId = profile.getProfileID();
+        String entrantId = profile.getUserID();
         EventRepository eventRepository = new EventRepository();
         EntrantListFirebase entrantList = new EntrantListFirebase();
         Notification notification = new Notification();

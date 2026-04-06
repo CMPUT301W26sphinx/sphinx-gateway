@@ -22,6 +22,9 @@ public class Event implements Serializable {
     private String organizerId;
     private List<String> co_organizerIds;
 
+    // New field for Base64 image (admin branch)
+    private String imageData;
+
     // Required no-arg constructor
     public Event() {
         this.co_organizerIds = new ArrayList<>();
@@ -95,10 +98,15 @@ public class Event implements Serializable {
     public void addCoOrganizer(String Id) {
         this.co_organizerIds.add(Id);
     }
+
     // Optional helper (clean filtering)
     public boolean isOrganizer(String userId) {
         if (userId == null) return false;
         if (userId.equals(organizerId)) return true;
         return co_organizerIds != null && co_organizerIds.contains(userId);
     }
+
+    // Image data (admin branch)
+    public String getImageData() { return imageData; }
+    public void setImageData(String imageData) { this.imageData = imageData; }
 }

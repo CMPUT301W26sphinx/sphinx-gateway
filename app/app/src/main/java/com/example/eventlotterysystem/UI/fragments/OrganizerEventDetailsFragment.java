@@ -21,6 +21,7 @@ import com.example.eventlotterysystem.database.EntrantListFirebase;
 import com.example.eventlotterysystem.database.UserCommentManager;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.utils.ImageHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -249,6 +250,11 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 loadCoOrganizers(event.getCoOrganizerIds());
 
                 // Waitlist count is handled by refreshWaitlistCount()
+
+                // ADDED: load event poster if available, otherwise keep placeholder
+                if (event.getImageData() != null && !event.getImageData().isEmpty()) {
+                    ImageHelper.loadEventImage(eventPoster, event);
+                }
             }
 
             @Override

@@ -93,7 +93,8 @@ public class EventRepository {
         String category = doc.getString("category");   // new field
         String privacy = doc.getString("privacy");
         String organizerId = doc.getString("organizerId");
-        List<String> co_organizerIds = (List<String>) doc.get("coOrganizerIds");
+        List<String> co_organizerIds = (List<String>) doc.get("co_organizerIds");
+        String imageData = doc.getString("imageData");   // <-- ADD THIS
 
         Event event = new Event(id, title, description);
         event.setPlace(place);
@@ -106,6 +107,8 @@ public class EventRepository {
         if (waitingListCount != null) event.setWaitingListCount(waitingListCount.intValue());
         if (category != null) event.setCategory(category);
         if (co_organizerIds != null) event.setCoOrganizerIds(co_organizerIds);
+        if (imageData != null) event.setImageData(imageData);   // <-- AND THIS
+
         return event;
     }
 

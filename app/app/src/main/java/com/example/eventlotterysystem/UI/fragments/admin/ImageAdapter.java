@@ -10,7 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.eventlotterysystem.R;
+import com.example.eventlotterysystem.model.Event;
 import com.example.eventlotterysystem.model.ImageItem;
+import com.example.eventlotterysystem.utils.ImageHelper;
 
 import java.util.List;
 
@@ -40,8 +42,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         ImageItem image = images.get(position);
         holder.title.setText(image.getTitle());
-        // For now, we use a static placeholder. Later, load from image.getImageUrl() with Glide.
-        holder.thumbnail.setImageResource(android.R.drawable.ic_menu_gallery);
+
+        // Create a dummy Event object with the image data
+        Event dummyEvent = new Event();
+        dummyEvent.setEventId(image.getId());
+        dummyEvent.setImageData(image.getImageData());
+
+        // Load image using helper
+        ImageHelper.loadEventImage(holder.thumbnail, dummyEvent);
+
         holder.itemView.setOnClickListener(v -> listener.onItemClick(image));
     }
 

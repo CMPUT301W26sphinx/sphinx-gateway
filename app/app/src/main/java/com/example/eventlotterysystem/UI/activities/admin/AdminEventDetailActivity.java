@@ -1,6 +1,8 @@
 package com.example.eventlotterysystem.UI.activities.admin;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -11,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.EventRepository;
 import com.example.eventlotterysystem.model.Event;
+import com.example.eventlotterysystem.utils.ImageHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,7 +25,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     private EventRepository repository;
     private TextView titleView, descView, regPeriodView, waitingListView;
     private ImageView posterView;
-    private Button backButton, removeButton;
+    private Button backButton, removeButton, viewCommentsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         posterView = findViewById(R.id.event_poster);
         backButton = findViewById(R.id.back_button);
         removeButton = findViewById(R.id.remove_event_button);
+        viewCommentsButton = findViewById(R.id.view_comments_button);
 
         repository = new EventRepository();
         loadEvent();
@@ -52,6 +56,12 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         removeButton.setOnClickListener(v -> deleteEvent());
+
+        viewCommentsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminEventDetailActivity.this, AdminEventCommentsActivity.class);
+            intent.putExtra("eventId", eventId);
+            startActivity(intent);
+        });
     }
 
     private void loadEvent() {
@@ -68,11 +78,17 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                         event.getRegistrationEndDate());
                 regPeriodView.setText(regPeriod);
 
+
                 // Waiting list
                 waitingListView.setText("Waiting List: " + event.getWaitingListCount() + " users");
 
-                // TODO: Load poster image from URL (Glide or similar)
-                // For now, keep placeholder
+                if (event.getImageData() != null) {
+                    Log.d("AdminEventDetail", "Image data present, length: " + event.getImageData().length());
+                } else {
+                    Log.d("AdminEventDetail", "Image data is null");
+                }
+
+                ImageHelper.loadEventImage(posterView, event);
             }
 
             @Override

@@ -31,7 +31,7 @@ public class OrganizerCommentsFragment extends Fragment {
     private String eventId;
     private Button addCommentButton;
     private RecyclerView commentRecyclerView;
-    private ArrayList commentList;
+    private ArrayList<UserComment> commentList;
     private CommentAdapter commentAdapter;
     private final UserCommentManager commentManager = UserCommentManager.getInstance();
     private ListenerRegistration commentListener;
@@ -90,13 +90,17 @@ public class OrganizerCommentsFragment extends Fragment {
         commentAdapter = new CommentAdapter(commentList, true, commentID -> {
             commentManager.deleteComment(eventId, commentID, new UserCommentManager.OnCommentDeletedListener() {
                 @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getContext(), "Comment could not be deleted", Toast.LENGTH_SHORT).show();
+                public void onSuccess() {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override
-                public void onSuccess(Void unused) {
-                    Toast.makeText(getContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
+                public void onFailure(Exception e) {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Comment could not be deleted", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         });
@@ -108,17 +112,13 @@ public class OrganizerCommentsFragment extends Fragment {
         initializeCommentList();
         updateComments();
         addComment();
-
-
     }
-
 
     private void initializeCommentList() {
         commentManager.getCommentsFromEvent(eventId, new UserCommentManager.UserCommentCallback() {
             @Override
             public void onCommentLoaded(List<UserComment> comments) {
                 if (!isAdded()) return;
-
                 commentList.clear();
                 commentList.addAll(comments);
                 commentAdapter.notifyDataSetChanged();
@@ -137,7 +137,6 @@ public class OrganizerCommentsFragment extends Fragment {
             @Override
             public void onCommentLoaded(List<UserComment> comments) {
                 if (!isAdded()) return;
-
                 commentList.clear();
                 commentList.addAll(comments);
                 commentAdapter.notifyDataSetChanged();
@@ -154,27 +153,33 @@ public class OrganizerCommentsFragment extends Fragment {
     private void addComment() {
         addCommentButton.setOnClickListener(v -> {
             String comment = writeCommentBox.getText().toString().trim();
-
             if (TextUtils.isEmpty(comment)) {
                 Toast.makeText(getContext(), "Enter a comment", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             commentManager.addCommentToEvent(eventId, comment, true, new UserCommentManager.OnCommentAddedListener() {
-
+                @Override
+                public void onSuccess(DocumentReference docRef) {
+                    if (!isAdded()) return;
+                    writeCommentBox.setText("");
+                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
+                }
 
                 @Override
                 public void onFailure(Exception e) {
                     if (!isAdded()) return;
                     Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-
-                @Override
-                public void onSuccess(Void unused) {
-                    writeCommentBox.setText("");
-                    Toast.makeText(getContext(), "Comment added!", Toast.LENGTH_SHORT).show();
-                }
             });
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (commentListener != null) {
+            commentListener.remove();
+        }
     }
 }
