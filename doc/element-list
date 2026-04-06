@@ -1,0 +1,10 @@
+com.example.eventlotterysystem
+com.example.eventlotterysystem.database
+com.example.eventlotterysystem.model
+com.example.eventlotterysystem.model.profiles
+com.example.eventlotterysystem.UI.activities
+com.example.eventlotterysystem.UI.activities.admin
+com.example.eventlotterysystem.UI.adapters
+com.example.eventlotterysystem.UI.fragments
+com.example.eventlotterysystem.UI.fragments.admin
+com.example.eventlotterysystem.utils
