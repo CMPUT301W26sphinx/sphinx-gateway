@@ -32,3 +32,6 @@ An event organizer posts an event in the app, specifying how much people the eve
 | `Ivan Yip` | `iyip`  |
 | `Syed Hammad` | `smhammad`  |
 | `Hassaan Ahmed Fazli` | `hafazli`  |
+
+<img width="1912" height="1314" alt="UML drawio" src="https://github.com/user-attachments/assets/485cfb26-6112-464c-8b54-abaa2db8c47c" />
+
