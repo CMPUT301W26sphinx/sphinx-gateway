@@ -19,6 +19,12 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This fragment allows viewing entrants of an event on a map.
+ * Use the {@link OrganizerEventMapFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ * @Author Hammad
+ */
 public class OrganizerEventMapFragment extends Fragment {
 
     private MapView mapView;

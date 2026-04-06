@@ -25,8 +25,8 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- *
- * create an instance of this fragment.
+ * This fragment shows the history list array adapter.
+ * @Author Jaylin
  */
 public class ViewHistoryListFragment extends Fragment {
 

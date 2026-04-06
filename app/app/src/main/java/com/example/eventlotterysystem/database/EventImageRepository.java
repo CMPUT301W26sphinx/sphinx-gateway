@@ -10,6 +10,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Connecting event images to the firestore database.
+ */
 public class EventImageRepository implements ImageRepository {
     private static final String TAG = "EventImageRepository";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();

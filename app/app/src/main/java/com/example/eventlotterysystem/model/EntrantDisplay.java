@@ -3,6 +3,7 @@ package com.example.eventlotterysystem.model;
 /**
  * UI model for displaying an entrant on the organizer entrants screen.
  * helper to combine user profile info with event-specific entrant status. (entrant list entry)
+ * @author Jaylin
  */
 public class EntrantDisplay {
 

@@ -3,6 +3,7 @@ package com.example.eventlotterysystem.model;
 /**
  * This class is used to represent an entry in the waitlist for an event.
  *Stored in Firestore
+ * @author Jaylin
  */
 public class EntrantListEntry {
     public static final int STATUS_WAITLIST = 1;

@@ -2,6 +2,10 @@ package com.example.eventlotterysystem.model;
 
 import java.io.Serializable;
 
+/**
+ * This class is used to represent an image item.
+ * @author Hassan
+ */
 public class ImageItem implements Serializable {
     private String id;   // Firestore document ID (event ID or image ID)
     private String title;   // event name or image title

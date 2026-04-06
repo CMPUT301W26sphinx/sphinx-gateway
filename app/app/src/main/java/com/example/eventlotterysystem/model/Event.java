@@ -3,7 +3,10 @@ package com.example.eventlotterysystem.model;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
-
+/**
+ * This class is used to represent an event.
+ * @author Ivan
+ */
 public class Event implements Serializable {
     private String eventId;
     private String title;

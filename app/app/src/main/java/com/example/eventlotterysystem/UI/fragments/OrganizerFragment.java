@@ -40,6 +40,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * A simple {@link Fragment} subclass.
+ *This fragment shows the organizers manage events array adapter.
+ * @Author Hammad
+ */
 public class OrganizerFragment extends Fragment {
 
     private RecyclerView recyclerView;
