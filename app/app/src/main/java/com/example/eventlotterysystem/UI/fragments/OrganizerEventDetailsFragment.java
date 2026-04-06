@@ -63,6 +63,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
     //Firestore data for these variables
     private Button inviteCo_OrgButton;
     private Button qrButton;
+    private Button geoRequirementButton;
     private String eventId; // Unique identifier for the event
     private String entrantId; // Unique identifier for the entrant
     private final EntrantListFirebase waitlistDb = new EntrantListFirebase();
@@ -146,6 +147,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
         addCommentButton = view.findViewById(R.id.add_comment_button);
         writeCommentBox = view.findViewById(R.id.write_comment_box);
         qrButton = view.findViewById(R.id.generateQrButton);
+        geoRequirementButton = view.findViewById(R.id.geoRequirementButton);
 
         // get the id
         Bundle args = getArguments();
@@ -170,6 +172,17 @@ public class OrganizerEventDetailsFragment extends Fragment{
         });
         editEventButton.setOnClickListener(v -> {
             Fragment fragment = EditEventFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        // US-02.02.03: Navigate to geolocation requirement settings
+        geoRequirementButton.setOnClickListener(v -> {
+            Fragment fragment = GeoRequirementFragment.newInstance(eventId);
             requireActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
@@ -206,6 +219,56 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             }
         });
+
+        geoRequirementButton.setOnClickListener(v -> {
+            Fragment fragment = GeoRequirementFragment.newInstance(eventId);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+//        // add a comment when the add button is pressed
+//        addCommentButton.setOnClickListener(v -> {
+//            String comment = writeCommentBox.getText().toString();
+//            // input validation
+//            boolean isValid = true;
+//            if (comment.isEmpty()){
+//                isValid = false;
+//            }
+//            // add the comment to firebase
+//            if (isValid){
+//                UserCommentManager commentManager = UserCommentManager.getInstance();
+//                commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
+//                    @Override
+//                    public void onSuccess(DocumentReference docRef) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Exception e) {
+//
+//                    }
+//                });
+//                // clear the text box
+//                writeCommentBox.setText("");
+//                // send a comment posted message
+//                Toast.makeText(getContext(), "Comment posted!", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
+//            }
+//
+//        });
+        /**
+         // the lottery system info pop up (future implementation)
+         infoButton.setOnClickListener(new View.OnClickListener() {
+         // TODO: add the pop up
+         @Override
+         public void onClick(View v) {
+         //TODO
+         }
+         });*/
 
         initializeUI(); // button update and get event details
     }

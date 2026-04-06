@@ -95,6 +95,11 @@ public class EventRepository {
         String organizerId = doc.getString("organizerId");
         List<String> co_organizerIds = (List<String>) doc.get("coOrganizerIds");
         String imageData = doc.getString("imageData");   // <-- ADD THIS
+        Boolean geoRequirementEnabled = doc.getBoolean("geoRequirementEnabled");
+        String geoRequirementMode = doc.getString("geoRequirementMode");
+        Double geoRequirementLatitude = doc.getDouble("geoRequirementLatitude");
+        Double geoRequirementLongitude = doc.getDouble("geoRequirementLongitude");
+        Double geoRequirementRadiusKm = doc.getDouble("geoRequirementRadiusKm");
 
         Event event = new Event(id, title, description);
         event.setPlace(place);
@@ -108,11 +113,35 @@ public class EventRepository {
         if (category != null) event.setCategory(category);
         if (co_organizerIds != null) event.setCoOrganizerIds(co_organizerIds);
         if (imageData != null) event.setImageData(imageData);   // <-- AND THIS
+        if (geoRequirementEnabled != null) event.setGeoRequirementEnabled(geoRequirementEnabled);
+        if (geoRequirementMode != null) event.setGeoRequirementMode(geoRequirementMode);
+        if (geoRequirementLatitude != null) event.setGeoRequirementLatitude(geoRequirementLatitude);
+        if (geoRequirementLongitude != null) event.setGeoRequirementLongitude(geoRequirementLongitude);
+        if (geoRequirementRadiusKm != null) event.setGeoRequirementRadiusKm(geoRequirementRadiusKm);
 
         return event;
     }
 
     private Event documentToEvent(QueryDocumentSnapshot doc) {
         return documentToEvent((com.google.firebase.firestore.DocumentSnapshot) doc);
+    }
+
+    /**
+     * Update the geolocation requirement settings for an event.
+     * US-02.02.03
+     */
+    public void updateGeoRequirement(String eventId, boolean enabled, String mode,
+                                     Double latitude, Double longitude, Double radiusKm,
+                                     OnDeleteListener listener) {
+        java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        updates.put("geoRequirementEnabled", enabled);
+        updates.put("geoRequirementMode", mode != null ? mode : "included");
+        updates.put("geoRequirementLatitude", latitude);
+        updates.put("geoRequirementLongitude", longitude);
+        updates.put("geoRequirementRadiusKm", radiusKm);
+        db.collection("events").document(eventId)
+                .update(updates)
+                .addOnSuccessListener(aVoid -> listener.onSuccess())
+                .addOnFailureListener(listener::onError);
     }
 }

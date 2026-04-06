@@ -28,9 +28,17 @@ public class Event implements Serializable {
     // New field for Base64 image (admin branch)
     private String imageData;
 
+    // US-02.02.03: Geolocation requirement fields
+    private boolean geoRequirementEnabled;       // default false
+    private String geoRequirementMode;           // "included" or "excluded"
+    private Double geoRequirementLatitude;
+    private Double geoRequirementLongitude;
+    private Double geoRequirementRadiusKm;       // radius in kilometres
+
     // Required no-arg constructor
     public Event() {
         this.co_organizerIds = new ArrayList<>();
+        this.geoRequirementEnabled = false;
     }
 
     public Event(String eventId, String title, String description) {
@@ -112,4 +120,20 @@ public class Event implements Serializable {
     // Image data (admin branch)
     public String getImageData() { return imageData; }
     public void setImageData(String imageData) { this.imageData = imageData; }
+
+    // US-02.02.03: Geolocation requirement getters and setters
+    public boolean isGeoRequirementEnabled() { return geoRequirementEnabled; }
+    public void setGeoRequirementEnabled(boolean geoRequirementEnabled) { this.geoRequirementEnabled = geoRequirementEnabled; }
+
+    public String getGeoRequirementMode() { return geoRequirementMode; }
+    public void setGeoRequirementMode(String geoRequirementMode) { this.geoRequirementMode = geoRequirementMode; }
+
+    public Double getGeoRequirementLatitude() { return geoRequirementLatitude; }
+    public void setGeoRequirementLatitude(Double geoRequirementLatitude) { this.geoRequirementLatitude = geoRequirementLatitude; }
+
+    public Double getGeoRequirementLongitude() { return geoRequirementLongitude; }
+    public void setGeoRequirementLongitude(Double geoRequirementLongitude) { this.geoRequirementLongitude = geoRequirementLongitude; }
+
+    public Double getGeoRequirementRadiusKm() { return geoRequirementRadiusKm; }
+    public void setGeoRequirementRadiusKm(Double geoRequirementRadiusKm) { this.geoRequirementRadiusKm = geoRequirementRadiusKm; }
 }
