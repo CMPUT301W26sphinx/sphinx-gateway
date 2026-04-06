@@ -13,6 +13,9 @@ import com.example.eventlotterysystem.R;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying notifications in RecyclerViews.
+ */
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
     public interface OnNotificationClickListener {
