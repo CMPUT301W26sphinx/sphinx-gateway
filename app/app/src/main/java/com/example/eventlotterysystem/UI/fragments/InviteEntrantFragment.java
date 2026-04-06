@@ -44,6 +44,7 @@
         private EditText phoneNum;
         private EditText email;
         private Button searchButton;
+        private Button backButton;
         private String privacy;
         private final EntrantListFirebase entrantListFirebase = new EntrantListFirebase();
         private final Notification notification = new Notification();
@@ -93,6 +94,11 @@
             phoneNum = view.findViewById(R.id.phoneNum);
             email = view.findViewById(R.id.email);
             searchButton = view.findViewById(R.id.search_button);
+            backButton = view.findViewById(R.id.backButton);
+
+            backButton.setOnClickListener(v -> {
+                getParentFragmentManager().popBackStack();
+            });
 
             loadProfiles();
             searchButton.setOnClickListener(v -> {
