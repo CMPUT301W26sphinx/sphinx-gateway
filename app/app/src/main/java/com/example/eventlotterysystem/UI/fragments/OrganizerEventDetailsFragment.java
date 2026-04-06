@@ -3,6 +3,7 @@ package com.example.eventlotterysystem.UI.fragments;
 import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,11 +25,14 @@ import com.example.eventlotterysystem.utils.ImageHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.BarcodeFormat;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -40,7 +44,6 @@ import java.util.Locale;
  */
 
 public class OrganizerEventDetailsFragment extends Fragment{
-    // TODO: Add the popup about event info for US 01.05.05
     private static final String EVENT_ID = "event_id";
 
     // UI elements (buttons, text views, etc.)
@@ -49,6 +52,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
     private TextView valueWaitlistCount;
     private TextView valueStarttime;
     private TextView valueLocation;
+    private TextView coorganizers;
     private ImageView eventPoster;
     private ImageButton infoButton;
     private Button backButton;
@@ -133,6 +137,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
         valueWaitlistCount = view.findViewById(R.id.valueWaitlistCount);
         valueStarttime = view.findViewById(R.id.valueStartTime);
         valueLocation = view.findViewById(R.id.valueLocation);
+        coorganizers = view.findViewById(R.id.valueCoOrganizers);
         eventPoster = view.findViewById(R.id.eventposter);
         inviteCo_OrgButton = view.findViewById(R.id.inviteCoOrganizerButton);
         //infoButton = view.findViewById(R.id.infoButton);
@@ -201,46 +206,7 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             }
         });
-//        // add a comment when the add button is pressed
-//        addCommentButton.setOnClickListener(v -> {
-//            String comment = writeCommentBox.getText().toString();
-//            // input validation
-//            boolean isValid = true;
-//            if (comment.isEmpty()){
-//                isValid = false;
-//            }
-//            // add the comment to firebase
-//            if (isValid){
-//                UserCommentManager commentManager = UserCommentManager.getInstance();
-//                commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
-//                    @Override
-//                    public void onSuccess(DocumentReference docRef) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Exception e) {
-//
-//                    }
-//                });
-//                // clear the text box
-//                writeCommentBox.setText("");
-//                // send a comment posted message
-//                Toast.makeText(getContext(), "Comment posted!", Toast.LENGTH_SHORT).show();
-//            } else {
-//                Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
-//            }
-//
-//        });
-        /**
-         // the lottery system info pop up (future implementation)
-         infoButton.setOnClickListener(new View.OnClickListener() {
-         // TODO: add the pop up
-         @Override
-         public void onClick(View v) {
-         //TODO
-         }
-         });*/
+
         initializeUI(); // button update and get event details
     }
 
@@ -276,11 +242,12 @@ public class OrganizerEventDetailsFragment extends Fragment{
                 );
                 valueRegistration.setText(regPeriod);
 
-                // These fields are not yet in the Event model
+
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 String datetStr = sdf.format(new Date(event.getDate()));
                 valueStarttime.setText(datetStr);
                 valueLocation.setText(event.getPlace());
+                loadCoOrganizers(event.getCoOrganizerIds());
 
                 // Waitlist count is handled by refreshWaitlistCount()
 
@@ -333,5 +300,39 @@ public class OrganizerEventDetailsFragment extends Fragment{
         waitlistDb.getWaitlistCount(eventId)
                 .addOnSuccessListener(count -> valueWaitlistCount.setText(String.valueOf(count)))
                 .addOnFailureListener(e -> valueWaitlistCount.setText("—"));
+    }
+
+    private void loadCoOrganizers(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            coorganizers.setText("None");
+            return;
+        }
+        coorganizers.setText("Loading...");//taking a while to show
+        List<String> names = new ArrayList<>();
+
+        for (String id : ids) {
+            FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(id)
+                    .get()
+                    .addOnSuccessListener(document -> {
+                        if (document.exists()) {
+                            String first = document.getString("firstName");
+                            String last = document.getString("lastName");
+                            String name = "";
+                            if (first != null) name += first;
+                            if (last != null) name += " " + last;
+                            name = name.trim();
+                            if (name != null) {
+                                names.add(name);
+                            }
+                        }
+
+                        // when all loaded
+                        if (names.size() == ids.size()) {
+                            coorganizers.setText(TextUtils.join(", ", names));
+                        }
+                    });
+        }
     }
 }
