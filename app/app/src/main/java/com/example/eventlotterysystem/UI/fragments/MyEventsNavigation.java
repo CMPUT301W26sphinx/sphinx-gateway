@@ -25,8 +25,10 @@ public class MyEventsNavigation extends Fragment {
 
 
     private static final String ARG_EVENT_ID = "eventId";
+    private static final String ARG_START_TAB = "startTab";
 
     private String eventId;
+    private String startTab = "waitlist";
 
     private TextView eventTitle;
     private ImageButton infoButton;
@@ -52,11 +54,11 @@ public class MyEventsNavigation extends Fragment {
      * @param eventId The unique identifier for the event.
      * @return A new instance of fragment OrganizerEventNavigationFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static MyEventsNavigation newInstance(String eventId) {
+    public static MyEventsNavigation newInstance(String eventId, String startTab) {
         MyEventsNavigation fragment = new MyEventsNavigation();
         Bundle args = new Bundle();
         args.putString(ARG_EVENT_ID, eventId);
+        args.putString(ARG_START_TAB, startTab);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,6 +68,7 @@ public class MyEventsNavigation extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             eventId = getArguments().getString(ARG_EVENT_ID);
+            startTab = getArguments().getString(ARG_START_TAB, "waitlist");
         }
     }
 
@@ -102,8 +105,22 @@ public class MyEventsNavigation extends Fragment {
         tabRegistered.setOnClickListener(v -> showRegisteredTab());
         tabHistory.setOnClickListener(v -> showHistoryTab());
 
-
-        showWaitlistTab();
+        // for the navigation to other tabs, not always starting on waitlist (event details goes to the invite tab etc)
+        switch (startTab) {
+            case "invites":
+                showInvitesTab();
+                break;
+            case "registered":
+                showRegisteredTab();
+                break;
+            case "history":
+                showHistoryTab();
+                break;
+            case "waitlist":
+            default:
+                showWaitlistTab();
+                break;
+        }
 
         if (buttonAll != null) {
             buttonAll.setOnClickListener(v -> {

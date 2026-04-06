@@ -93,7 +93,7 @@ public class EventRepository {
         String category = doc.getString("category");   // new field
         String privacy = doc.getString("privacy");
         String organizerId = doc.getString("organizerId");
-        List<String> co_organizerIds = (List<String>) doc.get("co_organizerIds");
+        List<String> co_organizerIds = (List<String>) doc.get("coOrganizerIds");
 
         Event event = new Event(id, title, description);
         event.setPlace(place);
