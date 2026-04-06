@@ -18,6 +18,10 @@ import org.w3c.dom.Comment;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying comments on an event.
+ * @author Noah
+ */
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
     private List<UserComment> comments;
     private boolean isOrganizer;

@@ -2,6 +2,10 @@ package com.example.eventlotterysystem.model;
 
 import com.google.firebase.Timestamp;
 
+/**
+ * This class is used to represent a log entry.
+ *
+ */
 public class Log {
     private String EntrantID;
     private String EventID;

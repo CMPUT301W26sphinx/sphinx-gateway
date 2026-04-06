@@ -11,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.eventlotterysystem.R;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * This activity is used to login as an admin.
+ * @author Hassan
+ */
 public class AdminLoginActivity extends AppCompatActivity {
 
     private EditText emailInput, passwordInput;

@@ -15,6 +15,10 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * This adapter is used to display the comments for an event.
+ * @author Hassan and Noah
+ */
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
 
     private List<UserComment> comments;

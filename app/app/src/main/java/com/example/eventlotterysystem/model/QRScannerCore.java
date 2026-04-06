@@ -17,6 +17,10 @@ import com.google.mlkit.vision.barcode.common.Barcode;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * QRScannerCore — handles all QR scanning logic using CameraX and ML Kit
+ *
+ */
 public class QRScannerCore {
 
     public interface OnQRScannedListener {

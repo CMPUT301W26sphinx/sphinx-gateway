@@ -25,6 +25,10 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This fragment allows an organizer to view and add comments to the event.
+ * @author Noah
+ */
 public class OrganizerCommentsFragment extends Fragment {
     private static final String EVENT_ID = "event_id";
     private EditText writeCommentBox;

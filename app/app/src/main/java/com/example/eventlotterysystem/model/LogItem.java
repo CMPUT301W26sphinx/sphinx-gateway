@@ -1,5 +1,8 @@
 package com.example.eventlotterysystem.model;
 
+/**
+ * This class is used to represent a log item.
+ */
 public class LogItem {
     private String eventName;
     private String recipientName;

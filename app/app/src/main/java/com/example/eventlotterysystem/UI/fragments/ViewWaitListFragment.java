@@ -29,6 +29,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A simple {@link Fragment} subclass.
+ * This fragment shows the wait list array adapter.
+ * @Author Jaylin
+ */
 public class ViewWaitListFragment extends Fragment {
 
     private RecyclerView recyclerView;

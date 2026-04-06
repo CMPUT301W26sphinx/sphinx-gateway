@@ -19,6 +19,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * This activity is used to display the details of an event.
+ * @author Hassan
+ */
 public class AdminEventDetailActivity extends AppCompatActivity {
 
     private String eventId;

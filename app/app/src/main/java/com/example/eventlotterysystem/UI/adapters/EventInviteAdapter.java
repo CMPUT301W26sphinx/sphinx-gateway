@@ -20,6 +20,9 @@ import com.example.eventlotterysystem.model.profiles.UserProfile;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying event invitations in RecyclerViews.
+ */
 public class EventInviteAdapter extends RecyclerView.Adapter<EventInviteAdapter.ViewHolder> {
 
     private final List<Event> events;

@@ -17,6 +17,10 @@ import com.example.eventlotterysystem.model.Event;
 import com.example.eventlotterysystem.model.ImageItem;
 import com.example.eventlotterysystem.utils.ImageHelper;
 
+/**
+ * This activity is used to display the details of an image.
+ * @author Hassan
+ */
 public class AdminImageDetailActivity extends AppCompatActivity {
 
     private ImageItem image;

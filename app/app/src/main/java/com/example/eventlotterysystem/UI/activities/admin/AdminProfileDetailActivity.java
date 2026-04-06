@@ -11,6 +11,10 @@ import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.database.ProfileManager;
 import com.example.eventlotterysystem.model.profiles.UserProfile;
 
+/**
+ * This activity is used to display the details of a profile.
+ * @author Hassan
+ */
 public class AdminProfileDetailActivity extends AppCompatActivity {
 
     private UserProfile profile;

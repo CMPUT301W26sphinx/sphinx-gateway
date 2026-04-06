@@ -16,10 +16,11 @@ import com.example.eventlotterysystem.model.Event;
 
 /**
  * A simple {@link Fragment} subclass.
- * THis class allows navigation for an organizer to view details about thier event
+ * THis class allows navigation for an organizer to view details about their event
  * Uses child fragments: OrganizerEventDetailsFragment, OrganizerEventEntrantsFragment, OrganizerEventMapFragment
  * Use the {@link OrganizerEventNavigationFragment#newInstance} factory method to
  * create an instance of this fragment.
+ * @Author Jaylin
  */
 public class OrganizerEventNavigationFragment extends Fragment {
 

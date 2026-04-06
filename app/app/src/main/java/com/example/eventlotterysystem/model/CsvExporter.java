@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * This class is used to export the registered entrants to a csv file.
+ * Creates CSV formatting.
  * @author Jaylin
  */
 public class CsvExporter {
@@ -48,6 +49,11 @@ public class CsvExporter {
         }
     }
 
+    /**
+     * This method is used to make sure that all input strings dont break the csv file.
+     * @param value
+     * @return
+     */
     private String escapeCsv(String value) {
         if (value == null) {
             value = "";
