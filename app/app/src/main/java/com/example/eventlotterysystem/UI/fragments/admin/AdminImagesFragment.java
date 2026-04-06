@@ -22,6 +22,11 @@ import com.example.eventlotterysystem.model.ImageItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This fragment is used to show images in Admin view
+ * @author Hassan
+ */
+
 public class AdminImagesFragment extends Fragment {
 
     private RecyclerView recyclerView;

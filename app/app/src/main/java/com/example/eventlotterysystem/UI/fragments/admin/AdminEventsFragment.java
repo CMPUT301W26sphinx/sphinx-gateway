@@ -23,6 +23,10 @@ import com.example.eventlotterysystem.model.Event;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This fragment is used to show events in Admin view
+ * @author Hassan
+ */
 public class AdminEventsFragment extends Fragment {
 
     private static final String TAG = "AdminEventsFragment";

@@ -22,6 +22,11 @@ import com.example.eventlotterysystem.model.profiles.UserProfile;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This fragment is used to show browse profiles in Admin view
+ * @author Hassan
+ */
+
 public class AdminProfilesFragment extends Fragment {
 
     private RecyclerView recyclerView;

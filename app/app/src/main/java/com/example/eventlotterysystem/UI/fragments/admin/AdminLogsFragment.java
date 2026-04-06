@@ -24,6 +24,10 @@ import com.example.eventlotterysystem.model.LogItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This fragment is used to show logs in Admin view
+ * @author Hassan
+ */
 public class AdminLogsFragment extends Fragment {
 
     private RecyclerView recyclerView;
