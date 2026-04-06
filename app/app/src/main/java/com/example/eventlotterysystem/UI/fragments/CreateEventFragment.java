@@ -34,6 +34,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * This fragment allows the user to create a new event.
+ */
 public class CreateEventFragment extends Fragment {
 
     private FirebaseFirestore db;

@@ -31,6 +31,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * This fragment allows the user to edit an existing event.
+ */
 public class EditEventFragment extends Fragment {
 
     private FirebaseFirestore db;

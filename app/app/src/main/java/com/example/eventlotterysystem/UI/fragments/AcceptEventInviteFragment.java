@@ -23,6 +23,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This fragment allows the user to accept an event invite.
+ */
 public class AcceptEventInviteFragment extends Fragment {
     /**
      *

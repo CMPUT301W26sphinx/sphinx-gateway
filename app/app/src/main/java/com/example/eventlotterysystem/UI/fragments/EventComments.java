@@ -25,6 +25,9 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This fragment allows the user to view the comments on a specific event
+ */
 public class EventComments extends Fragment {
 
     private static final String EVENT_ID = "event_id";

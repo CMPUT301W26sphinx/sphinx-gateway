@@ -41,6 +41,7 @@ import java.util.Locale;
  * Does not allow registration of an event
 
  * @ Author Jaylin
+ * @ Collaborators Noah, Hammad
  */
 
 public class OrganizerEventDetailsFragment extends Fragment{
@@ -229,46 +230,6 @@ public class OrganizerEventDetailsFragment extends Fragment{
                     .addToBackStack(null)
                     .commit();
         });
-//        // add a comment when the add button is pressed
-//        addCommentButton.setOnClickListener(v -> {
-//            String comment = writeCommentBox.getText().toString();
-//            // input validation
-//            boolean isValid = true;
-//            if (comment.isEmpty()){
-//                isValid = false;
-//            }
-//            // add the comment to firebase
-//            if (isValid){
-//                UserCommentManager commentManager = UserCommentManager.getInstance();
-//                commentManager.addCommentToEvent(eventId, comment, new UserCommentManager.OnCommentAddedListener() {
-//                    @Override
-//                    public void onSuccess(DocumentReference docRef) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Exception e) {
-//
-//                    }
-//                });
-//                // clear the text box
-//                writeCommentBox.setText("");
-//                // send a comment posted message
-//                Toast.makeText(getContext(), "Comment posted!", Toast.LENGTH_SHORT).show();
-//            } else {
-//                Toast.makeText(getContext(), "Please write a valid comment", Toast.LENGTH_SHORT).show();
-//            }
-//
-//        });
-        /**
-         // the lottery system info pop up (future implementation)
-         infoButton.setOnClickListener(new View.OnClickListener() {
-         // TODO: add the pop up
-         @Override
-         public void onClick(View v) {
-         //TODO
-         }
-         });*/
 
         initializeUI(); // button update and get event details
     }

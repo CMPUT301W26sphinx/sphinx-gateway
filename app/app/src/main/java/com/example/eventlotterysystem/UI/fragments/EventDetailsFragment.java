@@ -54,6 +54,8 @@ import java.util.Locale;
  * A simple {@link Fragment} subclass.
  * EventDetailsFragment displays details for a selected event, as well as provides buttons for registering and removing participants.
  * Details such as poster, description, registration period, and waitlist count are displayed (and are collected from firestore database)
+ * @Author Jaylin
+ * @Collaborators All members of sphnix group
  */
 public class EventDetailsFragment extends Fragment {
     private static final String EVENT_ID = "event_id";

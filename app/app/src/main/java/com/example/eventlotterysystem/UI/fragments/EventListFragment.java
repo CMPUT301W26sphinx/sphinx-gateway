@@ -39,6 +39,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * This fragment display a list of public events
+ * @Author Hammad
+ * @Collaborators Hassan
+ */
+
 public class EventListFragment extends Fragment {
 
     RecyclerView recyclerView;
@@ -176,6 +182,10 @@ public class EventListFragment extends Fragment {
         });
     }
 
+    /**
+     * Handles click on an event.
+     * @param event
+     */
     private void onEventClick(Event event) {
         Bundle bundle = new Bundle();
         bundle.putString("event_id", event.getEventId());
@@ -188,6 +198,9 @@ public class EventListFragment extends Fragment {
                 .commit();
     }
 
+    /**
+     * Applies all current filters (including search)
+     */
     private void applyAllFilters() {
         filteredEvents.clear();
 
@@ -236,6 +249,9 @@ public class EventListFragment extends Fragment {
         updateEmptyState();
     }
 
+    /**
+     * Clears all current filters.
+     */
     private void clearAllFilters() {
         currentSelectedCategories.clear();
         currentMinCap = -1;
@@ -248,6 +264,9 @@ public class EventListFragment extends Fragment {
         applyAllFilters();
     }
 
+    /**
+     * Updates the empty state based on the number of filtered events.
+     */
     private void updateEmptyState() {
         TextView emptyState = getView().findViewById(R.id.empty_state);
         if (filteredEvents.isEmpty()) {
@@ -259,6 +278,9 @@ public class EventListFragment extends Fragment {
         }
     }
 
+    /**
+     * Shows the filter dialog.
+     */
     private void showFilterDialog() {
         View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_filter, null);
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
