@@ -25,6 +25,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * Main home screen for the admin role.
  * This activity contains the bottom navigation bar and swaps
  * between the admin fragments for Events, Images, Profiles, and Logs.
+ * @author Hassan
  */
 public class AdminHomeActivity extends AppCompatActivity {
 

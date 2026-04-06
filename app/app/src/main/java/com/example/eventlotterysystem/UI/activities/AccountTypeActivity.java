@@ -14,6 +14,10 @@ import com.example.eventlotterysystem.MainActivity;
 import com.example.eventlotterysystem.R;
 import com.example.eventlotterysystem.UI.activities.admin.AdminHomeActivity;
 
+/**
+ * This activity is used to select the account type for the user.
+ * @author Hassan
+ */
 public class AccountTypeActivity extends AppCompatActivity {
 
     private AutoCompleteTextView dropdownAccountType;

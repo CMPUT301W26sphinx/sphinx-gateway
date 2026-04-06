@@ -20,6 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * This activity is used to display the comments for an event.
+ * @author Hassan
+ */
 public class AdminEventCommentsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -70,6 +74,10 @@ public class AdminEventCommentsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * This method is used to show the details of a comment.
+     * @param comment
+     */
     private void showCommentDetail(UserComment comment) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_comment_detail, null);
 
